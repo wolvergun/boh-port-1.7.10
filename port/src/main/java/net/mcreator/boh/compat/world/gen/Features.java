@@ -37,22 +37,32 @@ public final class Features {
     private Features() {}
 
     public static void place(ResourceLocation placedId, World w, Random r, int chunkX, int chunkZ) {
-        if ("minecraft".equals(placedId.getResourceDomain())) return;
+        place(placedId, w, r, chunkX, chunkZ, false);
+    }
+
+    /**
+     * Places a feature; with ignoreRarity (self-test) rarity filters always pass. Returns the positions it ran at
+     * (empty when a placement filter rejected the chunk).
+     */
+    public static List<int[]> place(ResourceLocation placedId, World w, Random r, int chunkX, int chunkZ, boolean ignoreRarity) {
+        List<int[]> none = new ArrayList<>();
+        if ("minecraft".equals(placedId.getResourceDomain())) return none;
         JsonObject placed = WorldgenData.get("worldgen/placed_feature", placedId);
-        if (placed == null) return;
+        if (placed == null) return none;
         List<int[]> positions = new ArrayList<>();
         positions.add(new int[] { chunkX * 16 + 8, 0, chunkZ * 16 + 8 });
-        if (placed.has("placement")) for (JsonElement m : placed.getAsJsonArray("placement")) positions = modify(m.getAsJsonObject(), positions, w, r);
-        if (positions.isEmpty()) return;
+        if (placed.has("placement")) for (JsonElement m : placed.getAsJsonArray("placement")) positions = modify(m.getAsJsonObject(), positions, w, r, ignoreRarity);
+        if (positions.isEmpty()) return none;
         JsonElement fe = placed.get("feature");
         JsonObject configured = fe.isJsonObject() ? fe.getAsJsonObject()
             : WorldgenData.get("worldgen/configured_feature", new ResourceLocation(fe.getAsString()));
-        if (configured == null) return;
+        if (configured == null) return none;
         ResourceLocation cfId = fe.isJsonPrimitive() ? new ResourceLocation(fe.getAsString()) : null;
         for (int[] p : positions) run(configured, cfId, w, r, p);
+        return positions;
     }
 
-    private static List<int[]> modify(JsonObject m, List<int[]> in, World w, Random r) {
+    private static List<int[]> modify(JsonObject m, List<int[]> in, World w, Random r, boolean ignoreRarity) {
         String type = m.get("type").getAsString().replace("minecraft:", "");
         List<int[]> out = new ArrayList<>();
         for (int[] p : in) {
@@ -68,7 +78,7 @@ public final class Features {
                     out.add(p.clone());
                     break;
                 case "rarity_filter":
-                    if (r.nextInt(Math.max(1, m.get("chance").getAsInt())) == 0) out.add(p);
+                    if (r.nextInt(Math.max(1, m.get("chance").getAsInt())) == 0 || ignoreRarity) out.add(p);
                     break;
                 case "in_square":
                     out.add(new int[] { p[0] + r.nextInt(16), p[1], p[2] + r.nextInt(16) });

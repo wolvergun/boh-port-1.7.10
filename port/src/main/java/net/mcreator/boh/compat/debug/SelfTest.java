@@ -4,7 +4,11 @@ import java.util.Arrays;
 
 import net.mcreator.boh.BohMod;
 import net.mcreator.boh.compat.world.gen.BohWorldProvider;
+import net.mcreator.boh.compat.world.gen.Features;
+import net.mcreator.boh.compat.world.gen.ModWorldGen;
 import net.mcreator.boh.compat.world.gen.StructureSets;
+import net.mcreator.boh.compat.world.gen.WorldgenData;
+import net.mcreator.boh.compat.mc.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.server.MinecraftServer;
@@ -50,6 +54,7 @@ public final class SelfTest {
                 generation(w, spec);
                 if (spec.floor == null) arrival(w, spec);
             }
+            overworld(server.worldServerForDimension(0));
         } catch (Throwable t) {
             BohMod.LOGGER.error("[BOH-SELFTEST] failed", t);
         }
@@ -111,5 +116,65 @@ public final class SelfTest {
             log("%s arrival from %d,%d -> %.1f %d %.1f: floor %s, roof at %d, room blocks %d (y %d..%d)", spec.name, p[0], p[1], spot[0], y, spot[2],
                 Block.blockRegistry.getNameForObject(below), roof, blocks, minY, maxY);
         }
+    }
+
+    /**
+     * Overworld features from the biome modifiers: each mod structure is forced (rarity ignored) in a chunk of one of
+     * its biomes and must place every block; then a populated area is scanned for the common features.
+     */
+    private static void overworld(WorldServer w) {
+        java.util.Map<net.minecraft.util.ResourceLocation, java.util.List<net.minecraft.world.biome.BiomeGenBase>> fb = ModWorldGen.featureBiomes();
+        java.util.Random rand = new java.util.Random(42);
+        for (java.util.Map.Entry<net.minecraft.util.ResourceLocation, java.util.List<net.minecraft.world.biome.BiomeGenBase>> e : fb.entrySet()) {
+            net.minecraft.util.ResourceLocation id = e.getKey();
+            com.google.gson.JsonObject placed = WorldgenData.get("worldgen/placed_feature", id);
+            if (placed == null || !placed.get("feature").isJsonPrimitive()) continue;
+            com.google.gson.JsonObject cf = WorldgenData.get("worldgen/configured_feature",
+                new net.minecraft.util.ResourceLocation(placed.get("feature").getAsString()));
+            if (cf == null || !"boh:structure_feature".equals(cf.get("type").getAsString())) continue;
+            java.util.List<String> names = new java.util.ArrayList<>();
+            for (net.minecraft.world.biome.BiomeGenBase b : e.getValue()) names.add(b.biomeName);
+            net.minecraft.world.ChunkPosition at = null;
+            for (int t = 0; t < 8 && at == null; t++)
+                at = w.getWorldChunkManager().findBiomePosition(3000 + t * 2500, -2000 + t * 1700, 1000, e.getValue(), rand);
+            if (at == null) {
+                log("overworld %s: no %s found", id, names);
+                continue;
+            }
+            String result = "no chunk passed its placement filters";
+            int cx0 = at.chunkPosX >> 4, cz0 = at.chunkPosZ >> 4;
+            search:
+            for (int r = 0; r <= 4; r++) for (int dx = -r; dx <= r; dx++) for (int dz = -r; dz <= r; dz++) {
+                if (Math.max(Math.abs(dx), Math.abs(dz)) != r) continue;
+                int cx = cx0 + dx, cz = cz0 + dz;
+                for (int x = cx - 1; x <= cx + 2; x++) for (int z = cz - 1; z <= cz + 2; z++) w.theChunkProviderServer.loadChunk(x, z);
+                net.minecraft.world.biome.BiomeGenBase b = w.getBiomeGenForCoords(cx * 16 + 16, cz * 16 + 16);
+                if (!e.getValue().contains(b)) continue;
+                StructureTemplate.lastBlocks = -1;
+                java.util.List<int[]> pos = Features.place(id, w, rand, cx, cz, true);
+                if (pos.isEmpty() || StructureTemplate.lastBlocks < 0) continue;
+                int[] p = pos.get(0);
+                result = String.format("placed at %d %d %d in %s: %d blocks, %d missed", p[0], p[1], p[2], b.biomeName, StructureTemplate.lastBlocks,
+                    StructureTemplate.lastMissed);
+                break search;
+            }
+            log("overworld %s (%s): %s", id, names, result);
+        }
+        // natural population: kindness flowers and spinel ore are in every overworld biome
+        int flowers = 0, ore = 0, n = 0;
+        Block flower = Block.getBlockFromName("boh:kindness_flower"), spinel = Block.getBlockFromName("boh:spinel_ore_ore");
+        for (int cx = -300; cx < -290; cx++) for (int cz = 300; cz < 310; cz++) for (int x = cx - 1; x <= cx + 1; x++) for (int z = cz - 1; z <= cz + 1; z++)
+            w.theChunkProviderServer.loadChunk(x, z);
+        for (int cx = -300; cx < -290; cx++) for (int cz = 300; cz < 310; cz++) {
+            Chunk c = w.getChunkFromChunkCoords(cx, cz);
+            if (!c.isTerrainPopulated) continue;
+            n++;
+            for (int x = 0; x < 16; x++) for (int z = 0; z < 16; z++) for (int y = 1; y < 128; y++) {
+                Block b = c.getBlock(x, y, z);
+                if (b == flower) flowers++;
+                else if (b == spinel) ore++;
+            }
+        }
+        log("overworld population: %d chunks, %d kindness flowers, %.1f spinel ore/chunk (%s, %s)", n, flowers, ore / (double) Math.max(1, n), flower, spinel);
     }
 }

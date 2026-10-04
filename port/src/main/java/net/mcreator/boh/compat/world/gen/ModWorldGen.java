@@ -34,6 +34,14 @@ public final class ModWorldGen implements IWorldGenerator {
 
     private ModWorldGen() {}
 
+    /** placed feature -> biomes it was added to by the biome modifiers (for the self-test) */
+    public static Map<ResourceLocation, List<BiomeGenBase>> featureBiomes() {
+        Map<ResourceLocation, List<BiomeGenBase>> out = new java.util.LinkedHashMap<>();
+        for (Map.Entry<Integer, List<ResourceLocation>> e : BY_BIOME.entrySet())
+            for (ResourceLocation f : e.getValue()) out.computeIfAbsent(f, k -> new ArrayList<>()).add(BiomeGenBase.getBiomeGenArray()[e.getKey()]);
+        return out;
+    }
+
     public static void init() {
         int n = 0;
         try (InputStream in = ModWorldGen.class.getResourceAsStream("/assets/boh/compat/biome_modifiers.txt");

@@ -34,19 +34,21 @@ public final class Spawning {
     private static final Map<String, int[]> BIOMES = new HashMap<>();
 
     static {
-        // 1.20 id -> 1.7.10 biome ids (mutated variants are base + 128)
-        String[][] m = { { "plains", "1" }, { "sunflower_plains", "129" }, { "desert", "2" }, { "windswept_hills", "3" },
-            { "forest", "4" }, { "flower_forest", "132" }, { "taiga", "5" }, { "swamp", "6" }, { "mangrove_swamp", "6" }, { "river", "7" },
-            { "nether_wastes", "8" }, { "soul_sand_valley", "8" }, { "crimson_forest", "8" }, { "warped_forest", "8" }, { "basalt_deltas", "8" },
-            { "the_end", "9" }, { "frozen_ocean", "10" }, { "frozen_river", "11" }, { "snowy_plains", "12" }, { "ice_spikes", "140" },
-            { "mushroom_fields", "14" }, { "beach", "16" }, { "jungle", "21" }, { "bamboo_jungle", "21" }, { "sparse_jungle", "23" },
-            { "deep_ocean", "24" }, { "stony_shore", "25" }, { "snowy_beach", "26" }, { "birch_forest", "27" },
-            { "old_growth_birch_forest", "155" }, { "dark_forest", "29" }, { "snowy_taiga", "30" }, { "old_growth_pine_taiga", "32" },
-            { "old_growth_spruce_taiga", "160" }, { "windswept_forest", "34" }, { "savanna", "35" }, { "savanna_plateau", "36" },
-            { "badlands", "37" }, { "wooded_badlands", "38" }, { "eroded_badlands", "165" }, { "ocean", "0" },
-            { "meadow", "3", }, { "grove", "30" }, { "snowy_slopes", "30" }, { "jagged_peaks", "3" }, { "frozen_peaks", "3" },
-            { "stony_peaks", "3" }, { "cherry_grove", "4" }, { "windswept_savanna", "163" }, { "windswept_gravelly_hills", "131" } };
-        for (String[] p : m) BIOMES.put(p[0], new int[] { Integer.parseInt(p[1]) });
+        // 1.20 id -> 1.7.10 biome ids (mutated variants are base + 128). 1.20 folded the hills and most mutated variants into
+        // their base biome, so those are included: "taiga" is also Taiga Hills and Taiga M
+        String[][] m = { { "plains", "1" }, { "sunflower_plains", "129" }, { "desert", "2,17,130" }, { "windswept_hills", "3,20" },
+            { "forest", "4,18" }, { "flower_forest", "132" }, { "taiga", "5,19,133" }, { "swamp", "6,134" }, { "mangrove_swamp", "6,134" },
+            { "river", "7" }, { "nether_wastes", "8" }, { "soul_sand_valley", "8" }, { "crimson_forest", "8" }, { "warped_forest", "8" },
+            { "basalt_deltas", "8" }, { "the_end", "9" }, { "frozen_ocean", "10" }, { "frozen_river", "11" }, { "snowy_plains", "12,13" },
+            { "ice_spikes", "140" }, { "mushroom_fields", "14,15" }, { "beach", "16" }, { "jungle", "21,22,149" }, { "bamboo_jungle", "21,22" },
+            { "sparse_jungle", "23,151" }, { "deep_ocean", "24" }, { "stony_shore", "25" }, { "snowy_beach", "26" }, { "birch_forest", "27,28" },
+            { "old_growth_birch_forest", "155,156" }, { "dark_forest", "29,157" }, { "snowy_taiga", "30,31,158" },
+            { "old_growth_pine_taiga", "32,33" }, { "old_growth_spruce_taiga", "160,161" }, { "windswept_forest", "34,162" },
+            { "savanna", "35" }, { "savanna_plateau", "36,164" }, { "badlands", "37,39,167" }, { "wooded_badlands", "38,166" },
+            { "eroded_badlands", "165" }, { "ocean", "0" }, { "meadow", "3" }, { "grove", "30" }, { "snowy_slopes", "30" },
+            { "jagged_peaks", "3" }, { "frozen_peaks", "3" }, { "stony_peaks", "3" }, { "cherry_grove", "4" }, { "windswept_savanna", "163" },
+            { "windswept_gravelly_hills", "131" } };
+        for (String[] p : m) BIOMES.put(p[0], java.util.Arrays.stream(p[1].split(",")).mapToInt(Integer::parseInt).toArray());
     }
 
     private Spawning() {}
@@ -100,7 +102,18 @@ public final class Spawning {
     }
 
     private static void addBiome(String id, Set<BiomeGenBase> out) {
-        if (id.startsWith("#")) return;
+        if (id.startsWith("#")) {
+            String tag = id.substring(1).replace("minecraft:", "");
+            // the vanilla overworld tag: every biome but the Nether, the End and this mod's own dimension biomes
+            if (tag.equals("is_overworld")) for (BiomeGenBase b : BiomeGenBase.getBiomeGenArray()) {
+                if (b == null || b.biomeID == 8 || b.biomeID == 9 || b instanceof net.mcreator.boh.compat.world.gen.BohBiome) continue;
+                if (net.minecraftforge.common.BiomeDictionary.isBiomeOfType(b, net.minecraftforge.common.BiomeDictionary.Type.NETHER)
+                    || net.minecraftforge.common.BiomeDictionary.isBiomeOfType(b, net.minecraftforge.common.BiomeDictionary.Type.END)) continue;
+                out.add(b);
+            }
+            else BohMod.LOGGER.warn("Biome tag {} is not supported", id);
+            return;
+        }
         if (id.contains(":") && !id.startsWith("minecraft:")) {
             BiomeGenBase b = Biomes.byKey(new ResourceLocation(id));
             if (b != null) out.add(b);

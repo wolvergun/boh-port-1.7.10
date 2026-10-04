@@ -155,6 +155,9 @@ public class StructureTemplate {
         return place(world, pos, settings, random, 2, true);
     }
 
+    /** Blocks the last placement tried to write and how many of them it couldn't (for the self-test). */
+    public static int lastBlocks, lastMissed;
+
     private boolean place(World world, BlockPos pos, StructurePlaceSettings settings, Random random, int flags, boolean worldgen) {
         if (world == null || world.isRemote || blocks.isEmpty()) return false;
         Mirror mirror = settings.mirror;
@@ -172,6 +175,7 @@ public class StructureTemplate {
         java.util.Set<net.minecraft.world.chunk.Chunk> fastChunks = new java.util.HashSet<>();
         java.util.Map<net.minecraft.world.chunk.Chunk, Boolean> writable = new java.util.HashMap<>();
         List<int[]> lights = new ArrayList<>();
+        int tried = 0, missed = 0;
         // two passes: solid blocks first, then attachables (torches, doors, plants) so they find support
         for (int pass = 0; pass < 2; pass++) {
             for (Info b : blocks) {
@@ -182,14 +186,18 @@ public class StructureTemplate {
                 int[] p = transform(b.x, b.y, b.z, mirror, settings.rotation);
                 int wx = pos.getX() + p[0], wy = pos.getY() + p[1], wz = pos.getZ() + p[2];
                 if (wy < 0 || wy > 255) continue;
+                tried++;
                 if (!worldgen || !setFast(world, wx, wy, wz, l, fastChunks, writable, lights)) {
-                    if (l.modState != null) M.setBlock(world, new BlockPos(wx, wy, wz), l.modState, 2);
+                    if (!world.blockExists(wx, wy, wz)) missed++;
+                    else if (l.modState != null) M.setBlock(world, new BlockPos(wx, wy, wz), l.modState, 2);
                     else world.setBlock(wx, wy, wz, l.block, l.meta, 2);
                 }
                 // block entities without data are created lazily by the chunk when first used
                 if (b.nbt != null && !isEmptyBlockEntity(b.nbt)) deferred.add(new Object[] { b, palette.get(b.state), new int[] { wx, wy, wz } });
             }
         }
+        lastBlocks = tried;
+        lastMissed = missed;
         for (net.minecraft.world.chunk.Chunk c : fastChunks) {
             c.generateSkylightMap();
             c.setChunkModified();
