@@ -196,7 +196,9 @@ public class Particle extends EntityFX {
         float cos = MathHelper.cos(r), sin = MathHelper.sin(r);
         for (int i = 0; i < 4; i++) {
             float cx = corners[i][0] * cos - corners[i][1] * sin, cy = corners[i][0] * sin + corners[i][1] * cos;
-            t.addVertexWithUV(px + (-rx * cx - ryz * cy) * size, py + rxz * cy * size, pz + (-rz * cx - rxy * cy) * size, uv[i][0], uv[i][1]);
+            // camera-facing quad as EntityFX does it: right = (rx, 0, rz), up = (ryz, rxz, rxy); the up vector's x/z and y
+            // parts must share the sign or the quad shears when the camera looks up or down
+            t.addVertexWithUV(px + (rx * cx + ryz * cy) * size, py + rxz * cy * size, pz + (rz * cx + rxy * cy) * size, uv[i][0], uv[i][1]);
         }
     }
 

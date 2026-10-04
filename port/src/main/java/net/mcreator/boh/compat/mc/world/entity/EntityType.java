@@ -31,7 +31,7 @@ public class EntityType<T extends Entity> {
     private static final Map<String, EntityType<?>> VANILLA = new HashMap<>();
 
     public static final EntityType<EntityLightningBolt> LIGHTNING_BOLT = vanilla("lightning_bolt", EntityLightningBolt.class,
-        (t, w) -> new EntityLightningBolt(w, 0, 0, 0), 0f, 0f);
+        (t, w) -> new net.mcreator.boh.compat.entity.BohLightningBolt(w, 0, 0, 0), 0f, 0f);
     public static final EntityType<EntitySmallFireball> SMALL_FIREBALL = vanilla("small_fireball", EntitySmallFireball.class,
         (t, w) -> new EntitySmallFireball(w), 0.3125f, 0.3125f);
     public static final EntityType<EntityLargeFireball> FIREBALL = vanilla("fireball", EntityLargeFireball.class,

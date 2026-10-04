@@ -192,10 +192,13 @@ public final class RiftTest {
         }
     }
 
+    private int hurt;
+
     private String mobsAt(int x, int z) {
         List<String> names = new ArrayList<>();
         for (Object o : w.getEntitiesWithinAABB(EntityLiving.class, AxisAlignedBB.getBoundingBox(x - 4, Y - 2, z - 4, x + 5, Y + 12, z + 5))) {
             Entity e = (Entity) o;
+            if (e.isBurning() || ((EntityLiving) e).getHealth() < ((EntityLiving) e).getMaxHealth()) hurt++;
             names.add(EntityList.getEntityString(e));
             e.setDead();
         }
@@ -249,7 +252,7 @@ public final class RiftTest {
             all.append(String.format(" %s=%s", d, mobs.isEmpty() ? "-" : mobs.replace("boh.", "")));
         }
         log("rift: %d/%d documents summoned and used up their stabilizers;%s", ok, docs.size(), bad.length() == 0 ? " all ok" : bad);
-        log("rift summons:%s", all);
+        log("rift summons (%d burning or hurt, expected 0: the lightning is visual only):%s", hurt, all);
         log("rift without stabilizers: mobs '%s' (expected none), document still held: %s", mobsAt(noRing[0], noRing[1]),
             player.inventory.mainInventory[0] != null);
     }

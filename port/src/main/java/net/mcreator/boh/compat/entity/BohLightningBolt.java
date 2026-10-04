@@ -23,9 +23,15 @@ public class BohLightningBolt extends EntityLightningBolt {
         return visualOnly;
     }
 
+    private boolean firstTick = true;
+
     @Override
     public void onUpdate() {
         if (!visualOnly) {
+            // created through EntityType (at 0,0,0, then moved), so vanilla's constructor fire landed nowhere: place it
+            // where the bolt actually struck
+            if (firstTick && !worldObj.isRemote) igniteAround();
+            firstTick = false;
             super.onUpdate();
             return;
         }
@@ -43,5 +49,20 @@ public class BohLightningBolt extends EntityLightningBolt {
             }
         }
         if (life >= 0 && worldObj.isRemote) worldObj.lastLightningBolt = 2;
+    }
+
+    private void igniteAround() {
+        if (!worldObj.getGameRules().getGameRuleBooleanValue("doFireTick")
+            || worldObj.difficultySetting != net.minecraft.world.EnumDifficulty.NORMAL && worldObj.difficultySetting != net.minecraft.world.EnumDifficulty.HARD)
+            return;
+        int x = net.minecraft.util.MathHelper.floor_double(posX), y = net.minecraft.util.MathHelper.floor_double(posY),
+            z = net.minecraft.util.MathHelper.floor_double(posZ);
+        if (!worldObj.doChunksNearChunkExist(x, y, z, 10)) return;
+        for (int i = 0; i < 5; i++) {
+            int fx = i == 0 ? x : x + rand.nextInt(3) - 1, fy = i == 0 ? y : y + rand.nextInt(3) - 1, fz = i == 0 ? z : z + rand.nextInt(3) - 1;
+            if (worldObj.getBlock(fx, fy, fz).getMaterial() == net.minecraft.block.material.Material.air
+                && net.minecraft.init.Blocks.fire.canPlaceBlockAt(worldObj, fx, fy, fz))
+                worldObj.setBlock(fx, fy, fz, net.minecraft.init.Blocks.fire);
+        }
     }
 }

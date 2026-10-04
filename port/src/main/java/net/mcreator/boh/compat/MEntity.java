@@ -166,6 +166,9 @@ public class MEntity extends MWorld {
     }
 
     public static void teleportTo(Entity e, double x, double y, double z) {
+        // procedures also run on the client; there a random teleport (the Saucer's hops) puts the entity somewhere
+        // else than the server did, and the next sync drags it back. The server's move reaches the client anyway.
+        if (e.worldObj.isRemote && !(e instanceof net.minecraft.entity.player.EntityPlayer)) return;
         if (e instanceof EntityPlayerMP) ((EntityPlayerMP) e).playerNetServerHandler.setPlayerLocation(x, y, z, e.rotationYaw, e.rotationPitch);
         else if (e instanceof EntityLivingBase) ((EntityLivingBase) e).setPositionAndUpdate(x, y, z);
         else e.setLocationAndAngles(x, y, z, e.rotationYaw, e.rotationPitch);
