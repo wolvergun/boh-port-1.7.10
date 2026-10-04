@@ -42,6 +42,18 @@ import com.google.common.collect.Multimap;
 /** Compat base for mod items: 1.20 Item hooks bridged onto the 1.7.10 Item callbacks. */
 public class BohItem extends Item {
 
+    // brewing-recipe ingredients must look like potion ingredients to the 1.7.10 brewing stand (see BrewingHooks)
+    @Override
+    public boolean isPotionIngredient(ItemStack stack) {
+        return net.mcreator.boh.compat.forge.common.brewing.BrewingHooks.isIngredient(stack) || super.isPotionIngredient(stack);
+    }
+
+    @Override
+    public String getPotionEffect(ItemStack stack) {
+        return net.mcreator.boh.compat.forge.common.brewing.BrewingHooks.isIngredient(stack)
+            ? net.mcreator.boh.compat.forge.common.brewing.BrewingHooks.INGREDIENT_EFFECT : super.getPotionEffect(stack);
+    }
+
     protected static final java.util.UUID BASE_ATTACK_DAMAGE_UUID = java.util.UUID.fromString("CB3F55D3-645C-4F38-A497-9C13A33DB5CF");
     protected static final java.util.UUID BASE_ATTACK_SPEED_UUID = java.util.UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3");
 

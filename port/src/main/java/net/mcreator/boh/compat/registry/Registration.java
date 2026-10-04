@@ -31,6 +31,7 @@ public final class Registration {
     private static int nextProfessionId = 6600;
     public static final List<MenuType<?>> MENUS = new ArrayList<>();
     public static final List<PaintingVariant> PAINTINGS = new ArrayList<>();
+    public static final List<VillagerProfession> PROFESSIONS = new ArrayList<>();
     public static final List<ParticleType<?>> PARTICLES = new ArrayList<>();
     public static final List<EntityType<?>> ENTITIES = new ArrayList<>();
     public static final List<CreativeModeTab> TABS = new ArrayList<>();
@@ -116,6 +117,8 @@ public final class Registration {
         int legacy = nextProfessionId++;
         p.setLegacyId(legacy);
         VillagerRegistry.instance().registerVillagerId(legacy);
+        net.mcreator.boh.compat.world.VillagerTrades.register(p, legacy);
+        PROFESSIONS.add(p);
         return p;
     }
 

@@ -87,6 +87,7 @@ Compatibility fixes to know about:
    Cliffs' fog colour in the overworld.
 3. Test Baseplate, Boiler Room and Gaster's room in-game, plus the overworld structures (Sadako well, Siren Head
    nests, forest structures).
-4. Apply villager trades and brewing recipes (both are loaded but not applied yet).
+4. ~~Apply villager trades and brewing recipes~~: hooked up (trade handler + PotionBrewEvent), needs in-game testing.
 5. Polish arm poses and 3D weapon positioning; optionally make the Xenomorph's see-through head solid.
-6. Some mobs don't attack the player or other mobs: check their AI targeting.
+6. Some mobs don't attack the player or other mobs: target goals are now ports of the 1.20 ones (line of sight to
+   acquire, 15 s revenge memory, ...) and ground pathfinding is capped at 64 blocks; needs in-game testing.
