@@ -179,6 +179,17 @@ public final class SelfTest {
                 else if (b == spinel) ore++;
             }
         }
+        // forced kindness flower patches: what the positions look like
+        int forced = 0;
+        StringBuilder sample = new StringBuilder();
+        for (int cx = bx - 5; cx < bx + 5 && sample.length() < 600; cx += 2) for (int cz = bz - 5; cz < bz + 5; cz += 2) {
+            for (int[] p : Features.place(new net.minecraft.util.ResourceLocation("boh", "kindness_flower"), w, rand, cx, cz, true)) {
+                if (w.getBlock(p[0], p[1], p[2]) == flower) forced++;
+                if (sample.length() < 600) sample.append(String.format(" [%d %d %d: %s on %s]", p[0], p[1], p[2], Block.blockRegistry.getNameForObject(w.getBlock(p[0], p[1], p[2])),
+                    Block.blockRegistry.getNameForObject(w.getBlock(p[0], p[1] - 1, p[2]))));
+            }
+        }
+        log("overworld forced kindness_flower: %d at the patch centres;%s", forced, sample);
         log("overworld population around chunk %d,%d: %d chunks %s, %d kindness flowers, %.1f spinel ore/chunk", bx, bz, n, biomes, flowers,
             ore / (double) Math.max(1, n));
     }
