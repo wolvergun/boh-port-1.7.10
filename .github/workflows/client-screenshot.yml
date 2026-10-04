@@ -1,9 +1,11 @@
 name: Client screenshot
 
 # Starts the real client on a virtual display (Xvfb + Mesa), waits for the title screen and publishes screenshots as
-# the "client-screenshot" release, to check rendering problems without a player. Run it by hand.
+# the "client-screenshot" release, to check rendering problems without a player. Runs for pushes whose commit message
+# contains [shot].
 
 on:
+  push:
   workflow_dispatch:
 
 permissions:
@@ -11,6 +13,7 @@ permissions:
 
 jobs:
   shot:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[shot]')
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
