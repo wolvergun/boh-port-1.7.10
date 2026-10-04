@@ -4,6 +4,9 @@ import java.util.AbstractList;
 import java.util.List;
 import java.util.UUID;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 import net.mcreator.boh.compat.mc.advancements.PlayerAdvancements;
 import net.mcreator.boh.compat.mc.client.Camera;
 import net.mcreator.boh.compat.mc.commands.Commands;
@@ -400,18 +403,22 @@ public class MEvent extends MEntity {
         };
     }
 
+    @SideOnly(Side.CLIENT)
     public static net.mcreator.boh.compat.mc.client.renderer.entity.EntityRenderDispatcher getEntityRenderDispatcher(Minecraft mc) {
         return net.mcreator.boh.compat.mc.client.renderer.entity.EntityRenderDispatcher.INSTANCE;
     }
 
+    @SideOnly(Side.CLIENT)
     public static net.minecraft.util.ResourceLocation getSkinTextureLocation(net.minecraft.client.entity.AbstractClientPlayer p) {
         return MClientImpl.skin(p);
     }
 
+    @SideOnly(Side.CLIENT)
     public static net.minecraft.client.gui.GuiScreen screen(Minecraft mc) {
         return MClientImpl.screen();
     }
 
+    @SideOnly(Side.CLIENT)
     public static net.mcreator.boh.compat.mc.client.BossOverlay gui(Minecraft mc) {
         return net.mcreator.boh.compat.mc.client.BossOverlay.INSTANCE;
     }
@@ -564,24 +571,29 @@ public class MEvent extends MEntity {
         return stack(s.decrStackSize(n));
     }
 
+    @SideOnly(Side.CLIENT)
     public static net.minecraft.client.multiplayer.WorldClient level(Minecraft mc) {
         return MClientImpl.world();
     }
 
     // ------------------------------------------------------------------ client (bodies delegate to MClientImpl)
 
+    @SideOnly(Side.CLIENT)
     public static net.minecraft.client.entity.AbstractClientPlayer player(Minecraft mc) {
         return MClientImpl.player();
     }
 
+    @SideOnly(Side.CLIENT)
     public static ClientConnection getConnection(Minecraft mc) {
         return ClientConnection.INSTANCE;
     }
 
+    @SideOnly(Side.CLIENT)
     public static ClientGameRenderer gameRenderer(Minecraft mc) {
         return ClientGameRenderer.INSTANCE;
     }
 
+    @SideOnly(Side.CLIENT)
     public static ClientOptions options(Minecraft mc) {
         return ClientOptions.INSTANCE;
     }
