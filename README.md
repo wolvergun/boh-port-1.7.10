@@ -31,6 +31,9 @@ references), `build-fast/`, tool jars, and the machine-specific `tools/classpath
 
 ## Building
 
+**Easiest:** every push is built by GitHub Actions (`.github/workflows/build.yml`), and the jar is published as
+`boh-port.jar` on the [dev-build release](https://github.com/wolvergun/boh-port-1.7.10/releases/tag/dev-build).
+
 Requirements: JDK 21 to run Gradle; the build compiles with a Java 25 toolchain (`enableModernJavaSyntax = modern`),
 so the jar is **Java 25 bytecode** and needs a Java 25 runtime (lwjgl3ify + RetroFuturaBootstrap). It won't load on
 Java 8.
