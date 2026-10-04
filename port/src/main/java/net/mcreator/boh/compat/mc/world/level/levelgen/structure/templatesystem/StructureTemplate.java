@@ -164,6 +164,7 @@ public class StructureTemplate {
             mx = true;
             t = (t + 2) & 3;
         }
+        if (worldgen) loadFootprint(world, pos, mirror, settings.rotation);
         VanillaStates.Legacy[] pal = convertedPalette(t, mx);
         boolean[] skip = new boolean[palette.size()];
         for (int i = 0; i < skip.length; i++) skip[i] = pal[i] == null || ignored(settings, palette.get(i).name);
@@ -208,6 +209,20 @@ public class StructureTemplate {
 
     public boolean placeInWorld(World world, BlockPos pos, BlockPos pivot, StructurePlaceSettings settings, Object random, int flags) {
         return placeInWorld(world, pos, pivot, settings, random instanceof Random ? (Random) random : world.rand, flags);
+    }
+
+    /**
+     * Templates wider than the 2x2 chunks that exist while a chunk is populated (the Baseplate, the Boiler Room) would
+     * lose every block outside them, so generate the rest of their footprint first, as 1.20 lets a structure span
+     * chunks that don't exist yet.
+     */
+    private void loadFootprint(World world, BlockPos pos, Mirror mirror, Rotation rot) {
+        if (!(world instanceof net.minecraft.world.WorldServer) || sx <= 0 || sz <= 0) return;
+        int[] a = transform(0, 0, 0, mirror, rot), b = transform(sx - 1, 0, sz - 1, mirror, rot);
+        int x0 = (pos.getX() + Math.min(a[0], b[0])) >> 4, x1 = (pos.getX() + Math.max(a[0], b[0])) >> 4;
+        int z0 = (pos.getZ() + Math.min(a[2], b[2])) >> 4, z1 = (pos.getZ() + Math.max(a[2], b[2])) >> 4;
+        net.minecraft.world.gen.ChunkProviderServer cp = ((net.minecraft.world.WorldServer) world).theChunkProviderServer;
+        for (int cx = x0; cx <= x1; cx++) for (int cz = z0; cz <= z1; cz++) if (!cp.chunkExists(cx, cz)) cp.loadChunk(cx, cz);
     }
 
     private VanillaStates.Legacy[] convertedPalette(int turns, boolean mirrorX) {

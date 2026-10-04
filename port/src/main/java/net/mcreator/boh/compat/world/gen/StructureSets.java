@@ -115,6 +115,11 @@ public final class StructureSets {
      * original procedures do) usually means falling into the void; this finds the room the player should land in.
      * Loads (and so generates and populates) the chunks around it.
      */
+    private static boolean hasRoof(World w, int x, int y, int z) {
+        for (int yy = y; yy < Math.min(y + 16, w.getActualHeight()); yy++) if (w.getBlock(x, yy, z).getMaterial().blocksMovement()) return true;
+        return false;
+    }
+
     /** Why the last findArrival call returned null (for the self-test). */
     public static String lastArrivalMiss;
 
@@ -160,16 +165,20 @@ public final class StructureSets {
         int[] c = rot == Rotation.CLOCKWISE_90 ? new int[] { -hz, hx } : rot == Rotation.CLOCKWISE_180 ? new int[] { -hx, -hz }
             : rot == Rotation.COUNTERCLOCKWISE_90 ? new int[] { hz, -hx } : new int[] { hx, hz };
         int ox = bcx * 16 + 16 + c[0], oz = bcz * 16 + 16 + c[1];
-        // nearest column to the middle with a floor and two free blocks above it, lowest floor first
-        for (int rad = 0; rad <= 8; rad++)
-            for (int dx = -rad; dx <= rad; dx++) for (int dz = -rad; dz <= rad; dz++) {
-                if (Math.max(Math.abs(dx), Math.abs(dz)) != rad) continue;
-                int x = ox + dx, z = oz + dz;
-                for (int y = 1; y < w.getActualHeight() - 2; y++) {
-                    if (w.getBlock(x, y - 1, z).getMaterial().blocksMovement() && !w.getBlock(x, y, z).getMaterial().blocksMovement()
-                        && !w.getBlock(x, y + 1, z).getMaterial().blocksMovement()) return new double[] { x + 0.5, y, z + 0.5 };
+        // nearest column to the middle with a floor and two free blocks above it, lowest floor first; inside the room
+        // (a roof above) before anywhere on top of it
+        int reach = Math.max(8, Math.max(t.getSize().getX(), t.getSize().getZ()) / 2 + 1);
+        for (int pass = 0; pass < 2; pass++)
+            for (int rad = 0; rad <= reach; rad++)
+                for (int dx = -rad; dx <= rad; dx++) for (int dz = -rad; dz <= rad; dz++) {
+                    if (Math.max(Math.abs(dx), Math.abs(dz)) != rad) continue;
+                    int x = ox + dx, z = oz + dz;
+                    for (int y = 1; y < w.getActualHeight() - 2; y++) {
+                        if (w.getBlock(x, y - 1, z).getMaterial().blocksMovement() && !w.getBlock(x, y, z).getMaterial().blocksMovement()
+                            && !w.getBlock(x, y + 1, z).getMaterial().blocksMovement() && (pass == 1 || hasRoof(w, x, y + 2, z)))
+                            return new double[] { x + 0.5, y, z + 0.5 };
+                    }
                 }
-            }
         int solid = 0, minY = 999, maxY = -1;
         for (int x = bcx * 16 - 16; x < bcx * 16 + 48; x++) for (int z = bcz * 16 - 16; z < bcz * 16 + 48; z++) for (int y = 0; y < 64; y++)
             if (!w.isAirBlock(x, y, z)) {
