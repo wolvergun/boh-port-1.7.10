@@ -148,7 +148,12 @@ public final class StructureSets {
             lastArrivalMiss = b.toString();
             return null;
         }
-        for (int x = bcx - 1; x <= bcx + 2; x++) for (int z = bcz - 1; z <= bcz + 2; z++) w.getChunkFromChunkCoords(x, z);
+        // load explicitly: getChunkFromChunkCoords can hand back the empty placeholder chunk for unloaded chunks;
+        // with the 3x3 around the start loaded, the start chunk is populated and so the structure is placed
+        for (int x = bcx - 1; x <= bcx + 2; x++) for (int z = bcz - 1; z <= bcz + 2; z++) {
+            if (w instanceof net.minecraft.world.WorldServer) ((net.minecraft.world.WorldServer) w).theChunkProviderServer.loadChunk(x, z);
+            else w.getChunkFromChunkCoords(x, z);
+        }
         StructureTemplate t = StructureTemplateManager.INSTANCE.getOrCreate(new ResourceLocation(best.pool));
         Rotation rot = Rotation.values()[new Random(w.getSeed() ^ (bcx * 31L + bcz) * 0x9E3779B97F4A7C15L ^ best.salt).nextInt(4)];
         int hx = t.getSize().getX() / 2, hz = t.getSize().getZ() / 2;

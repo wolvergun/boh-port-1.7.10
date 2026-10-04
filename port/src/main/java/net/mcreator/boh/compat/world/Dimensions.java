@@ -93,7 +93,7 @@ public final class Dimensions {
     private static double[] safeArrival(WorldServer target, double x, double y, double z) {
         if (!(target.provider instanceof net.mcreator.boh.compat.world.gen.BohWorldProvider)) return null;
         int bx = net.minecraft.util.MathHelper.floor_double(x), bz = net.minecraft.util.MathHelper.floor_double(z);
-        target.getChunkFromBlockCoords(bx, bz);
+        target.theChunkProviderServer.loadChunk(bx >> 4, bz >> 4);
         for (int by = Math.min(net.minecraft.util.MathHelper.floor_double(y), target.getActualHeight() - 1); by >= 0; by--)
             if (target.getBlock(bx, by, bz).getMaterial().blocksMovement()) return null;
         net.mcreator.boh.compat.world.gen.BohWorldProvider p = (net.mcreator.boh.compat.world.gen.BohWorldProvider) target.provider;
