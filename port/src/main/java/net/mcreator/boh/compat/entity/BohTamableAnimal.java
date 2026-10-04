@@ -180,7 +180,7 @@ public abstract class BohTamableAnimal extends net.minecraft.entity.passive.Enti
     protected void registerGoals() {}
 
     protected PathNavigation createNavigation(World world) {
-        return new PathNavigation(this, navigator);
+        return new PathNavigation(this, world);
     }
 
     public void addAdditionalSaveData(NBTTagCompound tag) {

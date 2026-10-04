@@ -128,6 +128,11 @@ public class DebugCommand extends CommandBase {
             msg(s, "attackTarget=" + name(l.getAttackTarget()) + (l instanceof EntityCreature ? " entityToAttack=" + name(((EntityCreature) l).getEntityToAttack()) : "")
                 + " path=" + (l.getNavigator().noPath() ? "none" : "yes") + " persistent=" + l.isNoDespawnRequired());
             msg(s, "running goals: " + running(l.tasks) + " | targets: " + running(l.targetTasks));
+            EntityLivingBase t = l.getAttackTarget();
+            net.minecraft.pathfinding.PathEntity path = t == null ? null : l.getNavigator().getPathToEntityLiving(t);
+            msg(s, "navigator=" + l.getNavigator().getClass().getSimpleName() + " searchRange=" + l.getNavigator().getPathSearchRange()
+                + (t == null ? "" : String.format(" pathToTarget=%s (target %.1f blocks away)",
+                    path == null ? "NONE" : path.getCurrentPathLength() + " points", l.getDistanceToEntity(t))));
         }
     }
 

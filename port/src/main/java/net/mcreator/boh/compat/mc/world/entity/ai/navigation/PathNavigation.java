@@ -16,7 +16,7 @@ public class PathNavigation {
     protected double speedModifier = 1.0;
 
     public PathNavigation(EntityLiving mob, World world) {
-        this(mob, new PathNavigate(mob, world));
+        this(mob, new BohPathNavigate(mob, world));
     }
 
     public PathNavigation(EntityLiving mob, PathNavigate nav) {
