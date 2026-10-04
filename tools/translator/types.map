@@ -1,0 +1,166 @@
+# modern FQN -> replacement FQN ("DROP" removes the import). Anything not listed here and living under
+# net.minecraft / net.minecraftforge / com.mojang is mirrored into net.mcreator.boh.compat.{mc,forge,mojang}.
+
+# ---- entities (vanilla-backed)
+net.minecraft.world.entity.Entity -> net.minecraft.entity.Entity
+net.minecraft.world.entity.LivingEntity -> net.minecraft.entity.EntityLivingBase
+net.minecraft.world.entity.Mob -> net.minecraft.entity.EntityLiving
+net.minecraft.world.entity.PathfinderMob -> net.minecraft.entity.EntityCreature
+net.minecraft.world.entity.AgeableMob -> net.minecraft.entity.EntityAgeable
+net.minecraft.world.entity.TamableAnimal -> net.minecraft.entity.passive.EntityTameable
+net.minecraft.world.entity.animal.Animal -> net.minecraft.entity.passive.EntityAnimal
+net.minecraft.world.entity.monster.Monster -> net.minecraft.entity.monster.EntityMob
+net.minecraft.world.entity.player.Player -> net.minecraft.entity.player.EntityPlayer
+net.minecraft.server.level.ServerPlayer -> net.minecraft.entity.player.EntityPlayerMP
+net.minecraft.client.player.LocalPlayer -> net.minecraft.client.entity.EntityClientPlayerMP
+net.minecraft.client.player.AbstractClientPlayer -> net.minecraft.client.entity.AbstractClientPlayer
+net.minecraft.world.entity.item.ItemEntity -> net.minecraft.entity.item.EntityItem
+net.minecraft.world.entity.LightningBolt -> net.minecraft.entity.effect.EntityLightningBolt
+net.minecraft.world.entity.projectile.AbstractArrow -> net.mcreator.boh.compat.entity.BohAbstractArrow
+net.minecraft.world.entity.projectile.Arrow -> net.mcreator.boh.compat.entity.BohArrow
+net.minecraft.world.entity.projectile.Projectile -> net.minecraft.entity.Entity
+net.minecraft.world.entity.projectile.ThrownPotion -> net.minecraft.entity.projectile.EntityPotion
+net.minecraft.world.entity.projectile.SmallFireball -> net.minecraft.entity.projectile.EntitySmallFireball
+net.minecraft.world.entity.projectile.LargeFireball -> net.minecraft.entity.projectile.EntityLargeFireball
+net.minecraft.world.entity.projectile.AbstractHurtingProjectile -> net.minecraft.entity.projectile.EntityFireball
+net.minecraft.world.entity.monster.Spider -> net.minecraft.entity.monster.EntitySpider
+net.minecraft.world.entity.monster.Phantom -> net.minecraft.entity.passive.EntityBat
+net.minecraft.world.entity.animal.Wolf -> net.minecraft.entity.passive.EntityWolf
+net.minecraft.world.entity.animal.Cow -> net.minecraft.entity.passive.EntityCow
+net.minecraft.world.entity.animal.Cat -> net.minecraft.entity.passive.EntityOcelot
+net.minecraft.world.entity.animal.Rabbit -> net.minecraft.entity.passive.EntityChicken
+net.minecraft.world.entity.animal.horse.SkeletonHorse -> net.minecraft.entity.passive.EntityHorse
+net.minecraft.world.entity.npc.Villager -> net.minecraft.entity.passive.EntityVillager
+net.minecraft.world.entity.decoration.ArmorStand -> net.minecraft.entity.Entity
+net.minecraft.world.entity.AreaEffectCloud -> net.mcreator.boh.compat.entity.BohAreaEffectCloud
+
+# ---- world (vanilla-backed)
+net.minecraft.world.level.Level -> net.minecraft.world.World
+net.minecraft.world.level.LevelAccessor -> net.minecraft.world.World
+net.minecraft.world.level.LevelReader -> net.minecraft.world.World
+net.minecraft.world.level.BlockGetter -> net.minecraft.world.IBlockAccess
+net.minecraft.world.level.ServerLevelAccessor -> net.minecraft.world.World
+net.minecraft.world.level.WorldGenLevel -> net.minecraft.world.World
+net.minecraft.server.level.ServerLevel -> net.minecraft.world.WorldServer
+net.minecraft.client.multiplayer.ClientLevel -> net.minecraft.client.multiplayer.WorldClient
+net.minecraft.server.MinecraftServer -> net.minecraft.server.MinecraftServer
+net.minecraft.world.level.block.entity.BlockEntity -> net.minecraft.tileentity.TileEntity
+net.minecraft.world.scores.Scoreboard -> net.minecraft.scoreboard.Scoreboard
+net.minecraft.world.scores.Objective -> net.minecraft.scoreboard.ScoreObjective
+net.minecraft.world.scores.PlayerTeam -> net.minecraft.scoreboard.ScorePlayerTeam
+net.minecraft.world.level.biome.Biome -> net.minecraft.world.biome.BiomeGenBase
+
+# ---- items / blocks (vanilla-backed)
+net.minecraft.world.item.ItemStack -> net.minecraft.item.ItemStack
+net.minecraft.world.item.Item -> net.minecraft.item.Item
+net.minecraft.world.level.block.Block -> net.minecraft.block.Block
+net.minecraft.world.item.BlockItem -> net.mcreator.boh.compat.item.BohBlockItem
+net.minecraft.world.level.ItemLike -> java.lang.Object
+net.minecraft.nbt.CompoundTag -> net.minecraft.nbt.NBTTagCompound
+net.minecraft.nbt.ListTag -> net.minecraft.nbt.NBTTagList
+net.minecraft.nbt.Tag -> net.minecraft.nbt.NBTBase
+net.minecraft.world.damagesource.DamageSource -> net.minecraft.util.DamageSource
+net.minecraft.world.effect.MobEffect -> net.minecraft.potion.Potion
+net.minecraft.world.effect.MobEffectInstance -> net.minecraft.potion.PotionEffect
+net.minecraft.world.item.enchantment.Enchantment -> net.minecraft.enchantment.Enchantment
+net.minecraft.resources.ResourceLocation -> net.minecraft.util.ResourceLocation
+net.minecraft.world.entity.player.Inventory -> net.minecraft.entity.player.InventoryPlayer
+net.minecraft.world.inventory.Slot -> net.minecraft.inventory.Slot
+net.minecraft.world.entity.ai.goal.Goal -> net.mcreator.boh.compat.mc.world.entity.ai.goal.Goal
+net.minecraft.world.entity.ai.attributes.AttributeModifier -> net.minecraft.entity.ai.attributes.AttributeModifier
+net.minecraft.world.entity.ai.attributes.Attribute -> net.minecraft.entity.ai.attributes.IAttribute
+
+# ---- client (vanilla-backed)
+net.minecraft.client.Minecraft -> net.minecraft.client.Minecraft
+net.minecraft.client.gui.screens.Screen -> net.minecraft.client.gui.GuiScreen
+
+# ---- client shims already written
+com.mojang.blaze3d.vertex.PoseStack -> net.mcreator.boh.compat.client.PoseStack
+com.mojang.blaze3d.vertex.VertexConsumer -> net.mcreator.boh.compat.client.VertexConsumer
+net.minecraft.client.renderer.MultiBufferSource -> net.mcreator.boh.compat.client.MultiBufferSource
+net.minecraft.client.renderer.RenderType -> net.mcreator.boh.compat.client.RenderType
+net.minecraft.client.renderer.texture.OverlayTexture -> net.mcreator.boh.compat.client.OverlayTexture
+net.minecraft.client.renderer.LightTexture -> net.mcreator.boh.compat.client.LightTexture
+com.mojang.math.Axis -> net.mcreator.boh.compat.client.Axis
+org.joml.Matrix4f -> net.mcreator.boh.compat.client.Matrix4f
+org.joml.Matrix3f -> net.mcreator.boh.compat.client.Matrix3f
+org.joml.Quaternionf -> net.mcreator.boh.compat.client.Quaternionf
+org.joml.Vector3f -> net.mcreator.boh.compat.mojang.math.Vector3f
+
+# ---- forge / fml annotations and events
+net.minecraftforge.eventbus.api.SubscribeEvent -> cpw.mods.fml.common.eventhandler.SubscribeEvent
+net.minecraftforge.eventbus.api.EventPriority -> cpw.mods.fml.common.eventhandler.EventPriority
+net.minecraftforge.eventbus.api.Event -> cpw.mods.fml.common.eventhandler.Event
+net.minecraftforge.fml.common.Mod.EventBusSubscriber -> DROP
+net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus -> DROP
+net.minecraftforge.api.distmarker.OnlyIn -> cpw.mods.fml.relauncher.SideOnly
+net.minecraftforge.api.distmarker.Dist -> cpw.mods.fml.relauncher.Side
+net.minecraftforge.event.entity.living.LivingAttackEvent -> net.minecraftforge.event.entity.living.LivingAttackEvent
+net.minecraftforge.event.entity.living.LivingHurtEvent -> net.minecraftforge.event.entity.living.LivingHurtEvent
+net.minecraftforge.event.entity.living.LivingDeathEvent -> net.minecraftforge.event.entity.living.LivingDeathEvent
+net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent -> net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent
+net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent -> net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent
+net.minecraftforge.event.entity.player.ItemTooltipEvent -> net.minecraftforge.event.entity.player.ItemTooltipEvent
+net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract -> net.minecraftforge.event.entity.player.EntityInteractEvent
+net.minecraftforge.event.entity.player.PlayerSleepInBedEvent -> net.minecraftforge.event.entity.player.PlayerSleepInBedEvent
+net.minecraftforge.event.entity.player.PlayerDestroyItemEvent -> net.minecraftforge.event.entity.player.PlayerDestroyItemEvent
+net.minecraftforge.event.entity.EntityStruckByLightningEvent -> net.minecraftforge.event.entity.EntityStruckByLightningEvent
+net.minecraftforge.event.entity.EntityJoinLevelEvent -> net.minecraftforge.event.entity.EntityJoinWorldEvent
+net.minecraftforge.event.TickEvent -> cpw.mods.fml.common.gameevent.TickEvent
+net.minecraftforge.event.TickEvent.Phase -> cpw.mods.fml.common.gameevent.TickEvent.Phase
+net.minecraftforge.event.TickEvent.PlayerTickEvent -> cpw.mods.fml.common.gameevent.TickEvent.PlayerTickEvent
+net.minecraftforge.event.TickEvent.ServerTickEvent -> cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent
+net.minecraftforge.event.TickEvent.LevelTickEvent -> cpw.mods.fml.common.gameevent.TickEvent.WorldTickEvent
+net.minecraftforge.common.MinecraftForge -> net.minecraftforge.common.MinecraftForge
+
+# ---- geckolib -> own runtime
+software.bernie.geckolib.animatable.GeoEntity -> net.mcreator.boh.geo.GeoEntity
+software.bernie.geckolib.animatable.GeoItem -> net.mcreator.boh.geo.GeoItem
+software.bernie.geckolib.animatable.GeoBlockEntity -> net.mcreator.boh.geo.GeoBlockEntity
+software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache -> net.mcreator.boh.geo.AnimatableInstanceCache
+software.bernie.geckolib.core.animation.AnimatableManager.ControllerRegistrar -> net.mcreator.boh.geo.AnimatableManager.ControllerRegistrar
+software.bernie.geckolib.core.animation.AnimationController -> net.mcreator.boh.geo.AnimationController
+software.bernie.geckolib.core.animation.AnimationController.State -> net.mcreator.boh.geo.AnimationController.State
+software.bernie.geckolib.core.animation.AnimationState -> net.mcreator.boh.geo.AnimationState
+software.bernie.geckolib.core.animation.RawAnimation -> net.mcreator.boh.geo.RawAnimation
+software.bernie.geckolib.core.object.PlayState -> net.mcreator.boh.geo.PlayState
+software.bernie.geckolib.core.animatable.model.CoreGeoBone -> net.mcreator.boh.geo.CoreGeoBone
+software.bernie.geckolib.util.GeckoLibUtil -> net.mcreator.boh.geo.GeckoLibUtil
+software.bernie.geckolib.util.RenderUtils -> net.mcreator.boh.geo.RenderUtils
+software.bernie.geckolib.model.GeoModel -> net.mcreator.boh.geo.GeoModel
+software.bernie.geckolib.model.data.EntityModelData -> net.mcreator.boh.geo.EntityModelData
+software.bernie.geckolib.constant.DataTickets -> net.mcreator.boh.geo.DataTickets
+software.bernie.geckolib.cache.object.BakedGeoModel -> net.mcreator.boh.geo.BakedGeoModel
+software.bernie.geckolib.cache.object.GeoBone -> net.mcreator.boh.geo.GeoBone
+software.bernie.geckolib.renderer.GeoEntityRenderer -> net.mcreator.boh.geo.GeoEntityRenderer
+software.bernie.geckolib.renderer.GeoRenderer -> net.mcreator.boh.geo.GeoRenderer
+software.bernie.geckolib.renderer.GeoItemRenderer -> net.mcreator.boh.geo.GeoItemRenderer
+software.bernie.geckolib.renderer.GeoArmorRenderer -> net.mcreator.boh.geo.GeoArmorRenderer
+software.bernie.geckolib.renderer.GeoBlockRenderer -> net.mcreator.boh.geo.GeoBlockRenderer
+software.bernie.geckolib.renderer.layer.GeoRenderLayer -> net.mcreator.boh.geo.GeoRenderLayer
+
+# ---- other libraries
+org.apache.logging.log4j.Logger -> org.apache.logging.log4j.Logger
+org.apache.logging.log4j.LogManager -> org.apache.logging.log4j.LogManager
+io.netty.buffer.Unpooled -> io.netty.buffer.Unpooled
+net.minecraft.world.item.alchemy.Potion -> net.mcreator.boh.compat.mc.world.item.alchemy.BrewPotion
+net.minecraft.world.level.ClipContext.Block -> net.mcreator.boh.compat.mc.world.level.ClipBlock
+net.minecraft.world.level.ClipContext.Fluid -> net.mcreator.boh.compat.mc.world.level.ClipFluid
+net.minecraft.world.phys.HitResult.Type -> net.mcreator.boh.compat.mc.world.phys.HitResultType
+net.minecraft.world.level.Level.ExplosionInteraction -> net.mcreator.boh.compat.mc.world.level.ExplosionInteraction
+net.minecraft.world.level.block.state.BlockBehaviour.Properties -> net.mcreator.boh.compat.mc.world.level.block.state.Properties
+net.minecraft.world.level.block.state.BlockBehaviour.OffsetType -> net.mcreator.boh.compat.mc.world.level.block.state.OffsetType
+net.minecraftforge.common.util.ForgeSoundType -> net.mcreator.boh.compat.forge.common.util.ForgeSoundType
+net.minecraft.world.entity.ai.attributes.AttributeMap -> net.minecraft.entity.ai.attributes.BaseAttributeMap
+net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation -> net.mcreator.boh.compat.mc.world.entity.ai.attributes.Operation
+net.minecraft.world.level.Explosion -> net.minecraft.world.Explosion
+net.minecraft.world.scores.criteria.ObjectiveCriteria.RenderType -> net.mcreator.boh.compat.mc.world.scores.criteria.RenderType
+net.minecraft.world.BossEvent.BossBarColor -> net.mcreator.boh.compat.mc.world.BossBarColor
+net.minecraft.world.BossEvent.BossBarOverlay -> net.mcreator.boh.compat.mc.world.BossBarOverlay
+net.minecraftforge.event.entity.player.PlayerEvent.PlayerChangedDimensionEvent -> cpw.mods.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent
+net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent -> cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent
+net.minecraftforge.event.entity.player.PlayerEvent.PlayerRespawnEvent -> cpw.mods.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent
+net.minecraftforge.event.entity.player.PlayerEvent.Clone -> net.minecraftforge.event.entity.player.PlayerEvent.Clone
+net.minecraftforge.common.util.FakePlayer -> net.minecraftforge.common.util.FakePlayer
+net.minecraftforge.common.util.FakePlayerFactory -> net.minecraftforge.common.util.FakePlayerFactory
+net.minecraftforge.network.NetworkEvent.Context -> net.mcreator.boh.compat.forge.network.Context

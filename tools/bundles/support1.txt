@@ -1,0 +1,516 @@
+//// FILE: entity/ItemCooldowns.java
+package net.mcreator.boh.compat.entity;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.WeakHashMap;
+
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+
+/** 1.20 per-player item cooldowns (1.7.10 has none). Tracked separately on each side. */
+public final class ItemCooldowns {
+
+    private static final Map<EntityPlayer, ItemCooldowns> BY_PLAYER = new WeakHashMap<>();
+
+    private final EntityPlayer player;
+    private final Map<Item, long[]> cooldowns = new HashMap<>();
+
+    private ItemCooldowns(EntityPlayer player) {
+        this.player = player;
+    }
+
+    public static synchronized ItemCooldowns of(EntityPlayer p) {
+        return BY_PLAYER.computeIfAbsent(p, ItemCooldowns::new);
+    }
+
+    private long now() {
+        return player.worldObj.getTotalWorldTime();
+    }
+
+    public void addCooldown(Item item, int ticks) {
+        cooldowns.put(item, new long[] { now(), now() + ticks });
+        if (!player.worldObj.isRemote && player instanceof net.minecraft.entity.player.EntityPlayerMP)
+            net.mcreator.boh.compat.net.CompatNetwork.sendCooldown((net.minecraft.entity.player.EntityPlayerMP) player, item, ticks);
+    }
+
+    public boolean isOnCooldown(Item item) {
+        long[] c = cooldowns.get(item);
+        return c != null && now() < c[1];
+    }
+
+    /** 0..1 remaining fraction, for the hotbar overlay. */
+    public float getCooldownPercent(Item item, float partial) {
+        long[] c = cooldowns.get(item);
+        if (c == null) return 0;
+        float total = c[1] - c[0];
+        float left = c[1] - (now() + partial);
+        return total <= 0 ? 0 : Math.max(0, Math.min(1, left / total));
+    }
+
+    public void removeCooldown(Item item) {
+        cooldowns.remove(item);
+    }
+}
+//// FILE: entity/BohLightningBolt.java
+package net.mcreator.boh.compat.entity;
+
+import net.minecraft.entity.effect.EntityLightningBolt;
+import net.minecraft.world.World;
+
+/** Lightning that can be visual-only (1.20 LightningBolt.setVisualOnly): no fire, no damage. */
+public class BohLightningBolt extends EntityLightningBolt {
+
+    private boolean visualOnly;
+    private int life = 2;
+    private int flashes;
+
+    public BohLightningBolt(World world, double x, double y, double z) {
+        super(world, x, y, z);
+        flashes = rand.nextInt(3) + 1;
+    }
+
+    public void setVisualOnly(boolean b) {
+        visualOnly = b;
+    }
+
+    public boolean isVisualOnly() {
+        return visualOnly;
+    }
+
+    @Override
+    public void onUpdate() {
+        if (!visualOnly) {
+            super.onUpdate();
+            return;
+        }
+        if (life == 2) {
+            worldObj.playSoundEffect(posX, posY, posZ, "ambient.weather.thunder", 10000.0F, 0.8F + rand.nextFloat() * 0.2F);
+            worldObj.playSoundEffect(posX, posY, posZ, "random.explode", 2.0F, 0.5F + rand.nextFloat() * 0.2F);
+        }
+        --life;
+        if (life < 0) {
+            if (flashes == 0) setDead();
+            else if (life < -rand.nextInt(10)) {
+                --flashes;
+                life = 1;
+                boltVertex = rand.nextLong();
+            }
+        }
+        if (life >= 0 && worldObj.isRemote) worldObj.lastLightningBolt = 2;
+    }
+}
+//// FILE: mc/world/entity/ai/attributes/AttributeInstance.java
+package net.mcreator.boh.compat.mc.world.entity.ai.attributes;
+
+import java.util.UUID;
+
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
+
+/** 1.20 AttributeInstance over a 1.7.10 {@link IAttributeInstance}. */
+public class AttributeInstance {
+
+    private final IAttributeInstance handle;
+
+    public AttributeInstance(IAttributeInstance handle) {
+        this.handle = handle;
+    }
+
+    public double getValue() {
+        return handle.getAttributeValue();
+    }
+
+    public double getBaseValue() {
+        return handle.getBaseValue();
+    }
+
+    public void setBaseValue(double v) {
+        handle.setBaseValue(v);
+    }
+
+    public void addTransientModifier(AttributeModifier m) {
+        if (handle.getModifier(m.getID()) == null) handle.applyModifier(m);
+    }
+
+    public void addPermanentModifier(AttributeModifier m) {
+        addTransientModifier(m);
+    }
+
+    public void removeModifier(AttributeModifier m) {
+        handle.removeModifier(m);
+    }
+
+    public void removeModifier(UUID id) {
+        AttributeModifier m = handle.getModifier(id);
+        if (m != null) handle.removeModifier(m);
+    }
+
+    public boolean hasModifier(AttributeModifier m) {
+        return handle.getModifier(m.getID()) != null;
+    }
+
+    public AttributeModifier getModifier(UUID id) {
+        return handle.getModifier(id);
+    }
+
+    public IAttributeInstance vanilla() {
+        return handle;
+    }
+}
+//// FILE: mc/world/entity/ai/sensing/Sensing.java
+package net.mcreator.boh.compat.mc.world.entity.ai.sensing;
+
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+
+public class Sensing {
+
+    private final EntityLiving mob;
+
+    public Sensing(EntityLiving mob) {
+        this.mob = mob;
+    }
+
+    public boolean hasLineOfSight(Entity e) {
+        return mob.getEntitySenses().canSee(e);
+    }
+}
+//// FILE: mc/world/entity/WalkAnimationState.java
+package net.mcreator.boh.compat.mc.world.entity;
+
+import net.minecraft.entity.EntityLivingBase;
+
+/** 1.20 WalkAnimationState view over the 1.7.10 limbSwing fields. */
+public class WalkAnimationState {
+
+    private final EntityLivingBase e;
+
+    public WalkAnimationState(EntityLivingBase e) {
+        this.e = e;
+    }
+
+    public float position() {
+        return e.limbSwing;
+    }
+
+    public float position(float partial) {
+        return e.limbSwing - e.limbSwingAmount * (1.0F - partial);
+    }
+
+    public float speed() {
+        return e.limbSwingAmount;
+    }
+
+    public float speed(float partial) {
+        return e.prevLimbSwingAmount + (e.limbSwingAmount - e.prevLimbSwingAmount) * partial;
+    }
+
+    public boolean isMoving() {
+        return e.limbSwingAmount > 1.0E-5F;
+    }
+
+    public void setSpeed(float s) {
+        e.limbSwingAmount = s;
+    }
+}
+//// FILE: mc/world/entity/projectile/Pickup.java
+package net.mcreator.boh.compat.mc.world.entity.projectile;
+
+/** 1.20 AbstractArrow.Pickup; ordinal matches 1.7.10 EntityArrow.canBePickedUp. */
+public enum Pickup {
+    DISALLOWED,
+    ALLOWED,
+    CREATIVE_ONLY
+}
+//// FILE: mc/world/level/material/Fluid.java
+package net.mcreator.boh.compat.mc.world.level.material;
+
+import net.minecraft.block.Block;
+
+/** 1.20 Fluid: water, lava or empty. */
+public final class Fluid {
+
+    final String name;
+    final Block still;
+
+    Fluid(String name, Block still) {
+        this.name = name;
+        this.still = still;
+    }
+
+    public boolean isSame(Fluid other) {
+        return other == this;
+    }
+
+    public FluidState defaultFluidState() {
+        return new FluidState(this, true);
+    }
+
+    public FluidState getSource(boolean falling) {
+        return new FluidState(this, true);
+    }
+
+    public int getTickDelay(Object world) {
+        return this == Fluids.LAVA ? 30 : 5;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+}
+//// FILE: mc/world/level/material/Fluids.java
+package net.mcreator.boh.compat.mc.world.level.material;
+
+import net.minecraft.init.Blocks;
+
+public final class Fluids {
+
+    public static final Fluid EMPTY = new Fluid("empty", Blocks.air);
+    public static final Fluid WATER = new Fluid("water", Blocks.water);
+    public static final Fluid FLOWING_WATER = WATER;
+    public static final Fluid LAVA = new Fluid("lava", Blocks.lava);
+    public static final Fluid FLOWING_LAVA = LAVA;
+
+    private Fluids() {}
+}
+//// FILE: mc/world/level/material/FluidState.java
+package net.mcreator.boh.compat.mc.world.level.material;
+
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+
+/** 1.20 FluidState for a block position. */
+public final class FluidState {
+
+    private final Fluid fluid;
+    private final boolean source;
+
+    FluidState(Fluid fluid, boolean source) {
+        this.fluid = fluid;
+        this.source = source;
+    }
+
+    public static FluidState of(Block block, int meta) {
+        Material m = block.getMaterial();
+        if (m == Material.water) return new FluidState(Fluids.WATER, meta == 0);
+        if (m == Material.lava) return new FluidState(Fluids.LAVA, meta == 0);
+        return new FluidState(Fluids.EMPTY, false);
+    }
+
+    public boolean isEmpty() {
+        return fluid == Fluids.EMPTY;
+    }
+
+    public boolean isSource() {
+        return source;
+    }
+
+    public Fluid getType() {
+        return fluid;
+    }
+
+    public boolean is(Fluid f) {
+        return fluid == f;
+    }
+
+    public int getAmount() {
+        return isEmpty() ? 0 : source ? 8 : 7;
+    }
+
+    public net.mcreator.boh.compat.mc.world.level.block.state.BlockState createLegacyBlock() {
+        return net.mcreator.boh.compat.mc.world.level.block.state.BlockState.of(fluid.still, 0);
+    }
+}
+//// FILE: world/Dimensions.java
+package net.mcreator.boh.compat.world;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import net.mcreator.boh.compat.mc.core.registries.Registries;
+import net.mcreator.boh.compat.mc.resources.ResourceKey;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.Teleporter;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+
+/** Dimension id <-> 1.20 dimension key, plus cross-dimension player transfer. */
+public final class Dimensions {
+
+    private static final Map<Integer, ResourceKey<World>> BY_ID = new HashMap<>();
+    private static final Map<ResourceKey<World>, Integer> BY_KEY = new HashMap<>();
+
+    public static final ResourceKey<World> OVERWORLD = register(new ResourceLocation("minecraft", "overworld"), 0);
+    public static final ResourceKey<World> NETHER = register(new ResourceLocation("minecraft", "the_nether"), -1);
+    public static final ResourceKey<World> END = register(new ResourceLocation("minecraft", "the_end"), 1);
+
+    private Dimensions() {}
+
+    public static ResourceKey<World> register(ResourceLocation name, int id) {
+        ResourceKey<World> key = ResourceKey.create(Registries.DIMENSION, name);
+        BY_ID.put(id, key);
+        BY_KEY.put(key, id);
+        return key;
+    }
+
+    public static ResourceKey<World> key(int id) {
+        ResourceKey<World> k = BY_ID.get(id);
+        if (k == null) k = register(new ResourceLocation("minecraft", "dim" + id), id);
+        return k;
+    }
+
+    public static int id(ResourceKey<?> key) {
+        Integer i = BY_KEY.get(key);
+        return i == null ? 0 : i;
+    }
+
+    /** Moves a player to another dimension and places them exactly at the given position (no portal search). */
+    public static void transferPlayer(EntityPlayerMP player, int dim, double x, double y, double z, float yaw, float pitch) {
+        MinecraftServer server = MinecraftServer.getServer();
+        WorldServer target = server.worldServerForDimension(dim);
+        if (target == null) return;
+        if (player.dimension != dim) {
+            server.getConfigurationManager().transferPlayerToDimension(player, dim, new Teleporter(target) {
+
+                @Override
+                public void placeInPortal(net.minecraft.entity.Entity e, double px, double py, double pz, float rot) {
+                    e.setLocationAndAngles(x, y, z, yaw, pitch);
+                    e.motionX = e.motionY = e.motionZ = 0;
+                }
+
+                @Override
+                public boolean placeInExistingPortal(net.minecraft.entity.Entity e, double px, double py, double pz, float rot) {
+                    placeInPortal(e, px, py, pz, rot);
+                    return true;
+                }
+
+                @Override
+                public boolean makePortal(net.minecraft.entity.Entity e) {
+                    return true;
+                }
+
+                @Override
+                public void removeStalePortalLocations(long time) {}
+            });
+        }
+        player.playerNetServerHandler.setPlayerLocation(x, y, z, yaw, pitch);
+    }
+}
+//// FILE: mc/world/food/FoodProperties.java
+package net.mcreator.boh.compat.mc.world.food;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
+
+import net.minecraft.potion.PotionEffect;
+
+/** 1.20 FoodProperties; consumed by the compat BohItem. */
+public class FoodProperties {
+
+    final int nutrition;
+    final float saturationModifier;
+    final boolean isMeat, canAlwaysEat, fastFood;
+    final List<Object[]> effects;
+
+    FoodProperties(int nutrition, float sat, boolean meat, boolean always, boolean fast, List<Object[]> effects) {
+        this.nutrition = nutrition;
+        this.saturationModifier = sat;
+        this.isMeat = meat;
+        this.canAlwaysEat = always;
+        this.fastFood = fast;
+        this.effects = effects;
+    }
+
+    public int getNutrition() {
+        return nutrition;
+    }
+
+    public float getSaturationModifier() {
+        return saturationModifier;
+    }
+
+    public boolean isMeat() {
+        return isMeat;
+    }
+
+    public boolean canAlwaysEat() {
+        return canAlwaysEat;
+    }
+
+    public boolean isFastFood() {
+        return fastFood;
+    }
+
+    /** (Supplier of PotionEffect, chance) pairs. */
+    @SuppressWarnings("unchecked")
+    public List<Object[]> getEffects() {
+        return effects;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder extends net.mcreator.boh.compat.mc.world.food.Builder {}
+}
+//// FILE: mc/world/food/Builder.java
+package net.mcreator.boh.compat.mc.world.food;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
+
+import net.minecraft.potion.PotionEffect;
+
+/** 1.20 FoodProperties.Builder. */
+public class Builder {
+
+    private int nutrition;
+    private float saturation;
+    private boolean meat, alwaysEat, fast;
+    private final List<Object[]> effects = new ArrayList<>();
+
+    public Builder nutrition(int n) {
+        nutrition = n;
+        return this;
+    }
+
+    public Builder saturationMod(float s) {
+        saturation = s;
+        return this;
+    }
+
+    public Builder meat() {
+        meat = true;
+        return this;
+    }
+
+    public Builder alwaysEat() {
+        alwaysEat = true;
+        return this;
+    }
+
+    public Builder fast() {
+        fast = true;
+        return this;
+    }
+
+    public Builder effect(Supplier<PotionEffect> effect, float chance) {
+        effects.add(new Object[] { effect, chance });
+        return this;
+    }
+
+    public Builder effect(PotionEffect effect, float chance) {
+        effects.add(new Object[] { (Supplier<PotionEffect>) () -> new PotionEffect(effect), chance });
+        return this;
+    }
+
+    public FoodProperties build() {
+        return new FoodProperties(nutrition, saturation, meat, alwaysEat, fast, effects);
+    }
+}

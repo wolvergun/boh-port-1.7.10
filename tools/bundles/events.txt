@@ -1,0 +1,630 @@
+//// FILE: forge/event/entity/living/LivingChangeTargetEvent.java
+package net.mcreator.boh.compat.forge.event.entity.living;
+
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraftforge.event.entity.living.LivingEvent;
+import cpw.mods.fml.common.eventhandler.Cancelable;
+
+/** 1.20 LivingChangeTargetEvent, posted by the bridge when a mob picks a new attack target. */
+@Cancelable
+public class LivingChangeTargetEvent extends LivingEvent {
+
+    private final EntityLivingBase originalTarget;
+    private EntityLivingBase newTarget;
+
+    public LivingChangeTargetEvent(EntityLivingBase entity, EntityLivingBase target) {
+        super(entity);
+        originalTarget = target;
+        newTarget = target;
+    }
+
+    public EntityLivingBase getOriginalTarget() {
+        return originalTarget;
+    }
+
+    public EntityLivingBase getNewTarget() {
+        return newTarget;
+    }
+
+    public void setNewTarget(EntityLivingBase t) {
+        newTarget = t;
+    }
+}
+//// FILE: forge/event/entity/living/ShieldBlockEvent.java
+package net.mcreator.boh.compat.forge.event.entity.living;
+
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.DamageSource;
+import net.minecraftforge.event.entity.living.LivingEvent;
+import cpw.mods.fml.common.eventhandler.Cancelable;
+
+/** 1.20 ShieldBlockEvent; 1.7.10 has no shields, so it fires when a sword-blocking player is attacked. */
+@Cancelable
+public class ShieldBlockEvent extends LivingEvent {
+
+    private final DamageSource source;
+    private float blocked;
+
+    public ShieldBlockEvent(EntityLivingBase entity, DamageSource source, float blocked) {
+        super(entity);
+        this.source = source;
+        this.blocked = blocked;
+    }
+
+    public DamageSource getDamageSource() {
+        return source;
+    }
+
+    public float getBlockedDamage() {
+        return blocked;
+    }
+
+    public void setBlockedDamage(float f) {
+        blocked = f;
+    }
+}
+//// FILE: forge/event/entity/player/RightClickBlock.java
+package net.mcreator.boh.compat.forge.event.entity.player;
+
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.core.Direction;
+import net.mcreator.boh.compat.mc.world.InteractionHand;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import cpw.mods.fml.common.eventhandler.Cancelable;
+
+/** 1.20 PlayerInteractEvent.RightClickBlock (bridged from 1.7.10 PlayerInteractEvent RIGHT_CLICK_BLOCK). */
+@Cancelable
+public class RightClickBlock extends PlayerEvent {
+
+    private final BlockPos pos;
+    private final Direction face;
+
+    public RightClickBlock(EntityPlayer player, BlockPos pos, Direction face) {
+        super(player);
+        this.pos = pos;
+        this.face = face;
+    }
+
+    public World getLevel() {
+        return entityPlayer.worldObj;
+    }
+
+    public BlockPos getPos() {
+        return pos;
+    }
+
+    public Direction getFace() {
+        return face;
+    }
+
+    public InteractionHand getHand() {
+        return InteractionHand.MAIN_HAND;
+    }
+
+    public ItemStack getItemStack() {
+        return net.mcreator.boh.compat.M.stack(entityPlayer.getHeldItem());
+    }
+}
+//// FILE: forge/event/entity/player/LeftClickBlock.java
+package net.mcreator.boh.compat.forge.event.entity.player;
+
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.core.Direction;
+import net.mcreator.boh.compat.mc.world.InteractionHand;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import cpw.mods.fml.common.eventhandler.Cancelable;
+
+/** 1.20 PlayerInteractEvent.LeftClickBlock (bridged from 1.7.10 PlayerInteractEvent LEFT_CLICK_BLOCK). */
+@Cancelable
+public class LeftClickBlock extends PlayerEvent {
+
+    private final BlockPos pos;
+    private final Direction face;
+
+    public LeftClickBlock(EntityPlayer player, BlockPos pos, Direction face) {
+        super(player);
+        this.pos = pos;
+        this.face = face;
+    }
+
+    public World getLevel() {
+        return entityPlayer.worldObj;
+    }
+
+    public BlockPos getPos() {
+        return pos;
+    }
+
+    public Direction getFace() {
+        return face;
+    }
+
+    public InteractionHand getHand() {
+        return InteractionHand.MAIN_HAND;
+    }
+
+    public ItemStack getItemStack() {
+        return net.mcreator.boh.compat.M.stack(entityPlayer.getHeldItem());
+    }
+}
+//// FILE: forge/event/entity/player/LeftClickEmpty.java
+package net.mcreator.boh.compat.forge.event.entity.player;
+
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.world.InteractionHand;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+
+/** 1.20 PlayerInteractEvent.LeftClickEmpty: client-side swing at nothing. */
+public class LeftClickEmpty extends PlayerEvent {
+
+    public LeftClickEmpty(EntityPlayer player) {
+        super(player);
+    }
+
+    public World getLevel() {
+        return entityPlayer.worldObj;
+    }
+
+    public BlockPos getPos() {
+        return BlockPos.containing(entityPlayer.posX, entityPlayer.boundingBox.minY, entityPlayer.posZ);
+    }
+
+    public InteractionHand getHand() {
+        return InteractionHand.MAIN_HAND;
+    }
+}
+//// FILE: forge/event/RegisterCommandsEvent.java
+package net.mcreator.boh.compat.forge.event;
+
+import net.mcreator.boh.compat.mc.commands.Commands;
+import cpw.mods.fml.common.eventhandler.Event;
+
+/** 1.20 RegisterCommandsEvent: commands are collected in Commands.REGISTERED and exposed as 1.7.10 commands. */
+public class RegisterCommandsEvent extends Event {
+
+    public Commands getDispatcher() {
+        return Commands.INSTANCE;
+    }
+}
+//// FILE: forge/event/entity/EntityAttributeCreationEvent.java
+package net.mcreator.boh.compat.forge.event.entity;
+
+import net.mcreator.boh.compat.mc.world.entity.EntityType;
+import net.mcreator.boh.compat.mc.world.entity.ai.attributes.AttributeSupplier;
+import cpw.mods.fml.common.eventhandler.Event;
+
+/** 1.20 EntityAttributeCreationEvent. */
+public class EntityAttributeCreationEvent extends Event {
+
+    public void put(EntityType<?> type, AttributeSupplier supplier) {
+        if (type != null && type.getEntityClass() != null) AttributeSupplier.register(type.getEntityClass(), supplier);
+    }
+}
+//// FILE: forge/fml/event/lifecycle/FMLCommonSetupEvent.java
+package net.mcreator.boh.compat.forge.fml.event.lifecycle;
+
+import cpw.mods.fml.common.eventhandler.Event;
+
+/** 1.20 FMLCommonSetupEvent, posted on the mod bus during init. */
+public class FMLCommonSetupEvent extends Event {
+
+    public void enqueueWork(Runnable r) {
+        r.run();
+    }
+}
+//// FILE: forge/fml/event/lifecycle/FMLClientSetupEvent.java
+package net.mcreator.boh.compat.forge.fml.event.lifecycle;
+
+import cpw.mods.fml.common.eventhandler.Event;
+
+/** 1.20 FMLClientSetupEvent, posted on the mod bus during client init. */
+public class FMLClientSetupEvent extends Event {
+
+    public void enqueueWork(Runnable r) {
+        r.run();
+    }
+}
+//// FILE: forge/client/event/RegisterRenderers.java
+package net.mcreator.boh.compat.forge.client.event;
+
+import java.util.function.Function;
+
+import net.mcreator.boh.compat.client.ClientRegistry;
+import net.mcreator.boh.compat.mc.client.renderer.entity.Context;
+import net.mcreator.boh.compat.mc.world.entity.EntityType;
+import net.mcreator.boh.compat.mc.world.level.block.entity.BlockEntityType;
+import cpw.mods.fml.common.eventhandler.Event;
+
+/** 1.20 EntityRenderersEvent.RegisterRenderers. */
+public class RegisterRenderers extends Event {
+
+    public void registerEntityRenderer(EntityType<?> type, Function<Context, ?> factory) {
+        ClientRegistry.entityRenderer(type, factory);
+    }
+
+    public void registerBlockEntityRenderer(BlockEntityType<?> type, Function<Context, ?> factory) {
+        ClientRegistry.blockEntityRenderer(type, factory);
+    }
+}
+//// FILE: forge/client/event/RegisterLayerDefinitions.java
+package net.mcreator.boh.compat.forge.client.event;
+
+import java.util.function.Supplier;
+
+import net.mcreator.boh.compat.mc.client.model.geom.ModelLayerLocation;
+import net.mcreator.boh.compat.mc.client.model.geom.ModelLayers;
+import net.mcreator.boh.compat.mc.client.model.geom.builders.LayerDefinition;
+import cpw.mods.fml.common.eventhandler.Event;
+
+/** 1.20 EntityRenderersEvent.RegisterLayerDefinitions. */
+public class RegisterLayerDefinitions extends Event {
+
+    public void registerLayerDefinition(ModelLayerLocation loc, Supplier<LayerDefinition> def) {
+        ModelLayers.register(loc, def);
+    }
+}
+//// FILE: forge/client/event/RegisterParticleProvidersEvent.java
+package net.mcreator.boh.compat.forge.client.event;
+
+import java.util.function.Function;
+
+import net.mcreator.boh.compat.client.particle.ParticleEngine;
+import net.mcreator.boh.compat.mc.client.particle.SpriteSet;
+import net.mcreator.boh.compat.mc.core.particles.ParticleType;
+import cpw.mods.fml.common.eventhandler.Event;
+
+/** 1.20 RegisterParticleProvidersEvent. */
+public class RegisterParticleProvidersEvent extends Event {
+
+    public <T> void registerSpriteSet(ParticleType<?> type, Function<SpriteSet, ? extends net.mcreator.boh.compat.mc.client.particle.ParticleProvider<T>> provider) {
+        ParticleEngine.registerSpriteSet(type, provider);
+    }
+}
+//// FILE: forge/client/event/Window.java
+package net.mcreator.boh.compat.forge.client.event;
+
+/** Scaled GUI size snapshot (1.20 Window). */
+public final class Window {
+
+    private final int w, h;
+
+    public Window(int w, int h) {
+        this.w = w;
+        this.h = h;
+    }
+
+    public int getGuiScaledWidth() {
+        return w;
+    }
+
+    public int getGuiScaledHeight() {
+        return h;
+    }
+
+    public int getScreenWidth() {
+        return w;
+    }
+
+    public int getScreenHeight() {
+        return h;
+    }
+}
+//// FILE: forge/client/event/Pre.java
+package net.mcreator.boh.compat.forge.client.event;
+
+import net.mcreator.boh.compat.mc.client.gui.GuiGraphics;
+import cpw.mods.fml.common.eventhandler.Cancelable;
+import cpw.mods.fml.common.eventhandler.Event;
+
+/** 1.20 RenderGuiEvent.Pre, posted from RenderGameOverlayEvent.Pre(ALL). */
+@Cancelable
+public class Pre extends Event {
+
+    private final Window window;
+    private final GuiGraphics graphics;
+    private final float partialTick;
+
+    public Pre(Window window, GuiGraphics graphics, float partialTick) {
+        this.window = window;
+        this.graphics = graphics;
+        this.partialTick = partialTick;
+    }
+
+    public Window getWindow() {
+        return window;
+    }
+
+    public GuiGraphics getGuiGraphics() {
+        return graphics;
+    }
+
+    public float getPartialTick() {
+        return partialTick;
+    }
+}
+//// FILE: forge/client/event/RenderFog.java
+package net.mcreator.boh.compat.forge.client.event;
+
+import net.mcreator.boh.compat.mc.client.Camera;
+import net.mcreator.boh.compat.mc.client.renderer.FogMode;
+import net.mcreator.boh.compat.mojang.blaze3d.shaders.FogShape;
+import cpw.mods.fml.common.eventhandler.Cancelable;
+import cpw.mods.fml.common.eventhandler.Event;
+
+/** 1.20 ViewportEvent.RenderFog; when canceled the bridge applies near/far as linear fog. */
+@Cancelable
+public class RenderFog extends Event {
+
+    private final FogMode mode;
+    private final Camera camera;
+    private final double partialTick;
+    private float near, far;
+    private FogShape shape = FogShape.SPHERE;
+
+    public RenderFog(FogMode mode, Camera camera, double partialTick, float near, float far) {
+        this.mode = mode;
+        this.camera = camera;
+        this.partialTick = partialTick;
+        this.near = near;
+        this.far = far;
+    }
+
+    public FogMode getMode() {
+        return mode;
+    }
+
+    public Camera getCamera() {
+        return camera;
+    }
+
+    public double getPartialTick() {
+        return partialTick;
+    }
+
+    public float getNearPlaneDistance() {
+        return near;
+    }
+
+    public void setNearPlaneDistance(float f) {
+        near = f;
+    }
+
+    public float getFarPlaneDistance() {
+        return far;
+    }
+
+    public void setFarPlaneDistance(float f) {
+        far = f;
+    }
+
+    public FogShape getFogShape() {
+        return shape;
+    }
+
+    public void setFogShape(FogShape s) {
+        shape = s;
+    }
+
+    public void scaleNearPlaneDistance(float f) {
+        near *= f;
+    }
+
+    public void scaleFarPlaneDistance(float f) {
+        far *= f;
+    }
+}
+//// FILE: forge/client/event/ComputeFogColor.java
+package net.mcreator.boh.compat.forge.client.event;
+
+import net.mcreator.boh.compat.mc.client.Camera;
+import cpw.mods.fml.common.eventhandler.Event;
+
+/** 1.20 ViewportEvent.ComputeFogColor, bridged from EntityViewRenderEvent.FogColors. */
+public class ComputeFogColor extends Event {
+
+    private final Camera camera;
+    private final double partialTick;
+    private float red, green, blue;
+
+    public ComputeFogColor(Camera camera, double partialTick, float r, float g, float b) {
+        this.camera = camera;
+        this.partialTick = partialTick;
+        red = r;
+        green = g;
+        blue = b;
+    }
+
+    public Camera getCamera() {
+        return camera;
+    }
+
+    public double getPartialTick() {
+        return partialTick;
+    }
+
+    public float getRed() {
+        return red;
+    }
+
+    public float getGreen() {
+        return green;
+    }
+
+    public float getBlue() {
+        return blue;
+    }
+
+    public void setRed(float f) {
+        red = f;
+    }
+
+    public void setGreen(float f) {
+        green = f;
+    }
+
+    public void setBlue(float f) {
+        blue = f;
+    }
+}
+//// FILE: mc/client/Camera.java
+package net.mcreator.boh.compat.mc.client;
+
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.world.phys.Vec3;
+import net.minecraft.entity.Entity;
+
+/** 1.20 Camera: view entity + interpolated eye position. */
+public final class Camera {
+
+    private final Entity entity;
+    private final Vec3 position;
+
+    public Camera(Entity entity, Vec3 position) {
+        this.entity = entity;
+        this.position = position;
+    }
+
+    public Entity getEntity() {
+        return entity;
+    }
+
+    public Vec3 getPosition() {
+        return position;
+    }
+
+    public BlockPos getBlockPosition() {
+        return BlockPos.containing(position.x, position.y, position.z);
+    }
+
+    public boolean isInitialized() {
+        return entity != null;
+    }
+
+    public float getYRot() {
+        return entity == null ? 0 : entity.rotationYaw;
+    }
+
+    public float getXRot() {
+        return entity == null ? 0 : entity.rotationPitch;
+    }
+}
+//// FILE: mc/client/renderer/FogMode.java
+package net.mcreator.boh.compat.mc.client.renderer;
+
+/** 1.20 FogRenderer.FogMode. */
+public enum FogMode {
+    FOG_SKY,
+    FOG_TERRAIN
+}
+//// FILE: mojang/blaze3d/shaders/FogShape.java
+package net.mcreator.boh.compat.mojang.blaze3d.shaders;
+
+/** 1.20 FogShape. */
+public enum FogShape {
+    SPHERE,
+    CYLINDER
+}
+//// FILE: mc/client/gui/GuiGraphics.java
+package net.mcreator.boh.compat.mc.client.gui;
+
+import net.mcreator.boh.compat.MClientImpl;
+import net.mcreator.boh.compat.client.PoseStack;
+import net.mcreator.boh.compat.mc.network.chat.Component;
+import net.minecraft.util.ResourceLocation;
+
+/** 1.20 GuiGraphics: immediate-mode 2D drawing, implemented by MClientImpl. */
+public class GuiGraphics {
+
+    private final PoseStack pose = new PoseStack();
+
+    public PoseStack pose() {
+        return pose;
+    }
+
+    public int guiWidth() {
+        return MClientImpl.guiWidth();
+    }
+
+    public int guiHeight() {
+        return MClientImpl.guiHeight();
+    }
+
+    public void blit(ResourceLocation tex, int x, int y, float u, float v, int w, int h, int texW, int texH) {
+        MClientImpl.blit(tex, x, y, u, v, w, h, w, h, texW, texH);
+    }
+
+    public void blit(ResourceLocation tex, int x, int y, int w, int h, float u, float v, int uw, int vh, int texW, int texH) {
+        MClientImpl.blit(tex, x, y, u, v, w, h, uw, vh, texW, texH);
+    }
+
+    public void blit(ResourceLocation tex, int x, int y, int u, int v, int w, int h) {
+        MClientImpl.blit(tex, x, y, u, v, w, h, w, h, 256, 256);
+    }
+
+    public int drawString(Object font, String text, int x, int y, int color) {
+        return MClientImpl.drawString(text, x, y, color, true);
+    }
+
+    public int drawString(Object font, String text, int x, int y, int color, boolean shadow) {
+        return MClientImpl.drawString(text, x, y, color, shadow);
+    }
+
+    public int drawString(Object font, Component text, int x, int y, int color) {
+        return MClientImpl.drawString(text.getFormattedText(), x, y, color, true);
+    }
+
+    public int drawString(Object font, Component text, int x, int y, int color, boolean shadow) {
+        return MClientImpl.drawString(text.getFormattedText(), x, y, color, shadow);
+    }
+
+    public void drawCenteredString(Object font, String text, int x, int y, int color) {
+        MClientImpl.drawString(text, x - MClientImpl.stringWidth(text) / 2, y, color, true);
+    }
+
+    public void drawCenteredString(Object font, Component text, int x, int y, int color) {
+        drawCenteredString(font, text.getFormattedText(), x, y, color);
+    }
+
+    public void fill(int x1, int y1, int x2, int y2, int color) {
+        MClientImpl.fill(x1, y1, x2, y2, color);
+    }
+
+    public void renderItem(net.minecraft.item.ItemStack stack, int x, int y) {
+        MClientImpl.renderItem(stack, x, y);
+    }
+}
+//// FILE: client/ClientRegistry.java
+package net.mcreator.boh.compat.client;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Function;
+
+import net.mcreator.boh.compat.mc.client.renderer.entity.Context;
+import net.mcreator.boh.compat.mc.world.entity.EntityType;
+import net.mcreator.boh.compat.mc.world.level.block.entity.BlockEntityType;
+
+/** Renderer factories collected from the 1.20 registration events; bound to 1.7.10 registries by MClientImpl. */
+public final class ClientRegistry {
+
+    public static final Map<EntityType<?>, Function<Context, ?>> ENTITY = new LinkedHashMap<>();
+    public static final Map<BlockEntityType<?>, Function<Context, ?>> BLOCK_ENTITY = new LinkedHashMap<>();
+
+    private ClientRegistry() {}
+
+    public static void entityRenderer(EntityType<?> type, Function<Context, ?> f) {
+        ENTITY.put(type, f);
+    }
+
+    public static void blockEntityRenderer(BlockEntityType<?> type, Function<Context, ?> f) {
+        BLOCK_ENTITY.put(type, f);
+    }
+}

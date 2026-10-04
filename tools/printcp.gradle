@@ -1,0 +1,8 @@
+allprojects {
+    afterEvaluate { p ->
+        p.tasks.register("printCp") {
+            def cp = p.sourceSets.main.compileClasspath
+            doLast { new File(p.rootDir, "../tools/classpath.txt").text = cp.asPath }
+        }
+    }
+}

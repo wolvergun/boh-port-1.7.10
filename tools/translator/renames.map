@@ -1,0 +1,2 @@
+# methods whose modern signature clashes with a same-named 1.7.10 method -> new name (declarations and calls)
+getDeathSound -> getDeathSoundEvent

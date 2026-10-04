@@ -1,0 +1,224 @@
+//// FILE: net/CompatNetwork.java
+package net.mcreator.boh.compat.net;
+
+import io.netty.buffer.ByteBuf;
+import net.mcreator.boh.compat.MClientImpl;
+import net.mcreator.boh.compat.mc.core.particles.ParticleType;
+import net.mcreator.boh.compat.registry.Registration;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.Item;
+import net.minecraft.world.WorldServer;
+import cpw.mods.fml.common.network.ByteBufUtils;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
+import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import cpw.mods.fml.relauncher.Side;
+
+/** Port-internal packets for things 1.7.10 cannot sync on its own (mod particles, action bar, cooldowns). */
+public final class CompatNetwork {
+
+    public static final SimpleNetworkWrapper CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel("boh_compat");
+    private static boolean registered;
+
+    private CompatNetwork() {}
+
+    public static void init() {
+        if (registered) return;
+        registered = true;
+        CHANNEL.registerMessage(ParticleMsg.Handler.class, ParticleMsg.class, 0, Side.CLIENT);
+        CHANNEL.registerMessage(TextMsg.Handler.class, TextMsg.class, 1, Side.CLIENT);
+        CHANNEL.registerMessage(CooldownMsg.Handler.class, CooldownMsg.class, 2, Side.CLIENT);
+    }
+
+    public static void sendParticles(WorldServer w, ParticleType<?> type, double x, double y, double z, int count, double dx, double dy,
+        double dz, double speed) {
+        int idx = Registration.PARTICLES.indexOf(type);
+        if (idx < 0) return;
+        CHANNEL.sendToAllAround(new ParticleMsg(idx, x, y, z, count, dx, dy, dz, speed),
+            new NetworkRegistry.TargetPoint(w.provider.dimensionId, x, y, z, 64));
+    }
+
+    public static void sendActionBar(EntityPlayerMP p, String text) {
+        CHANNEL.sendTo(new TextMsg(text), p);
+    }
+
+    public static void sendCooldown(EntityPlayerMP p, Item item, int ticks) {
+        CHANNEL.sendTo(new CooldownMsg(Item.getIdFromItem(item), ticks), p);
+    }
+
+    public static final class ParticleMsg implements IMessage {
+
+        int type, count;
+        double x, y, z, dx, dy, dz, speed;
+
+        public ParticleMsg() {}
+
+        ParticleMsg(int type, double x, double y, double z, int count, double dx, double dy, double dz, double speed) {
+            this.type = type;
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.count = count;
+            this.dx = dx;
+            this.dy = dy;
+            this.dz = dz;
+            this.speed = speed;
+        }
+
+        @Override
+        public void fromBytes(ByteBuf b) {
+            type = b.readInt();
+            count = b.readInt();
+            x = b.readDouble();
+            y = b.readDouble();
+            z = b.readDouble();
+            dx = b.readDouble();
+            dy = b.readDouble();
+            dz = b.readDouble();
+            speed = b.readDouble();
+        }
+
+        @Override
+        public void toBytes(ByteBuf b) {
+            b.writeInt(type);
+            b.writeInt(count);
+            b.writeDouble(x);
+            b.writeDouble(y);
+            b.writeDouble(z);
+            b.writeDouble(dx);
+            b.writeDouble(dy);
+            b.writeDouble(dz);
+            b.writeDouble(speed);
+        }
+
+        public static final class Handler implements IMessageHandler<ParticleMsg, IMessage> {
+
+            @Override
+            public IMessage onMessage(ParticleMsg m, MessageContext ctx) {
+                if (m.type < 0 || m.type >= Registration.PARTICLES.size()) return null;
+                ParticleType<?> t = Registration.PARTICLES.get(m.type);
+                MClientImpl.spawnParticleBurst(t, m.x, m.y, m.z, m.count, m.dx, m.dy, m.dz, m.speed);
+                return null;
+            }
+        }
+    }
+
+    public static final class TextMsg implements IMessage {
+
+        String text;
+
+        public TextMsg() {}
+
+        TextMsg(String text) {
+            this.text = text;
+        }
+
+        @Override
+        public void fromBytes(ByteBuf b) {
+            text = ByteBufUtils.readUTF8String(b);
+        }
+
+        @Override
+        public void toBytes(ByteBuf b) {
+            ByteBufUtils.writeUTF8String(b, text);
+        }
+
+        public static final class Handler implements IMessageHandler<TextMsg, IMessage> {
+
+            @Override
+            public IMessage onMessage(TextMsg m, MessageContext ctx) {
+                MClientImpl.setActionBar(m.text);
+                return null;
+            }
+        }
+    }
+
+    public static final class CooldownMsg implements IMessage {
+
+        int item, ticks;
+
+        public CooldownMsg() {}
+
+        CooldownMsg(int item, int ticks) {
+            this.item = item;
+            this.ticks = ticks;
+        }
+
+        @Override
+        public void fromBytes(ByteBuf b) {
+            item = b.readInt();
+            ticks = b.readInt();
+        }
+
+        @Override
+        public void toBytes(ByteBuf b) {
+            b.writeInt(item);
+            b.writeInt(ticks);
+        }
+
+        public static final class Handler implements IMessageHandler<CooldownMsg, IMessage> {
+
+            @Override
+            public IMessage onMessage(CooldownMsg m, MessageContext ctx) {
+                MClientImpl.applyCooldown(Item.getItemById(m.item), m.ticks);
+                return null;
+            }
+        }
+    }
+}
+//// FILE: MClientImpl.java
+package net.mcreator.boh.compat;
+
+import net.mcreator.boh.compat.client.particle.ParticleEngine;
+import net.mcreator.boh.compat.entity.ItemCooldowns;
+import net.mcreator.boh.compat.mc.core.particles.ParticleType;
+import net.minecraft.client.Minecraft;
+import net.minecraft.item.Item;
+import net.minecraft.world.World;
+
+/**
+ * Client-only implementations behind the M helpers. Only referenced from method bodies, so a dedicated server
+ * never loads it.
+ */
+public final class MClientImpl {
+
+    private MClientImpl() {}
+
+    public static float starBrightness(World w, float partial) {
+        return w.isRemote ? w.getStarBrightness(partial) : 0;
+    }
+
+    public static void spawnModParticle(ParticleType<?> t, double x, double y, double z, double dx, double dy, double dz) {
+        ParticleEngine.spawn(t, x, y, z, dx, dy, dz);
+    }
+
+    public static void spawnParticleBurst(ParticleType<?> t, double x, double y, double z, int count, double dx, double dy, double dz,
+        double speed) {
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc.theWorld == null) return;
+        java.util.Random r = mc.theWorld.rand;
+        if (count == 0) {
+            ParticleEngine.spawn(t, x, y, z, dx * speed, dy * speed, dz * speed);
+            return;
+        }
+        for (int i = 0; i < count; i++) {
+            ParticleEngine.spawn(t, x + r.nextGaussian() * dx, y + r.nextGaussian() * dy, z + r.nextGaussian() * dz,
+                r.nextGaussian() * speed, r.nextGaussian() * speed, r.nextGaussian() * speed);
+        }
+    }
+
+    public static void setActionBar(String text) {
+        Minecraft.getMinecraft().ingameGUI.func_110326_a(text, false);
+    }
+
+    public static void closeScreen() {
+        Minecraft.getMinecraft().displayGuiScreen(null);
+    }
+
+    public static void applyCooldown(Item item, int ticks) {
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc.thePlayer != null && item != null) ItemCooldowns.of(mc.thePlayer).addCooldown(item, ticks);
+    }
+}

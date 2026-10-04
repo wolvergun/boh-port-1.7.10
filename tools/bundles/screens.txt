@@ -1,0 +1,329 @@
+//// FILE: mc/client/gui/screens/inventory/AbstractContainerScreen.java
+package net.mcreator.boh.compat.mc.client.gui.screens.inventory;
+
+import net.mcreator.boh.compat.mc.client.gui.GuiGraphics;
+import net.mcreator.boh.compat.mc.client.gui.components.Button;
+import net.mcreator.boh.compat.mc.network.chat.Component;
+import net.mcreator.boh.compat.mc.world.inventory.AbstractContainerMenu;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.entity.player.InventoryPlayer;
+
+import org.lwjgl.input.Keyboard;
+
+/** 1.20 AbstractContainerScreen on 1.7.10 GuiContainer. */
+public abstract class AbstractContainerScreen<T extends AbstractContainerMenu> extends GuiContainer {
+
+    protected final T menu;
+    protected final InventoryPlayer playerInventory;
+    protected final Component title;
+    protected int imageWidth = 176, imageHeight = 166;
+    protected int leftPos, topPos;
+    protected int titleLabelX = 8, titleLabelY = 6, inventoryLabelX = 8, inventoryLabelY;
+    protected FontRenderer font;
+    protected Minecraft minecraft;
+    private final GuiGraphics graphics = new GuiGraphics();
+
+    public AbstractContainerScreen(T menu, InventoryPlayer inv, Component title) {
+        super(menu);
+        this.menu = menu;
+        this.playerInventory = inv;
+        this.title = title;
+        inventoryLabelY = imageHeight - 94;
+    }
+
+    public T getMenu() {
+        return menu;
+    }
+
+    public Component getTitle() {
+        return title;
+    }
+
+    // ------------------------------------------------------------------ 1.20 API
+
+    protected void init() {}
+
+    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        super.drawScreen(mouseX, mouseY, partialTick);
+    }
+
+    protected abstract void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY);
+
+    protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
+        g.drawString(font, title, titleLabelX, titleLabelY, 0x404040, false);
+    }
+
+    public void renderBackground(GuiGraphics g) {
+        drawDefaultBackground();
+    }
+
+    protected void renderTooltip(GuiGraphics g, int mouseX, int mouseY) {}
+
+    public boolean keyPressed(int key, int scanCode, int modifiers) {
+        int lwjgl = key == 256 ? Keyboard.KEY_ESCAPE : scanCode;
+        super.keyTyped('\0', lwjgl);
+        return true;
+    }
+
+    public <W extends GuiButton> W addRenderableWidget(W w) {
+        w.id = buttonList.size();
+        buttonList.add(w);
+        return w;
+    }
+
+    public <W> W addWidget(W w) {
+        if (w instanceof GuiButton) addRenderableWidget((GuiButton) w);
+        return w;
+    }
+
+    public void onClose() {
+        if (mc.thePlayer != null) mc.thePlayer.closeScreen();
+    }
+
+    public void containerTick() {}
+
+    public boolean isPauseScreen() {
+        return false;
+    }
+
+    // ------------------------------------------------------------------ 1.7.10 bridge
+
+    @Override
+    public void initGui() {
+        xSize = imageWidth;
+        ySize = imageHeight;
+        super.initGui();
+        buttonList.clear();
+        leftPos = guiLeft;
+        topPos = guiTop;
+        font = fontRendererObj;
+        minecraft = mc;
+        init();
+    }
+
+    @Override
+    public void drawScreen(int mouseX, int mouseY, float partialTick) {
+        render(graphics, mouseX, mouseY, partialTick);
+    }
+
+    @Override
+    protected void drawGuiContainerBackgroundLayer(float partialTick, int mouseX, int mouseY) {
+        renderBg(graphics, partialTick, mouseX, mouseY);
+    }
+
+    @Override
+    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+        renderLabels(graphics, mouseX, mouseY);
+    }
+
+    @Override
+    protected void keyTyped(char c, int key) {
+        int glfw = key == Keyboard.KEY_ESCAPE ? 256 : key;
+        keyPressed(glfw, key, 0);
+    }
+
+    @Override
+    protected void actionPerformed(GuiButton b) {
+        if (b instanceof Button) ((Button) b).onPress();
+    }
+
+    @Override
+    public void updateScreen() {
+        super.updateScreen();
+        containerTick();
+    }
+
+    @Override
+    public boolean doesGuiPauseGame() {
+        return isPauseScreen();
+    }
+}
+//// FILE: mc/client/gui/screens/inventory/EffectRenderingInventoryScreen.java
+package net.mcreator.boh.compat.mc.client.gui.screens.inventory;
+
+import net.mcreator.boh.compat.mc.network.chat.Component;
+import net.mcreator.boh.compat.mc.world.inventory.AbstractContainerMenu;
+import net.minecraft.entity.player.InventoryPlayer;
+
+/** 1.20 EffectRenderingInventoryScreen (type used in mob effect client extensions). */
+public abstract class EffectRenderingInventoryScreen<T extends AbstractContainerMenu> extends AbstractContainerScreen<T> {
+
+    public EffectRenderingInventoryScreen(T menu, InventoryPlayer inv, Component title) {
+        super(menu, inv, title);
+    }
+}
+//// FILE: mc/client/gui/components/Button.java
+package net.mcreator.boh.compat.mc.client.gui.components;
+
+import java.util.function.Function;
+
+import net.mcreator.boh.compat.mc.client.gui.GuiGraphics;
+import net.mcreator.boh.compat.mc.network.chat.Component;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
+
+/** 1.20 Button on 1.7.10 GuiButton. */
+public class Button extends GuiButton {
+
+    @FunctionalInterface
+    public interface OnPress {
+
+        void onPress(Button b);
+    }
+
+    public static final class Builder {
+
+        final Component message;
+        final OnPress onPress;
+        int x, y, width = 150, height = 20;
+
+        Builder(Component message, OnPress onPress) {
+            this.message = message;
+            this.onPress = onPress;
+        }
+
+        public Builder bounds(int x, int y, int w, int h) {
+            this.x = x;
+            this.y = y;
+            width = w;
+            height = h;
+            return this;
+        }
+
+        public Builder pos(int x, int y) {
+            this.x = x;
+            this.y = y;
+            return this;
+        }
+
+        public Builder size(int w, int h) {
+            width = w;
+            height = h;
+            return this;
+        }
+
+        public Builder tooltip(Object t) {
+            return this;
+        }
+
+        public Button build() {
+            return new Button(this);
+        }
+
+        public Button build(Function<Builder, Button> f) {
+            return f.apply(this);
+        }
+    }
+
+    protected final OnPress onPress;
+    private Minecraft mcRef;
+    private int lastMouseX, lastMouseY;
+
+    public static Builder builder(Component message, OnPress onPress) {
+        return new Builder(message, onPress);
+    }
+
+    protected Button(Builder b) {
+        super(0, b.x, b.y, b.width, b.height, b.message == null ? "" : b.message.getFormattedText());
+        onPress = b.onPress;
+    }
+
+    public Button(int x, int y, int w, int h, Component message, OnPress onPress) {
+        super(0, x, y, w, h, message == null ? "" : message.getFormattedText());
+        this.onPress = onPress;
+    }
+
+    public void onPress() {
+        if (onPress != null) onPress.onPress(this);
+    }
+
+    public void setMessage(Component c) {
+        displayString = c.getFormattedText();
+    }
+
+    public boolean isHoveredOrFocused() {
+        return field_146123_n;
+    }
+
+    public void renderWidget(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        super.drawButton(mcRef, mouseX, mouseY);
+    }
+
+    @Override
+    public void drawButton(Minecraft mc, int mouseX, int mouseY) {
+        mcRef = mc;
+        lastMouseX = mouseX;
+        lastMouseY = mouseY;
+        field_146123_n = mouseX >= xPosition && mouseY >= yPosition && mouseX < xPosition + width && mouseY < yPosition + height;
+        renderWidget(new GuiGraphics(), mouseX, mouseY, 0);
+    }
+}
+//// FILE: mc/client/gui/components/ImageButton.java
+package net.mcreator.boh.compat.mc.client.gui.components;
+
+import net.mcreator.boh.compat.MClientImpl;
+import net.mcreator.boh.compat.mc.client.gui.GuiGraphics;
+import net.mcreator.boh.compat.mc.network.chat.Component;
+import net.minecraft.util.ResourceLocation;
+
+import org.lwjgl.opengl.GL11;
+
+/** 1.20 ImageButton: textured button with a hover row offset. */
+public class ImageButton extends Button {
+
+    private final ResourceLocation texture;
+    private final int u, v, yDiff, texW, texH;
+
+    public ImageButton(int x, int y, int w, int h, int u, int v, int yDiff, ResourceLocation tex, int texW, int texH, OnPress onPress) {
+        super(x, y, w, h, Component.empty(), onPress);
+        this.texture = tex;
+        this.u = u;
+        this.v = v;
+        this.yDiff = yDiff;
+        this.texW = texW;
+        this.texH = texH;
+    }
+
+    public ImageButton(int x, int y, int w, int h, int u, int v, int yDiff, ResourceLocation tex, OnPress onPress) {
+        this(x, y, w, h, u, v, yDiff, tex, 256, 256, onPress);
+    }
+
+    public ImageButton(int x, int y, int w, int h, int u, int v, ResourceLocation tex, OnPress onPress) {
+        this(x, y, w, h, u, v, h, tex, 256, 256, onPress);
+    }
+
+    @Override
+    public void renderWidget(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        if (!visible) return;
+        GL11.glColor4f(1, 1, 1, 1);
+        GL11.glEnable(GL11.GL_BLEND);
+        int vv = v + (isHoveredOrFocused() ? yDiff : 0);
+        MClientImpl.blit(texture, xPosition, yPosition, u, vv, width, height, width, height, texW, texH);
+    }
+}
+//// FILE: mc/client/gui/components/EditBox.java
+package net.mcreator.boh.compat.mc.client.gui.components;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiTextField;
+
+/** 1.20 EditBox on 1.7.10 GuiTextField. */
+public class EditBox extends GuiTextField {
+
+    public EditBox(Object font, int x, int y, int w, int h, Object message) {
+        super(Minecraft.getMinecraft().fontRenderer, x, y, w, h);
+    }
+
+    public void setValue(String s) {
+        setText(s);
+    }
+
+    public String getValue() {
+        return getText();
+    }
+
+    public void setSuggestion(String s) {}
+}

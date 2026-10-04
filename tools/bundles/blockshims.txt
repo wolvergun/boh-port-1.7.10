@@ -1,0 +1,667 @@
+//// FILE: mc/world/phys/shapes/VoxelShape.java
+package net.mcreator.boh.compat.mc.world.phys.shapes;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import net.mcreator.boh.compat.mc.world.phys.AABB;
+
+/** 1.20 VoxelShape as a list of boxes in block-local 0..1 coordinates. */
+public class VoxelShape {
+
+    final List<AABB> boxes;
+
+    VoxelShape(List<AABB> boxes) {
+        this.boxes = boxes;
+    }
+
+    public List<AABB> toAabbs() {
+        return Collections.unmodifiableList(boxes);
+    }
+
+    public boolean isEmpty() {
+        return boxes.isEmpty();
+    }
+
+    public AABB bounds() {
+        if (boxes.isEmpty()) return new AABB(0, 0, 0, 0, 0, 0);
+        AABB b = boxes.get(0);
+        for (int i = 1; i < boxes.size(); i++) b = b.minmax(boxes.get(i));
+        return b;
+    }
+
+    public VoxelShape move(double x, double y, double z) {
+        List<AABB> out = new ArrayList<>(boxes.size());
+        for (AABB b : boxes) out.add(b.move(x, y, z));
+        return new VoxelShape(out);
+    }
+
+    public VoxelShape optimize() {
+        return this;
+    }
+
+    public double max(net.mcreator.boh.compat.mc.core.Axis axis) {
+        AABB b = bounds();
+        return axis == net.mcreator.boh.compat.mc.core.Axis.X ? b.maxX : axis == net.mcreator.boh.compat.mc.core.Axis.Y ? b.maxY : b.maxZ;
+    }
+
+    public double min(net.mcreator.boh.compat.mc.core.Axis axis) {
+        AABB b = bounds();
+        return axis == net.mcreator.boh.compat.mc.core.Axis.X ? b.minX : axis == net.mcreator.boh.compat.mc.core.Axis.Y ? b.minY : b.minZ;
+    }
+
+    public boolean isFullBlock() {
+        AABB b = bounds();
+        return boxes.size() == 1 && b.minX <= 0 && b.minY <= 0 && b.minZ <= 0 && b.maxX >= 1 && b.maxY >= 1 && b.maxZ >= 1;
+    }
+}
+//// FILE: mc/world/phys/shapes/Shapes.java
+package net.mcreator.boh.compat.mc.world.phys.shapes;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import net.mcreator.boh.compat.mc.world.phys.AABB;
+
+public final class Shapes {
+
+    private static final VoxelShape EMPTY = new VoxelShape(Collections.emptyList());
+    private static final VoxelShape BLOCK = new VoxelShape(Collections.singletonList(new AABB(0, 0, 0, 1, 1, 1)));
+
+    private Shapes() {}
+
+    public static VoxelShape empty() {
+        return EMPTY;
+    }
+
+    public static VoxelShape block() {
+        return BLOCK;
+    }
+
+    public static VoxelShape box(double x1, double y1, double z1, double x2, double y2, double z2) {
+        return new VoxelShape(Collections.singletonList(new AABB(x1, y1, z1, x2, y2, z2)));
+    }
+
+    public static VoxelShape create(AABB b) {
+        return new VoxelShape(Collections.singletonList(b));
+    }
+
+    public static VoxelShape or(VoxelShape first, VoxelShape... others) {
+        List<AABB> l = new ArrayList<>(first.boxes);
+        for (VoxelShape s : others) l.addAll(s.boxes);
+        return new VoxelShape(l);
+    }
+
+    public static VoxelShape or(VoxelShape a, VoxelShape b) {
+        List<AABB> l = new ArrayList<>(a.boxes);
+        l.addAll(b.boxes);
+        return new VoxelShape(l);
+    }
+
+    public static VoxelShape join(VoxelShape a, VoxelShape b, Object op) {
+        return or(a, b);
+    }
+}
+//// FILE: mc/world/phys/shapes/CollisionContext.java
+package net.mcreator.boh.compat.mc.world.phys.shapes;
+
+import net.minecraft.entity.Entity;
+
+/** 1.20 CollisionContext. */
+public class CollisionContext {
+
+    private static final CollisionContext EMPTY = new CollisionContext(null);
+    private final Entity entity;
+
+    CollisionContext(Entity entity) {
+        this.entity = entity;
+    }
+
+    public static CollisionContext empty() {
+        return EMPTY;
+    }
+
+    public static CollisionContext of(Entity e) {
+        return e == null ? EMPTY : new CollisionContext(e);
+    }
+
+    public Entity getEntity() {
+        return entity;
+    }
+
+    public boolean isDescending() {
+        return entity != null && entity.isSneaking();
+    }
+}
+//// FILE: mc/world/level/block/SoundType.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+import net.mcreator.boh.compat.mc.sounds.SoundEvent;
+import net.minecraft.block.Block;
+
+/** 1.20 SoundType mapped onto 1.7.10 {@link Block.SoundType}. */
+public class SoundType {
+
+    public static final SoundType WOOD = new SoundType(Block.soundTypeWood, "wood");
+    public static final SoundType GRAVEL = new SoundType(Block.soundTypeGravel, "ground");
+    public static final SoundType GRASS = new SoundType(Block.soundTypeGrass, "plants");
+    public static final SoundType LILY_PAD = GRASS;
+    public static final SoundType STONE = new SoundType(Block.soundTypeStone, "rock");
+    public static final SoundType METAL = new SoundType(Block.soundTypeMetal, "iron");
+    public static final SoundType GLASS = new SoundType(Block.soundTypeGlass, "glass");
+    public static final SoundType WOOL = new SoundType(Block.soundTypeCloth, "cloth");
+    public static final SoundType SAND = new SoundType(Block.soundTypeSand, "sand");
+    public static final SoundType SNOW = new SoundType(Block.soundTypeSnow, "snow");
+    public static final SoundType LADDER = new SoundType(Block.soundTypeLadder, "wood");
+    public static final SoundType ANVIL = new SoundType(Block.soundTypeAnvil, "anvil");
+    public static final SoundType SLIME_BLOCK = new SoundType(Block.soundTypeGravel, "clay");
+    public static final SoundType HONEY_BLOCK = SLIME_BLOCK;
+    public static final SoundType CROP = GRASS;
+    public static final SoundType HARD_CROP = GRASS;
+    public static final SoundType VINE = GRASS;
+    public static final SoundType SWEET_BERRY_BUSH = GRASS;
+    public static final SoundType ROOTS = GRASS;
+    public static final SoundType MOSS = GRASS;
+    public static final SoundType MOSS_CARPET = GRASS;
+    public static final SoundType AZALEA = GRASS;
+    public static final SoundType FUNGUS = GRASS;
+    public static final SoundType NETHER_WOOD = WOOD;
+    public static final SoundType BAMBOO_WOOD = WOOD;
+    public static final SoundType CHERRY_WOOD = WOOD;
+    public static final SoundType NETHERRACK = STONE;
+    public static final SoundType NETHER_BRICKS = STONE;
+    public static final SoundType BASALT = STONE;
+    public static final SoundType DEEPSLATE = STONE;
+    public static final SoundType DEEPSLATE_BRICKS = STONE;
+    public static final SoundType POLISHED_DEEPSLATE = STONE;
+    public static final SoundType TUFF = STONE;
+    public static final SoundType CALCITE = STONE;
+    public static final SoundType BONE_BLOCK = STONE;
+    public static final SoundType COPPER = METAL;
+    public static final SoundType CHAIN = METAL;
+    public static final SoundType LANTERN = METAL;
+    public static final SoundType NETHERITE_BLOCK = METAL;
+    public static final SoundType AMETHYST = GLASS;
+    public static final SoundType MUD = GRAVEL;
+    public static final SoundType MUD_BRICKS = STONE;
+    public static final SoundType PACKED_MUD = GRAVEL;
+    public static final SoundType SOUL_SAND = SAND;
+    public static final SoundType SOUL_SOIL = SAND;
+    public static final SoundType SCAFFOLDING = WOOD;
+    public static final SoundType FROGLIGHT = GLASS;
+    public static final SoundType SCULK = WOOL;
+    public static final SoundType POWDER_SNOW = SNOW;
+    public static final SoundType EMPTY = new SoundType(Block.soundTypeCloth, "cloth");
+
+    private final Block.SoundType legacy;
+    private final String materialHint;
+
+    private SoundType(Block.SoundType legacy, String materialHint) {
+        this.legacy = legacy;
+        this.materialHint = materialHint;
+    }
+
+    /** Forge-style custom sound type (ForgeSoundType). */
+    public SoundType(float volume, float pitch, java.util.function.Supplier<SoundEvent> breakSound,
+        java.util.function.Supplier<SoundEvent> stepSound, java.util.function.Supplier<SoundEvent> placeSound,
+        java.util.function.Supplier<SoundEvent> hitSound, java.util.function.Supplier<SoundEvent> fallSound) {
+        this.materialHint = "rock";
+        this.legacy = new Block.SoundType("stone", volume, pitch) {
+
+            @Override
+            public String getBreakSound() {
+                SoundEvent s = breakSound.get();
+                return s == null ? super.getBreakSound() : s.legacyName();
+            }
+
+            @Override
+            public String getStepResourcePath() {
+                SoundEvent s = stepSound.get();
+                return s == null ? super.getStepResourcePath() : s.legacyName();
+            }
+
+            @Override
+            public String func_150496_b() {
+                SoundEvent s = placeSound.get();
+                return s == null ? getBreakSound() : s.legacyName();
+            }
+        };
+    }
+
+    public Block.SoundType toVanilla() {
+        return legacy;
+    }
+
+    public String materialHint() {
+        return materialHint;
+    }
+
+    public float getVolume() {
+        return legacy.getVolume();
+    }
+
+    public float getPitch() {
+        return legacy.getPitch();
+    }
+}
+//// FILE: forge/common/util/ForgeSoundType.java
+package net.mcreator.boh.compat.forge.common.util;
+
+import java.util.function.Supplier;
+
+import net.mcreator.boh.compat.mc.sounds.SoundEvent;
+import net.mcreator.boh.compat.mc.world.level.block.SoundType;
+
+public class ForgeSoundType extends SoundType {
+
+    public ForgeSoundType(float volume, float pitch, Supplier<SoundEvent> breakSound, Supplier<SoundEvent> stepSound,
+        Supplier<SoundEvent> placeSound, Supplier<SoundEvent> hitSound, Supplier<SoundEvent> fallSound) {
+        super(volume, pitch, breakSound, stepSound, placeSound, hitSound, fallSound);
+    }
+}
+//// FILE: mc/world/level/block/Rotation.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+import net.mcreator.boh.compat.mc.core.Direction;
+
+public enum Rotation {
+
+    NONE,
+    CLOCKWISE_90,
+    CLOCKWISE_180,
+    COUNTERCLOCKWISE_90;
+
+    public Direction rotate(Direction d) {
+        if (d.getAxis() == net.mcreator.boh.compat.mc.core.Axis.Y) return d;
+        switch (this) {
+            case CLOCKWISE_90:
+                return d.getClockWise();
+            case CLOCKWISE_180:
+                return d.getOpposite();
+            case COUNTERCLOCKWISE_90:
+                return d.getCounterClockWise();
+            default:
+                return d;
+        }
+    }
+
+    public Rotation getRotated(Rotation other) {
+        return values()[(ordinal() + other.ordinal()) % 4];
+    }
+
+    public static Rotation getRandom(java.util.Random r) {
+        return values()[r.nextInt(4)];
+    }
+}
+//// FILE: mc/world/level/block/Mirror.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+import net.mcreator.boh.compat.mc.core.Direction;
+
+public enum Mirror {
+
+    NONE,
+    LEFT_RIGHT,
+    FRONT_BACK;
+
+    public Direction mirror(Direction d) {
+        if (this == FRONT_BACK && d.getAxis() == net.mcreator.boh.compat.mc.core.Axis.X) return d.getOpposite();
+        if (this == LEFT_RIGHT && d.getAxis() == net.mcreator.boh.compat.mc.core.Axis.Z) return d.getOpposite();
+        return d;
+    }
+
+    public Rotation getRotation(Direction d) {
+        return mirror(d) != d ? Rotation.CLOCKWISE_180 : Rotation.NONE;
+    }
+}
+//// FILE: mc/world/level/block/RenderShape.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+public enum RenderShape {
+    INVISIBLE,
+    ENTITYBLOCK_ANIMATED,
+    MODEL
+}
+//// FILE: mc/world/level/block/EntityBlock.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.minecraft.tileentity.TileEntity;
+
+/** 1.20 EntityBlock: blocks with a block entity. */
+public interface EntityBlock {
+
+    TileEntity newBlockEntity(BlockPos pos, BlockState state);
+}
+//// FILE: mc/world/level/block/HorizontalDirectionalBlock.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+import net.mcreator.boh.compat.block.BohBlock;
+import net.mcreator.boh.compat.mc.world.level.block.state.Properties;
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.BlockStateProperties;
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.DirectionProperty;
+
+public class HorizontalDirectionalBlock extends BohBlock {
+
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+
+    public HorizontalDirectionalBlock(Properties p) {
+        super(p);
+    }
+}
+//// FILE: mc/world/level/block/DirectionalBlock.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+import net.mcreator.boh.compat.block.BohBlock;
+import net.mcreator.boh.compat.mc.world.level.block.state.Properties;
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.BlockStateProperties;
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.DirectionProperty;
+
+public class DirectionalBlock extends BohBlock {
+
+    public static final DirectionProperty FACING = BlockStateProperties.FACING;
+
+    public DirectionalBlock(Properties p) {
+        super(p);
+    }
+}
+//// FILE: mc/world/level/block/FaceAttachedHorizontalDirectionalBlock.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+import net.mcreator.boh.compat.mc.world.level.block.state.Properties;
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.AttachFace;
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.BlockStateProperties;
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.EnumProperty;
+
+public class FaceAttachedHorizontalDirectionalBlock extends HorizontalDirectionalBlock {
+
+    public static final EnumProperty<AttachFace> FACE = BlockStateProperties.ATTACH_FACE;
+
+    public FaceAttachedHorizontalDirectionalBlock(Properties p) {
+        super(p);
+    }
+}
+//// FILE: mc/world/level/block/state/properties/NoteBlockInstrument.java
+package net.mcreator.boh.compat.mc.world.level.block.state.properties;
+
+public enum NoteBlockInstrument {
+    HARP,
+    BASEDRUM,
+    SNARE,
+    HAT,
+    BASS,
+    FLUTE,
+    BELL,
+    GUITAR,
+    CHIME,
+    XYLOPHONE,
+    IRON_XYLOPHONE,
+    COW_BELL,
+    DIDGERIDOO,
+    BIT,
+    BANJO,
+    PLING,
+    ZOMBIE,
+    SKELETON,
+    CREEPER,
+    DRAGON,
+    WITHER_SKELETON,
+    PIGLIN,
+    CUSTOM_HEAD
+}
+//// FILE: mc/world/level/material/PushReaction.java
+package net.mcreator.boh.compat.mc.world.level.material;
+
+public enum PushReaction {
+    NORMAL,
+    DESTROY,
+    BLOCK,
+    IGNORE,
+    PUSH_ONLY
+}
+//// FILE: mc/world/level/material/MapColor.java
+package net.mcreator.boh.compat.mc.world.level.material;
+
+/** 1.20 MapColor constants (only identity is used). */
+public final class MapColor {
+
+    public static final MapColor NONE = new MapColor(), GRASS = new MapColor(), SAND = new MapColor(), WOOL = new MapColor(),
+        FIRE = new MapColor(), ICE = new MapColor(), METAL = new MapColor(), PLANT = new MapColor(), SNOW = new MapColor(),
+        CLAY = new MapColor(), DIRT = new MapColor(), STONE = new MapColor(), WATER = new MapColor(), WOOD = new MapColor(),
+        QUARTZ = new MapColor(), COLOR_ORANGE = new MapColor(), COLOR_MAGENTA = new MapColor(), COLOR_LIGHT_BLUE = new MapColor(),
+        COLOR_YELLOW = new MapColor(), COLOR_LIGHT_GREEN = new MapColor(), COLOR_PINK = new MapColor(), COLOR_GRAY = new MapColor(),
+        COLOR_LIGHT_GRAY = new MapColor(), COLOR_CYAN = new MapColor(), COLOR_PURPLE = new MapColor(), COLOR_BLUE = new MapColor(),
+        COLOR_BROWN = new MapColor(), COLOR_GREEN = new MapColor(), COLOR_RED = new MapColor(), COLOR_BLACK = new MapColor(),
+        GOLD = new MapColor(), DIAMOND = new MapColor(), LAPIS = new MapColor(), EMERALD = new MapColor(), PODZOL = new MapColor(),
+        NETHER = new MapColor(), DEEPSLATE = new MapColor();
+
+    private MapColor() {}
+}
+//// FILE: mc/world/level/block/state/OffsetType.java
+package net.mcreator.boh.compat.mc.world.level.block.state;
+
+/** 1.20 BlockBehaviour.OffsetType. */
+public enum OffsetType {
+    NONE,
+    XZ,
+    XYZ
+}
+//// FILE: mc/world/level/block/state/Properties.java
+package net.mcreator.boh.compat.mc.world.level.block.state;
+
+import java.util.function.ToIntFunction;
+
+import net.mcreator.boh.compat.mc.world.level.block.SoundType;
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.NoteBlockInstrument;
+import net.mcreator.boh.compat.mc.world.level.material.MapColor;
+import net.mcreator.boh.compat.mc.world.level.material.PushReaction;
+import net.minecraft.block.Block;
+
+/** 1.20 BlockBehaviour.Properties. */
+public class Properties {
+
+    public SoundType sound = SoundType.STONE;
+    public float hardness = 0, resistance = 0;
+    public boolean noOcclusion, noCollission, randomTicks, requiresCorrectTool, instabreak, ignitedByLava, dynamicShape,
+        replaceable, air, liquid, forceSolidOn, noLootTable, emissive;
+    public ToIntFunction<BlockState> lightLevel = s -> 0;
+    public float friction = 0.6F, speedFactor = 1.0F, jumpFactor = 1.0F;
+    public PushReaction pushReaction = PushReaction.NORMAL;
+    public StatePredicate redstoneConductor;
+    public OffsetType offsetType = OffsetType.NONE;
+    public MapColor mapColor = MapColor.STONE;
+
+    @FunctionalInterface
+    public interface StatePredicate {
+
+        boolean test(BlockState state, Object level, Object pos);
+    }
+
+    public static Properties of() {
+        return new Properties();
+    }
+
+    public static Properties copy(Block b) {
+        Properties p = new Properties();
+        p.hardness = b.getBlockHardness(null, 0, 0, 0);
+        p.resistance = b.getExplosionResistance(null) * 5F;
+        return p;
+    }
+
+    public static Properties ofFullCopy(Block b) {
+        return copy(b);
+    }
+
+    public Properties sound(SoundType s) {
+        sound = s;
+        return this;
+    }
+
+    public Properties strength(float h, float r) {
+        hardness = h;
+        resistance = r;
+        return this;
+    }
+
+    public Properties strength(float hr) {
+        return strength(hr, hr);
+    }
+
+    public Properties destroyTime(float h) {
+        hardness = h;
+        return this;
+    }
+
+    public Properties explosionResistance(float r) {
+        resistance = r;
+        return this;
+    }
+
+    public Properties instrument(NoteBlockInstrument i) {
+        return this;
+    }
+
+    public Properties noOcclusion() {
+        noOcclusion = true;
+        return this;
+    }
+
+    public Properties noCollission() {
+        noCollission = true;
+        noOcclusion = true;
+        return this;
+    }
+
+    public Properties randomTicks() {
+        randomTicks = true;
+        return this;
+    }
+
+    public Properties requiresCorrectToolForDrops() {
+        requiresCorrectTool = true;
+        return this;
+    }
+
+    public Properties instabreak() {
+        instabreak = true;
+        hardness = 0;
+        resistance = 0;
+        return this;
+    }
+
+    public Properties lightLevel(ToIntFunction<BlockState> f) {
+        lightLevel = f;
+        return this;
+    }
+
+    public Properties friction(float f) {
+        friction = f;
+        return this;
+    }
+
+    public Properties speedFactor(float f) {
+        speedFactor = f;
+        return this;
+    }
+
+    public Properties jumpFactor(float f) {
+        jumpFactor = f;
+        return this;
+    }
+
+    public Properties pushReaction(PushReaction r) {
+        pushReaction = r;
+        return this;
+    }
+
+    public Properties isRedstoneConductor(StatePredicate p) {
+        redstoneConductor = p;
+        return this;
+    }
+
+    public Properties isSuffocating(StatePredicate p) {
+        return this;
+    }
+
+    public Properties isViewBlocking(StatePredicate p) {
+        return this;
+    }
+
+    public Properties hasPostProcess(StatePredicate p) {
+        return this;
+    }
+
+    public Properties emissiveRendering(StatePredicate p) {
+        emissive = true;
+        return this;
+    }
+
+    public Properties isValidSpawn(Object p) {
+        return this;
+    }
+
+    public Properties offsetType(OffsetType t) {
+        offsetType = t;
+        return this;
+    }
+
+    public Properties mapColor(MapColor c) {
+        mapColor = c;
+        return this;
+    }
+
+    public Properties mapColor(Object c) {
+        return this;
+    }
+
+    public Properties ignitedByLava() {
+        ignitedByLava = true;
+        return this;
+    }
+
+    public Properties dynamicShape() {
+        dynamicShape = true;
+        return this;
+    }
+
+    public Properties forceSolidOn() {
+        forceSolidOn = true;
+        return this;
+    }
+
+    public Properties forceSolidOff() {
+        return this;
+    }
+
+    public Properties replaceable() {
+        replaceable = true;
+        return this;
+    }
+
+    public Properties noLootTable() {
+        noLootTable = true;
+        return this;
+    }
+
+    public Properties air() {
+        air = true;
+        return this;
+    }
+
+    public Properties liquid() {
+        liquid = true;
+        return this;
+    }
+
+    public Properties noParticlesOnBreak() {
+        return this;
+    }
+
+    public Properties randomTicks(boolean b) {
+        randomTicks = b;
+        return this;
+    }
+}

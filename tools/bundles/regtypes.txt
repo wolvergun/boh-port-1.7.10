@@ -1,0 +1,478 @@
+//// FILE: mc/world/level/block/entity/BlockEntitySupplier.java
+package net.mcreator.boh.compat.mc.world.level.block.entity;
+
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.minecraft.tileentity.TileEntity;
+
+/** 1.20 BlockEntityType.BlockEntitySupplier. */
+@FunctionalInterface
+public interface BlockEntitySupplier<T extends TileEntity> {
+
+    T create(BlockPos pos, BlockState state);
+}
+//// FILE: mc/world/level/block/entity/BlockEntityType.java
+package net.mcreator.boh.compat.mc.world.level.block.entity;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.minecraft.block.Block;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
+
+/** 1.20 BlockEntityType: a tile entity factory plus its valid blocks. */
+public class BlockEntityType<T extends TileEntity> {
+
+    private final BlockEntitySupplier<? extends T> factory;
+    private final Set<Block> validBlocks;
+    private Class<? extends TileEntity> tileClass;
+    private ResourceLocation id;
+
+    BlockEntityType(BlockEntitySupplier<? extends T> factory, Set<Block> validBlocks) {
+        this.factory = factory;
+        this.validBlocks = validBlocks;
+    }
+
+    public T create(BlockPos pos, BlockState state) {
+        return factory.create(pos, state);
+    }
+
+    public boolean isValid(BlockState state) {
+        return validBlocks.contains(state.getBlock());
+    }
+
+    public Set<Block> getValidBlocks() {
+        return validBlocks;
+    }
+
+    /** The tile entity class, discovered by instantiating once (1.7.10 registers tiles by class). */
+    public Class<? extends TileEntity> tileClass() {
+        if (tileClass == null) tileClass = factory.create(BlockPos.ZERO, null).getClass();
+        return tileClass;
+    }
+
+    public ResourceLocation getId() {
+        return id;
+    }
+
+    public void setRegistryName(ResourceLocation id) {
+        this.id = id;
+    }
+
+    static <T extends TileEntity> BlockEntityType<T> create(BlockEntitySupplier<? extends T> f, Block... blocks) {
+        return new BlockEntityType<>(f, new HashSet<>(Arrays.asList(blocks)));
+    }
+}
+//// FILE: mc/world/level/block/entity/Builder.java
+package net.mcreator.boh.compat.mc.world.level.block.entity;
+
+import net.minecraft.block.Block;
+import net.minecraft.tileentity.TileEntity;
+
+/** 1.20 BlockEntityType.Builder. */
+public class Builder<T extends TileEntity> {
+
+    private final BlockEntitySupplier<? extends T> factory;
+    private final Block[] blocks;
+
+    private Builder(BlockEntitySupplier<? extends T> factory, Block[] blocks) {
+        this.factory = factory;
+        this.blocks = blocks;
+    }
+
+    public static <T extends TileEntity> Builder<T> of(BlockEntitySupplier<? extends T> factory, Block... blocks) {
+        return new Builder<>(factory, blocks);
+    }
+
+    public static <T extends TileEntity> Builder<T> of(BlockEntitySupplier<? extends T> factory, Class<?> cls, Block... blocks) {
+        return new Builder<>(factory, blocks);
+    }
+
+    public BlockEntityType<T> build(Object dataFixerType) {
+        return BlockEntityType.create(factory, blocks);
+    }
+}
+//// FILE: mc/world/inventory/MenuType.java
+package net.mcreator.boh.compat.mc.world.inventory;
+
+import net.minecraft.util.ResourceLocation;
+
+/** 1.20 MenuType: a container factory; opened through the mod's IGuiHandler in 1.7.10. */
+public class MenuType<T> {
+
+    @FunctionalInterface
+    public interface MenuFactory<T> {
+
+        T create(int id, net.minecraft.entity.player.InventoryPlayer inv,
+            net.mcreator.boh.compat.mc.network.FriendlyByteBuf extraData);
+    }
+
+    private final MenuFactory<T> factory;
+    private ResourceLocation id;
+    private int guiId = -1;
+
+    public MenuType(MenuFactory<T> factory) {
+        this.factory = factory;
+    }
+
+    public T create(int windowId, net.minecraft.entity.player.InventoryPlayer inv,
+        net.mcreator.boh.compat.mc.network.FriendlyByteBuf extraData) {
+        return factory.create(windowId, inv, extraData);
+    }
+
+    public ResourceLocation getId() {
+        return id;
+    }
+
+    public int guiId() {
+        return guiId;
+    }
+
+    public void bind(ResourceLocation id, int guiId) {
+        this.id = id;
+        this.guiId = guiId;
+    }
+}
+//// FILE: forge/common/extensions/IForgeMenuType.java
+package net.mcreator.boh.compat.forge.common.extensions;
+
+import net.mcreator.boh.compat.mc.world.inventory.MenuType;
+
+public final class IForgeMenuType {
+
+    private IForgeMenuType() {}
+
+    public static <T> MenuType<T> create(MenuType.MenuFactory<T> factory) {
+        return new MenuType<>(factory);
+    }
+}
+//// FILE: mc/core/particles/ParticleOptions.java
+package net.mcreator.boh.compat.mc.core.particles;
+
+public interface ParticleOptions {
+
+    ParticleType<?> getType();
+}
+//// FILE: mc/core/particles/ParticleType.java
+package net.mcreator.boh.compat.mc.core.particles;
+
+import net.minecraft.util.ResourceLocation;
+
+/** 1.20 ParticleType; vanilla ones carry the 1.7.10 particle name, mod ones are rendered by the port. */
+public class ParticleType<T extends ParticleOptions> {
+
+    private final boolean overrideLimiter;
+    private ResourceLocation id;
+    private String legacyName;
+
+    protected ParticleType(boolean overrideLimiter) {
+        this.overrideLimiter = overrideLimiter;
+    }
+
+    public boolean getOverrideLimiter() {
+        return overrideLimiter;
+    }
+
+    public ResourceLocation getId() {
+        return id;
+    }
+
+    public void setRegistryName(ResourceLocation id) {
+        this.id = id;
+    }
+
+    /** Name for World.spawnParticle when this is a vanilla particle, else null. */
+    public String legacyName() {
+        return legacyName;
+    }
+
+    public ParticleType<T> withLegacyName(String name) {
+        legacyName = name;
+        return this;
+    }
+}
+//// FILE: mc/core/particles/SimpleParticleType.java
+package net.mcreator.boh.compat.mc.core.particles;
+
+public class SimpleParticleType extends ParticleType<SimpleParticleType> implements ParticleOptions {
+
+    public SimpleParticleType(boolean overrideLimiter) {
+        super(overrideLimiter);
+    }
+
+    @Override
+    public SimpleParticleType getType() {
+        return this;
+    }
+}
+//// FILE: mc/core/particles/ParticleTypes.java
+package net.mcreator.boh.compat.mc.core.particles;
+
+/** Vanilla particle types the mod spawns, mapped to 1.7.10 particle names. */
+public final class ParticleTypes {
+
+    public static final SimpleParticleType ASH = vanilla("townaura");
+    public static final SimpleParticleType LARGE_SMOKE = vanilla("largesmoke");
+    public static final SimpleParticleType SMOKE = vanilla("smoke");
+    public static final SimpleParticleType SQUID_INK = vanilla("largesmoke");
+    public static final SimpleParticleType SOUL = vanilla("depthsuspend");
+    public static final SimpleParticleType EXPLOSION = vanilla("largeexplode");
+    public static final SimpleParticleType EXPLOSION_EMITTER = vanilla("hugeexplosion");
+    public static final SimpleParticleType FLAME = vanilla("flame");
+    public static final SimpleParticleType HEART = vanilla("heart");
+    public static final SimpleParticleType PORTAL = vanilla("portal");
+    public static final SimpleParticleType CRIT = vanilla("crit");
+    public static final SimpleParticleType ENCHANTED_HIT = vanilla("magicCrit");
+    public static final SimpleParticleType CLOUD = vanilla("cloud");
+    public static final SimpleParticleType POOF = vanilla("explode");
+    public static final SimpleParticleType DRIPPING_LAVA = vanilla("dripLava");
+    public static final SimpleParticleType DRIPPING_WATER = vanilla("dripWater");
+    public static final SimpleParticleType WITCH = vanilla("witchMagic");
+    public static final SimpleParticleType ENCHANT = vanilla("enchantmenttable");
+    public static final SimpleParticleType NOTE = vanilla("note");
+    public static final SimpleParticleType LAVA = vanilla("lava");
+    public static final SimpleParticleType SPLASH = vanilla("splash");
+    public static final SimpleParticleType BUBBLE = vanilla("bubble");
+    public static final SimpleParticleType ANGRY_VILLAGER = vanilla("angryVillager");
+    public static final SimpleParticleType HAPPY_VILLAGER = vanilla("happyVillager");
+    public static final SimpleParticleType SOUL_FIRE_FLAME = vanilla("flame");
+    public static final SimpleParticleType END_ROD = vanilla("fireworksSpark");
+    public static final SimpleParticleType ITEM_SNOWBALL = vanilla("snowballpoof");
+
+    private ParticleTypes() {}
+
+    private static SimpleParticleType vanilla(String legacy) {
+        SimpleParticleType t = new SimpleParticleType(false);
+        t.withLegacyName(legacy);
+        return t;
+    }
+}
+//// FILE: mc/world/entity/decoration/PaintingVariant.java
+package net.mcreator.boh.compat.mc.world.entity.decoration;
+
+import net.minecraft.util.ResourceLocation;
+
+/** 1.20 PaintingVariant (size in pixels); placed by the port's painting entity. */
+public class PaintingVariant {
+
+    private final int width, height;
+    private ResourceLocation id;
+
+    public PaintingVariant(int width, int height) {
+        this.width = width;
+        this.height = height;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public ResourceLocation getId() {
+        return id;
+    }
+
+    public void setRegistryName(ResourceLocation id) {
+        this.id = id;
+    }
+}
+//// FILE: mc/core/Holder.java
+package net.mcreator.boh.compat.mc.core;
+
+/** 1.20 Holder: just a value box here. */
+public interface Holder<T> {
+
+    T value();
+
+    default T get() {
+        return value();
+    }
+
+    static <T> Holder<T> direct(T value) {
+        return () -> value;
+    }
+}
+//// FILE: mc/world/entity/ai/village/poi/PoiType.java
+package net.mcreator.boh.compat.mc.world.entity.ai.village.poi;
+
+import java.util.Set;
+
+/** 1.20 point-of-interest type (the job-site block of a profession). */
+public class PoiType {
+
+    private final Set<?> states;
+    private final int maxTickets, validRange;
+
+    public PoiType(Set<?> states, int maxTickets, int validRange) {
+        this.states = states;
+        this.maxTickets = maxTickets;
+        this.validRange = validRange;
+    }
+
+    public Set<?> states() {
+        return states;
+    }
+}
+//// FILE: mc/world/entity/npc/VillagerProfession.java
+package net.mcreator.boh.compat.mc.world.entity.npc;
+
+import java.util.function.Predicate;
+
+import net.mcreator.boh.compat.mc.sounds.SoundEvent;
+
+/** 1.20 VillagerProfession; registered as a 1.7.10 VillagerRegistry profession id. */
+public class VillagerProfession {
+
+    private final String name;
+    private final SoundEvent workSound;
+    private int legacyId = -1;
+
+    public VillagerProfession(String name, Predicate<?> heldJobSite, Predicate<?> acquirableJobSite, Object requestedItems,
+        Object secondaryPoi, SoundEvent workSound) {
+        this.name = name;
+        this.workSound = workSound;
+    }
+
+    public String name() {
+        return name;
+    }
+
+    public SoundEvent workSound() {
+        return workSound;
+    }
+
+    public int legacyId() {
+        return legacyId;
+    }
+
+    public void setLegacyId(int id) {
+        legacyId = id;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+}
+//// FILE: mc/world/item/alchemy/BrewPotion.java
+package net.mcreator.boh.compat.mc.world.item.alchemy;
+
+import java.util.Arrays;
+import java.util.List;
+
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.ResourceLocation;
+
+/** 1.20 brewing Potion (a named list of effects); 1.7.10 has no equivalent registry. */
+public class BrewPotion {
+
+    private final List<PotionEffect> effects;
+    private ResourceLocation id;
+
+    public BrewPotion(PotionEffect... effects) {
+        this.effects = Arrays.asList(effects);
+    }
+
+    public BrewPotion(String name, PotionEffect... effects) {
+        this(effects);
+    }
+
+    public List<PotionEffect> getEffects() {
+        return effects;
+    }
+
+    public ResourceLocation getId() {
+        return id;
+    }
+
+    public void setRegistryName(ResourceLocation id) {
+        this.id = id;
+    }
+}
+//// FILE: mc/world/item/crafting/Ingredient.java
+package net.mcreator.boh.compat.mc.world.item.crafting;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
+
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+
+/** 1.20 Ingredient: a set of acceptable items. */
+public class Ingredient implements Predicate<ItemStack> {
+
+    public static final Ingredient EMPTY = new Ingredient(new ArrayList<>());
+
+    private final List<ItemStack> stacks;
+
+    private Ingredient(List<ItemStack> stacks) {
+        this.stacks = stacks;
+    }
+
+    public static Ingredient of(Object... things) {
+        List<ItemStack> out = new ArrayList<>();
+        for (Object o : things) {
+            if (o instanceof Item) out.add(new ItemStack((Item) o));
+            else if (o instanceof Block) out.add(new ItemStack((Block) o));
+            else if (o instanceof ItemStack) out.add((ItemStack) o);
+        }
+        return new Ingredient(out);
+    }
+
+    public static Ingredient of(ItemStack... stacks) {
+        return new Ingredient(new ArrayList<>(Arrays.asList(stacks)));
+    }
+
+    public static Ingredient of(java.util.stream.Stream<ItemStack> stacks) {
+        return new Ingredient(stacks.collect(java.util.stream.Collectors.toList()));
+    }
+
+    public ItemStack[] getItems() {
+        return stacks.toArray(new ItemStack[0]);
+    }
+
+    public Item firstItem() {
+        return stacks.isEmpty() ? null : stacks.get(0).getItem();
+    }
+
+    public boolean isEmpty() {
+        return stacks.isEmpty();
+    }
+
+    @Override
+    public boolean test(ItemStack stack) {
+        if (stack == null || stack.getItem() == null) return stacks.isEmpty();
+        for (ItemStack s : stacks)
+            if (s.getItem() == stack.getItem() && (s.getItemDamage() == stack.getItemDamage() || s.getItemDamage() == 32767))
+                return true;
+        return false;
+    }
+}
+//// FILE: mc/world/level/levelgen/feature/Feature.java
+package net.mcreator.boh.compat.mc.world.level.levelgen.feature;
+
+import net.minecraft.util.ResourceLocation;
+
+/** 1.20 worldgen Feature; concrete features are implemented by the port's worldgen package. */
+public abstract class Feature<C> {
+
+    private ResourceLocation id;
+
+    public ResourceLocation getId() {
+        return id;
+    }
+
+    public void setRegistryName(ResourceLocation id) {
+        this.id = id;
+    }
+}

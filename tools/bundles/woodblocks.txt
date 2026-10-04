@@ -1,0 +1,1351 @@
+//// FILE: block/CompatBlock.java
+package net.mcreator.boh.compat.block;
+
+import net.minecraft.util.ResourceLocation;
+
+/** A 1.7.10 block (vanilla-derived shim) that wants its 1.20 registry id after registration. */
+public interface CompatBlock {
+
+    void onRegistered(ResourceLocation id);
+}
+//// FILE: block/CompatBlocks.java
+package net.mcreator.boh.compat.block;
+
+import net.mcreator.boh.compat.client.ItemModels;
+import net.mcreator.boh.compat.mc.tags.BlockTags;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.mcreator.boh.compat.mc.world.level.block.state.Properties;
+import net.minecraft.block.Block;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.ResourceLocation;
+
+/** Shared setup for blocks that extend 1.7.10 vanilla classes instead of BohBlock. */
+public final class CompatBlocks {
+
+    private CompatBlocks() {}
+
+    public static void apply(Block b, Properties p) {
+        if (p == null) return;
+        b.setHardness(p.instabreak ? 0 : p.hardness);
+        b.setResistance(p.resistance / 3.0F);
+        b.setStepSound(p.sound.toVanilla());
+        int light = p.lightLevel.applyAsInt(BlockState.of(b));
+        if (light > 0) b.setLightLevel(light / 15.0F);
+        b.slipperiness = p.friction;
+    }
+
+    /** Harvest tool/level from the 1.20 mineable/needs_*_tool tags. */
+    public static void harvest(Block b, ResourceLocation id) {
+        for (String tool : new String[] { "pickaxe", "axe", "shovel", "hoe" }) {
+            if (BlockTags.create(new ResourceLocation("minecraft", "mineable/" + tool)).contains(id)) {
+                int level = BlockTags.create(new ResourceLocation("minecraft", "needs_diamond_tool")).contains(id) ? 3
+                    : BlockTags.create(new ResourceLocation("minecraft", "needs_iron_tool")).contains(id) ? 2
+                        : BlockTags.create(new ResourceLocation("minecraft", "needs_stone_tool")).contains(id) ? 1 : 0;
+                b.setHarvestLevel(tool, level);
+            }
+        }
+    }
+
+    public static void registered(Block b, ResourceLocation id) {
+        BlockModels.configure(b, id);
+        harvest(b, id);
+    }
+
+    /** Flat item icon for blocks whose item model is item/generated (doors, saplings, flowers), else null. */
+    public static String itemIconName(ResourceLocation id) {
+        if (id == null) return null;
+        String parent = ItemModels.parentOf(id);
+        if (parent == null) return null;
+        String p = parent.replace("minecraft:", "");
+        return p.startsWith("item/") ? ItemModels.iconFor(id) : null;
+    }
+
+    /** Registers the block's model textures; returns the icon for a texture key of its first model ("side", "texture"...). */
+    public static IIcon register(Block b, IIconRegister reg, String key) {
+        BlockModels.registerIcons(b, reg);
+        return icon(b, key);
+    }
+
+    public static IIcon icon(Block b, String key) {
+        String loc = BlockModels.textureOf(b, key);
+        IIcon i = loc == null ? null : BlockModels.iconFor(b, loc);
+        if (i == null) {
+            loc = BlockModels.textureOf(b, "particle");
+            i = loc == null ? null : BlockModels.iconFor(b, loc);
+        }
+        return i;
+    }
+}
+//// FILE: mc/world/level/block/state/properties/SlabType.java
+package net.mcreator.boh.compat.mc.world.level.block.state.properties;
+
+/** 1.20 SlabType. */
+public enum SlabType {
+    TOP,
+    BOTTOM,
+    DOUBLE
+}
+//// FILE: mc/world/level/block/state/properties/DoubleBlockHalf.java
+package net.mcreator.boh.compat.mc.world.level.block.state.properties;
+
+/** 1.20 DoubleBlockHalf. */
+public enum DoubleBlockHalf {
+    UPPER,
+    LOWER
+}
+//// FILE: mc/world/level/block/DoorBlock.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+import java.util.Random;
+
+import net.mcreator.boh.compat.block.CompatBlock;
+import net.mcreator.boh.compat.block.CompatBlocks;
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.core.Direction;
+import net.mcreator.boh.compat.mc.world.InteractionHand;
+import net.mcreator.boh.compat.mc.world.InteractionResult;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.mcreator.boh.compat.mc.world.level.block.state.Properties;
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.BlockSetType;
+import net.mcreator.boh.compat.mc.world.phys.BlockHitResult;
+import net.mcreator.boh.compat.mc.world.phys.Vec3;
+import net.minecraft.block.BlockDoor;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.IconFlipped;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+/** 1.20 DoorBlock on 1.7.10 BlockDoor (placed by DoorItem as two halves). */
+public class DoorBlock extends BlockDoor implements CompatBlock {
+
+    protected final BlockSetType type;
+    protected ResourceLocation registryName;
+    private IIcon[] upper, lower;
+
+    public DoorBlock(Properties props, BlockSetType type) {
+        super(type.wooden ? Material.wood : Material.iron);
+        this.type = type;
+        CompatBlocks.apply(this, props);
+        disableStats();
+    }
+
+    @Override
+    public void onRegistered(ResourceLocation id) {
+        registryName = id;
+        CompatBlocks.registered(this, id);
+    }
+
+    public BlockSetType type() {
+        return type;
+    }
+
+    /** 1.20 use(): wooden doors toggle; subclasses may override and call super. */
+    public InteractionResult use(BlockState state, World world, BlockPos pos, EntityPlayer player, InteractionHand hand, BlockHitResult hit) {
+        if (!type.wooden) return InteractionResult.PASS;
+        func_150014_a(world, pos.getX(), pos.getY(), pos.getZ(), !func_150015_f(world, pos.getX(), pos.getY(), pos.getZ()));
+        return InteractionResult.sidedSuccess(world.isRemote);
+    }
+
+    @Override
+    public boolean onBlockActivated(World w, int x, int y, int z, EntityPlayer p, int side, float hx, float hy, float hz) {
+        BlockHitResult hit = new BlockHitResult(new Vec3(x + hx, y + hy, z + hz), Direction.from3DDataValue(side), new BlockPos(x, y, z), false);
+        InteractionResult r = use(BlockState.of(this, w.getBlockMetadata(x, y, z)), w, new BlockPos(x, y, z), p, InteractionHand.MAIN_HAND, hit);
+        return r != null && r.consumesAction();
+    }
+
+    public int getFlammability(BlockState state, IBlockAccess world, BlockPos pos, Direction face) {
+        return type.wooden ? 20 : 0;
+    }
+
+    @Override
+    public int getFlammability(IBlockAccess w, int x, int y, int z, net.minecraftforge.common.util.ForgeDirection face) {
+        return getFlammability(BlockState.of(this, w.getBlockMetadata(x, y, z)), w, new BlockPos(x, y, z), Direction.from3DDataValue(face.ordinal()));
+    }
+
+    @Override
+    public boolean isFlammable(IBlockAccess w, int x, int y, int z, net.minecraftforge.common.util.ForgeDirection face) {
+        return getFlammability(w, x, y, z, face) > 0;
+    }
+
+    public int getLightBlock(BlockState state, IBlockAccess world, BlockPos pos) {
+        return 0;
+    }
+
+    @Override
+    public Item getItemDropped(int meta, Random r, int fortune) {
+        return (meta & 8) != 0 ? null : Item.getItemFromBlock(this);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public Item getItem(World w, int x, int y, int z) {
+        return Item.getItemFromBlock(this);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public String getItemIconName() {
+        return CompatBlocks.itemIconName(registryName);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerBlockIcons(IIconRegister reg) {
+        net.mcreator.boh.compat.block.BlockModels.registerIcons(this, reg);
+        IIcon top = CompatBlocks.icon(this, "top"), bottom = CompatBlocks.icon(this, "bottom");
+        if (top == null) top = reg.registerIcon("door_wood_upper");
+        if (bottom == null) bottom = reg.registerIcon("door_wood_lower");
+        upper = new IIcon[] { top, new IconFlipped(top, true, false) };
+        lower = new IIcon[] { bottom, new IconFlipped(bottom, true, false) };
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(int side, int meta) {
+        return lower[0];
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(IBlockAccess w, int x, int y, int z, int side) {
+        if (side == 1 || side == 0) return lower[0];
+        int i1 = func_150012_g(w, x, y, z);
+        int j1 = i1 & 3;
+        boolean open = (i1 & 4) != 0;
+        boolean flip = false;
+        boolean top = (i1 & 8) != 0;
+        if (open) {
+            if (j1 == 0 && side == 2 || j1 == 1 && side == 5 || j1 == 2 && side == 3 || j1 == 3 && side == 4) flip = true;
+        } else {
+            if (j1 == 0 && side == 5 || j1 == 1 && side == 3 || j1 == 2 && side == 4 || j1 == 3 && side == 2) flip = true;
+            if ((i1 & 16) != 0) flip = !flip;
+        }
+        return top ? upper[flip ? 1 : 0] : lower[flip ? 1 : 0];
+    }
+}
+//// FILE: mc/world/level/block/TrapDoorBlock.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+import net.mcreator.boh.compat.block.CompatBlock;
+import net.mcreator.boh.compat.block.CompatBlocks;
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.core.Direction;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.mcreator.boh.compat.mc.world.level.block.state.Properties;
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.BlockSetType;
+import net.minecraft.block.BlockTrapDoor;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+/** 1.20 TrapDoorBlock on 1.7.10 BlockTrapDoor. */
+public class TrapDoorBlock extends BlockTrapDoor implements CompatBlock {
+
+    protected final BlockSetType type;
+    protected ResourceLocation registryName;
+
+    public TrapDoorBlock(Properties props, BlockSetType type) {
+        super(type.wooden ? Material.wood : Material.iron);
+        this.type = type;
+        CompatBlocks.apply(this, props);
+    }
+
+    @Override
+    public void onRegistered(ResourceLocation id) {
+        registryName = id;
+        CompatBlocks.registered(this, id);
+    }
+
+    @Override
+    public boolean onBlockActivated(World w, int x, int y, int z, EntityPlayer p, int side, float hx, float hy, float hz) {
+        if (!type.wooden) return false;
+        int meta = w.getBlockMetadata(x, y, z);
+        w.setBlockMetadataWithNotify(x, y, z, meta ^ 4, 2);
+        w.playAuxSFXAtEntity(p, 1003, x, y, z, 0);
+        return true;
+    }
+
+    public int getFlammability(BlockState state, IBlockAccess world, BlockPos pos, Direction face) {
+        return type.wooden ? 20 : 0;
+    }
+
+    @Override
+    public int getFlammability(IBlockAccess w, int x, int y, int z, net.minecraftforge.common.util.ForgeDirection face) {
+        return getFlammability(BlockState.of(this, w.getBlockMetadata(x, y, z)), w, new BlockPos(x, y, z), Direction.from3DDataValue(face.ordinal()));
+    }
+
+    @Override
+    public boolean isFlammable(IBlockAccess w, int x, int y, int z, net.minecraftforge.common.util.ForgeDirection face) {
+        return getFlammability(w, x, y, z, face) > 0;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerBlockIcons(IIconRegister reg) {
+        blockIcon = CompatBlocks.register(this, reg, "texture");
+        if (blockIcon == null) blockIcon = reg.registerIcon("trapdoor");
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(int side, int meta) {
+        return blockIcon;
+    }
+}
+//// FILE: mc/world/level/block/StairBlock.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+import java.util.function.Supplier;
+
+import net.mcreator.boh.compat.block.CompatBlock;
+import net.mcreator.boh.compat.block.CompatBlocks;
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.core.Direction;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.mcreator.boh.compat.mc.world.level.block.state.Properties;
+import net.minecraft.block.BlockStairs;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.entity.Entity;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.IBlockAccess;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+/** 1.20 StairBlock on 1.7.10 BlockStairs (planks as the model block, own textures). */
+public class StairBlock extends BlockStairs implements CompatBlock {
+
+    protected ResourceLocation registryName;
+    private IIcon side, top, bottom;
+
+    public StairBlock(Supplier<BlockState> base, Properties props) {
+        super(Blocks.planks, 0);
+        CompatBlocks.apply(this, props);
+        setLightOpacity(0);
+        useNeighborBrightness = true;
+    }
+
+    public StairBlock(BlockState base, Properties props) {
+        this(() -> base, props);
+    }
+
+    @Override
+    public void onRegistered(ResourceLocation id) {
+        registryName = id;
+        CompatBlocks.registered(this, id);
+    }
+
+    public float getExplosionResistance() {
+        return blockResistance / 3.0F;
+    }
+
+    @Override
+    public float getExplosionResistance(Entity e) {
+        return getExplosionResistance();
+    }
+
+    public boolean isRandomlyTicking(BlockState state) {
+        return false;
+    }
+
+    public int getLightBlock(BlockState state, IBlockAccess world, BlockPos pos) {
+        return 0;
+    }
+
+    public int getFlammability(BlockState state, IBlockAccess world, BlockPos pos, Direction face) {
+        return 0;
+    }
+
+    @Override
+    public int getFlammability(IBlockAccess w, int x, int y, int z, net.minecraftforge.common.util.ForgeDirection face) {
+        return getFlammability(BlockState.of(this, w.getBlockMetadata(x, y, z)), w, new BlockPos(x, y, z), Direction.from3DDataValue(face.ordinal()));
+    }
+
+    @Override
+    public boolean isFlammable(IBlockAccess w, int x, int y, int z, net.minecraftforge.common.util.ForgeDirection face) {
+        return getFlammability(w, x, y, z, face) > 0;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerBlockIcons(IIconRegister reg) {
+        side = CompatBlocks.register(this, reg, "side");
+        top = CompatBlocks.icon(this, "top");
+        bottom = CompatBlocks.icon(this, "bottom");
+        if (side == null) side = Blocks.planks.getIcon(2, 0);
+        if (top == null) top = side;
+        if (bottom == null) bottom = side;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(int s, int meta) {
+        return s == 0 ? bottom : s == 1 ? top : side;
+    }
+}
+//// FILE: mc/world/level/block/SlabBlock.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+import java.util.Random;
+
+import net.mcreator.boh.compat.block.BohBlock;
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.core.Direction;
+import net.mcreator.boh.compat.mc.world.item.context.BlockPlaceContext;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.mcreator.boh.compat.mc.world.level.block.state.Builder;
+import net.mcreator.boh.compat.mc.world.level.block.state.Properties;
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.EnumProperty;
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.Property;
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.SlabType;
+import net.mcreator.boh.compat.mc.world.phys.shapes.CollisionContext;
+import net.mcreator.boh.compat.mc.world.phys.shapes.Shapes;
+import net.mcreator.boh.compat.mc.world.phys.shapes.VoxelShape;
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+
+/** 1.20 SlabBlock: one block with type=bottom|top|double. */
+public class SlabBlock extends BohBlock {
+
+    public static final EnumProperty<SlabType> TYPE = EnumProperty.create("type", SlabType.class);
+
+    public SlabBlock(Properties props) {
+        super(props);
+        registerDefaultState(defaultBlockState().setValue(TYPE, SlabType.BOTTOM));
+        useNeighborBrightness = true;
+        setLightOpacity(0);
+    }
+
+    @Override
+    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+        builder.add(new Property[] { TYPE });
+    }
+
+    @Override
+    public VoxelShape getShape(BlockState state, IBlockAccess world, BlockPos pos, CollisionContext ctx) {
+        SlabType t = state.getValue(TYPE);
+        return t == SlabType.DOUBLE ? Shapes.block() : t == SlabType.TOP ? box(0, 8, 0, 16, 16, 16) : box(0, 0, 0, 16, 8, 16);
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        Direction face = ctx.getClickedFace();
+        double hy = ctx.getClickLocation().y - ctx.getClickedPos().getY();
+        boolean top = face != Direction.UP && (face == Direction.DOWN || hy > 0.5);
+        return defaultBlockState().setValue(TYPE, top ? SlabType.TOP : SlabType.BOTTOM);
+    }
+
+    @Override
+    public boolean isOpaqueCube() {
+        return false;
+    }
+
+    @Override
+    public boolean renderAsNormalBlock() {
+        return false;
+    }
+
+    @Override
+    public int quantityDropped(int meta, int fortune, Random r) {
+        return BlockState.of(this, meta).getValue(TYPE) == SlabType.DOUBLE ? 2 : 1;
+    }
+
+    @Override
+    public boolean shouldSideBeRendered(IBlockAccess w, int x, int y, int z, int side) {
+        return true;
+    }
+
+    /** Places a second slab into a single slab (called by BohBlockItem before normal placement). */
+    public boolean tryMerge(ItemStack stack, EntityPlayer player, World w, int x, int y, int z, int side, float hy) {
+        if (tryMergeAt(stack, player, w, x, y, z, side, hy, true)) return true;
+        int[] o = { 0, 0, 0 };
+        switch (side) {
+            case 0: o[1] = -1; break;
+            case 1: o[1] = 1; break;
+            case 2: o[2] = -1; break;
+            case 3: o[2] = 1; break;
+            case 4: o[0] = -1; break;
+            default: o[0] = 1;
+        }
+        return tryMergeAt(stack, player, w, x + o[0], y + o[1], z + o[2], side, hy, false);
+    }
+
+    private boolean tryMergeAt(ItemStack stack, EntityPlayer player, World w, int x, int y, int z, int side, float hy, boolean clicked) {
+        if (w.getBlock(x, y, z) != this) return false;
+        SlabType t = BlockState.of(this, w.getBlockMetadata(x, y, z)).getValue(TYPE);
+        if (t == SlabType.DOUBLE) return false;
+        if (clicked && !(t == SlabType.BOTTOM && side == 1 || t == SlabType.TOP && side == 0)) return false;
+        if (!clicked && side < 2) return false;
+        if (!player.canPlayerEdit(x, y, z, side, stack)) return false;
+        if (!w.checkNoEntityCollision(net.minecraft.util.AxisAlignedBB.getBoundingBox(x, y, z, x + 1, y + 1, z + 1))) return false;
+        w.setBlockMetadataWithNotify(x, y, z, BlockState.of(this, w.getBlockMetadata(x, y, z)).setValue(TYPE, SlabType.DOUBLE).meta(), 3);
+        w.playSoundEffect(x + 0.5, y + 0.5, z + 0.5, stepSound.func_150496_b(), (stepSound.getVolume() + 1.0F) / 2.0F, stepSound.getPitch() * 0.8F);
+        if (!player.capabilities.isCreativeMode) stack.stackSize--;
+        return true;
+    }
+}
+//// FILE: mc/world/level/block/FenceBlock.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+import net.mcreator.boh.compat.block.CompatBlock;
+import net.mcreator.boh.compat.block.CompatBlocks;
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.core.Direction;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.mcreator.boh.compat.mc.world.level.block.state.Properties;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockFence;
+import net.minecraft.block.BlockFenceGate;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.IBlockAccess;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+/** 1.20 FenceBlock on 1.7.10 BlockFence; connects to any fence/fence gate of the same material class. */
+public class FenceBlock extends BlockFence implements CompatBlock {
+
+    public FenceBlock(Properties props) {
+        super("planks_oak", Material.wood);
+        CompatBlocks.apply(this, props);
+    }
+
+    @Override
+    public void onRegistered(ResourceLocation id) {
+        CompatBlocks.registered(this, id);
+    }
+
+    @Override
+    public boolean canConnectFenceTo(IBlockAccess w, int x, int y, int z) {
+        Block b = w.getBlock(x, y, z);
+        if (b instanceof BlockFence && b.getMaterial() == getMaterial() || b instanceof BlockFenceGate) return true;
+        return super.canConnectFenceTo(w, x, y, z);
+    }
+
+    public int getLightBlock(BlockState state, IBlockAccess world, BlockPos pos) {
+        return 0;
+    }
+
+    public int getFlammability(BlockState state, IBlockAccess world, BlockPos pos, Direction face) {
+        return 0;
+    }
+
+    @Override
+    public int getFlammability(IBlockAccess w, int x, int y, int z, net.minecraftforge.common.util.ForgeDirection face) {
+        return getFlammability(BlockState.of(this, w.getBlockMetadata(x, y, z)), w, new BlockPos(x, y, z), Direction.from3DDataValue(face.ordinal()));
+    }
+
+    @Override
+    public boolean isFlammable(IBlockAccess w, int x, int y, int z, net.minecraftforge.common.util.ForgeDirection face) {
+        return getFlammability(w, x, y, z, face) > 0;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerBlockIcons(IIconRegister reg) {
+        blockIcon = CompatBlocks.register(this, reg, "texture");
+        if (blockIcon == null) blockIcon = reg.registerIcon("planks_oak");
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(int side, int meta) {
+        return blockIcon;
+    }
+}
+//// FILE: mc/world/level/block/FenceGateBlock.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+import net.mcreator.boh.compat.block.CompatBlock;
+import net.mcreator.boh.compat.block.CompatBlocks;
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.core.Direction;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.mcreator.boh.compat.mc.world.level.block.state.Properties;
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.WoodType;
+import net.minecraft.block.BlockFenceGate;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.IBlockAccess;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+/** 1.20 FenceGateBlock on 1.7.10 BlockFenceGate. */
+public class FenceGateBlock extends BlockFenceGate implements CompatBlock {
+
+    public FenceGateBlock(Properties props, WoodType type) {
+        CompatBlocks.apply(this, props);
+    }
+
+    @Override
+    public void onRegistered(ResourceLocation id) {
+        CompatBlocks.registered(this, id);
+    }
+
+    public int getLightBlock(BlockState state, IBlockAccess world, BlockPos pos) {
+        return 0;
+    }
+
+    public int getFlammability(BlockState state, IBlockAccess world, BlockPos pos, Direction face) {
+        return 0;
+    }
+
+    @Override
+    public int getFlammability(IBlockAccess w, int x, int y, int z, net.minecraftforge.common.util.ForgeDirection face) {
+        return getFlammability(BlockState.of(this, w.getBlockMetadata(x, y, z)), w, new BlockPos(x, y, z), Direction.from3DDataValue(face.ordinal()));
+    }
+
+    @Override
+    public boolean isFlammable(IBlockAccess w, int x, int y, int z, net.minecraftforge.common.util.ForgeDirection face) {
+        return getFlammability(w, x, y, z, face) > 0;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerBlockIcons(IIconRegister reg) {
+        blockIcon = CompatBlocks.register(this, reg, "texture");
+        if (blockIcon == null) blockIcon = reg.registerIcon("planks_oak");
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(int side, int meta) {
+        return blockIcon;
+    }
+}
+//// FILE: mc/world/level/block/ButtonBlock.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+import net.mcreator.boh.compat.block.CompatBlock;
+import net.mcreator.boh.compat.block.CompatBlocks;
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.core.Direction;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.mcreator.boh.compat.mc.world.level.block.state.Properties;
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.BlockSetType;
+import net.minecraft.block.BlockButton;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+/** 1.20 ButtonBlock on 1.7.10 BlockButton. */
+public class ButtonBlock extends BlockButton implements CompatBlock {
+
+    private final int ticks;
+
+    public ButtonBlock(Properties props, BlockSetType type, int ticks, boolean arrowsCanPress) {
+        super(arrowsCanPress);
+        this.ticks = ticks;
+        CompatBlocks.apply(this, props);
+    }
+
+    @Override
+    public void onRegistered(ResourceLocation id) {
+        CompatBlocks.registered(this, id);
+    }
+
+    @Override
+    public int tickRate(World w) {
+        return ticks;
+    }
+
+    public int getLightBlock(BlockState state, IBlockAccess world, BlockPos pos) {
+        return 0;
+    }
+
+    public int getFlammability(BlockState state, IBlockAccess world, BlockPos pos, Direction face) {
+        return 0;
+    }
+
+    @Override
+    public int getFlammability(IBlockAccess w, int x, int y, int z, net.minecraftforge.common.util.ForgeDirection face) {
+        return getFlammability(BlockState.of(this, w.getBlockMetadata(x, y, z)), w, new BlockPos(x, y, z), Direction.from3DDataValue(face.ordinal()));
+    }
+
+    @Override
+    public boolean isFlammable(IBlockAccess w, int x, int y, int z, net.minecraftforge.common.util.ForgeDirection face) {
+        return getFlammability(w, x, y, z, face) > 0;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerBlockIcons(IIconRegister reg) {
+        blockIcon = CompatBlocks.register(this, reg, "texture");
+        if (blockIcon == null) blockIcon = reg.registerIcon("planks_oak");
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(int side, int meta) {
+        return blockIcon;
+    }
+}
+//// FILE: mc/world/level/block/PressurePlateBlock.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+import net.mcreator.boh.compat.block.CompatBlock;
+import net.mcreator.boh.compat.block.CompatBlocks;
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.core.Direction;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.mcreator.boh.compat.mc.world.level.block.state.Properties;
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.BlockSetType;
+import net.minecraft.block.BlockPressurePlate;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.IBlockAccess;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+/** 1.20 PressurePlateBlock on 1.7.10 BlockPressurePlate. */
+public class PressurePlateBlock extends BlockPressurePlate implements CompatBlock {
+
+    public PressurePlateBlock(Sensitivity sensitivity, Properties props, BlockSetType type) {
+        super("planks_oak", type.wooden ? Material.wood : Material.rock,
+            sensitivity == Sensitivity.MOBS ? BlockPressurePlate.Sensitivity.mobs : BlockPressurePlate.Sensitivity.everything);
+        CompatBlocks.apply(this, props);
+    }
+
+    @Override
+    public void onRegistered(ResourceLocation id) {
+        CompatBlocks.registered(this, id);
+    }
+
+    public int getLightBlock(BlockState state, IBlockAccess world, BlockPos pos) {
+        return 0;
+    }
+
+    public int getFlammability(BlockState state, IBlockAccess world, BlockPos pos, Direction face) {
+        return 0;
+    }
+
+    @Override
+    public int getFlammability(IBlockAccess w, int x, int y, int z, net.minecraftforge.common.util.ForgeDirection face) {
+        return getFlammability(BlockState.of(this, w.getBlockMetadata(x, y, z)), w, new BlockPos(x, y, z), Direction.from3DDataValue(face.ordinal()));
+    }
+
+    @Override
+    public boolean isFlammable(IBlockAccess w, int x, int y, int z, net.minecraftforge.common.util.ForgeDirection face) {
+        return getFlammability(w, x, y, z, face) > 0;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerBlockIcons(IIconRegister reg) {
+        blockIcon = CompatBlocks.register(this, reg, "texture");
+        if (blockIcon == null) blockIcon = reg.registerIcon("planks_oak");
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(int side, int meta) {
+        return blockIcon;
+    }
+}
+//// FILE: mc/world/level/block/LeavesBlock.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+import java.util.Random;
+
+import net.mcreator.boh.compat.block.BohBlock;
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.tags.BlockTags;
+import net.mcreator.boh.compat.mc.util.RandomSource;
+import net.mcreator.boh.compat.mc.world.item.context.BlockPlaceContext;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.mcreator.boh.compat.mc.world.level.block.state.Builder;
+import net.mcreator.boh.compat.mc.world.level.block.state.Properties;
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.BlockStateProperties;
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.Property;
+import net.minecraft.block.Block;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+
+/** 1.20 LeavesBlock: distance-to-log decay with persistent leaves when placed by players. */
+public class LeavesBlock extends BohBlock {
+
+    private static final net.mcreator.boh.compat.mc.tags.TagKey<Object> LOGS = BlockTags.create(new ResourceLocation("minecraft", "logs"));
+
+    public LeavesBlock(Properties props) {
+        super(props);
+        registerDefaultState(defaultBlockState().setValue(BlockStateProperties.DISTANCE, 7).setValue(BlockStateProperties.PERSISTENT, false));
+        setTickRandomly(true);
+        setLightOpacity(1);
+    }
+
+    @Override
+    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+        builder.add(new Property[] { BlockStateProperties.DISTANCE, BlockStateProperties.PERSISTENT });
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return defaultBlockState().setValue(BlockStateProperties.PERSISTENT, true);
+    }
+
+    @Override
+    public void randomTick(BlockState state, WorldServer world, BlockPos pos, RandomSource random) {
+        super.randomTick(state, world, pos, random);
+        int x = pos.getX(), y = pos.getY(), z = pos.getZ();
+        if (world.getBlock(x, y, z) != this) return;
+        BlockState s = stateAt(world, x, y, z);
+        if (s.getValue(BlockStateProperties.PERSISTENT)) return;
+        int d = distanceAt(world, x, y, z);
+        if (d >= 7) {
+            dropBlockAsItem(world, x, y, z, world.getBlockMetadata(x, y, z), 0);
+            world.setBlockToAir(x, y, z);
+        } else if (d != s.getValue(BlockStateProperties.DISTANCE)) {
+            net.mcreator.boh.compat.M.setBlock(world, pos, s.setValue(BlockStateProperties.DISTANCE, d), 4);
+        }
+    }
+
+    private int distanceAt(World w, int x, int y, int z) {
+        int best = 7;
+        int[][] dirs = { { 1, 0, 0 }, { -1, 0, 0 }, { 0, 1, 0 }, { 0, -1, 0 }, { 0, 0, 1 }, { 0, 0, -1 } };
+        for (int[] d : dirs) {
+            int nx = x + d[0], ny = y + d[1], nz = z + d[2];
+            Block b = w.getBlock(nx, ny, nz);
+            if (isLog(w, b, nx, ny, nz)) return 1;
+            if (b instanceof LeavesBlock) best = Math.min(best, stateAt(w, nx, ny, nz).getValue(BlockStateProperties.DISTANCE) + 1);
+        }
+        return Math.min(best, 7);
+    }
+
+    private static boolean isLog(World w, Block b, int x, int y, int z) {
+        if (b.isWood(w, x, y, z)) return true;
+        String n = Block.blockRegistry.getNameForObject(b);
+        return n != null && LOGS.contains(new ResourceLocation(n));
+    }
+
+    @Override
+    public boolean isLeaves(IBlockAccess world, int x, int y, int z) {
+        return true;
+    }
+
+    @Override
+    public boolean isOpaqueCube() {
+        return false;
+    }
+
+    @Override
+    public boolean renderAsNormalBlock() {
+        return false;
+    }
+
+    @Override
+    public boolean shouldSideBeRendered(IBlockAccess w, int x, int y, int z, int side) {
+        return true;
+    }
+
+    @Override
+    public void beginLeavesDecay(World world, int x, int y, int z) {}
+
+    public int quantityDroppedBase(Random r) {
+        return 0;
+    }
+}
+//// FILE: mc/world/level/block/grower/AbstractTreeGrower.java
+package net.mcreator.boh.compat.mc.world.level.block.grower;
+
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.resources.ResourceKey;
+import net.mcreator.boh.compat.mc.util.RandomSource;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.mcreator.boh.compat.world.TreePlacer;
+import net.minecraft.world.World;
+
+/** 1.20 AbstractTreeGrower: grows the configured tree feature named by the subclass. */
+public abstract class AbstractTreeGrower {
+
+    protected abstract ResourceKey<?> getConfiguredFeature(RandomSource random, boolean hasFlowers);
+
+    public boolean growTree(World world, Object generator, BlockPos pos, BlockState state, RandomSource random) {
+        ResourceKey<?> key = getConfiguredFeature(random, false);
+        if (key == null) return false;
+        world.setBlockToAir(pos.getX(), pos.getY(), pos.getZ());
+        if (TreePlacer.place(key.location(), world, pos, random)) return true;
+        net.mcreator.boh.compat.M.setBlock(world, pos, state, 4);
+        return false;
+    }
+}
+//// FILE: mc/world/level/block/grower/AbstractMegaTreeGrower.java
+package net.mcreator.boh.compat.mc.world.level.block.grower;
+
+import net.mcreator.boh.compat.mc.resources.ResourceKey;
+import net.mcreator.boh.compat.mc.util.RandomSource;
+
+/** 1.20 AbstractMegaTreeGrower (2x2 variant grows like the single tree here). */
+public abstract class AbstractMegaTreeGrower extends AbstractTreeGrower {
+
+    protected abstract ResourceKey<?> getConfiguredMegaFeature(RandomSource random);
+
+    @Override
+    protected ResourceKey<?> getConfiguredFeature(RandomSource random, boolean hasFlowers) {
+        return null;
+    }
+}
+//// FILE: mc/world/level/block/SaplingBlock.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+import java.util.Random;
+
+import net.mcreator.boh.compat.block.BohBlock;
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.util.RandomSource;
+import net.mcreator.boh.compat.mc.world.level.block.grower.AbstractTreeGrower;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.mcreator.boh.compat.mc.world.level.block.state.Builder;
+import net.mcreator.boh.compat.mc.world.level.block.state.Properties;
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.BlockStateProperties;
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.Property;
+import net.mcreator.boh.compat.mc.world.phys.shapes.CollisionContext;
+import net.mcreator.boh.compat.mc.world.phys.shapes.VoxelShape;
+import net.minecraft.block.Block;
+import net.minecraft.block.IGrowable;
+import net.minecraft.init.Blocks;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+
+/** 1.20 SaplingBlock: stage 0 -> 1 -> tree, bonemeal through IGrowable. */
+public class SaplingBlock extends BohBlock implements IGrowable {
+
+    protected final AbstractTreeGrower treeGrower;
+
+    public SaplingBlock(AbstractTreeGrower grower, Properties props) {
+        super(props);
+        treeGrower = grower;
+        registerDefaultState(defaultBlockState().setValue(BlockStateProperties.STAGE, 0));
+        setTickRandomly(true);
+    }
+
+    @Override
+    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+        builder.add(new Property[] { BlockStateProperties.STAGE });
+    }
+
+    @Override
+    public VoxelShape getShape(BlockState state, IBlockAccess world, BlockPos pos, CollisionContext ctx) {
+        return box(2, 0, 2, 14, 12, 14);
+    }
+
+    @Override
+    public void randomTick(BlockState state, WorldServer world, BlockPos pos, RandomSource random) {
+        super.randomTick(state, world, pos, random);
+        if (world.getBlockLightValue(pos.getX(), pos.getY() + 1, pos.getZ()) >= 9 && random.nextInt(7) == 0) advanceTree(world, pos, state, random);
+    }
+
+    public void advanceTree(World world, BlockPos pos, BlockState state, RandomSource random) {
+        if (state.getValue(BlockStateProperties.STAGE) == 0) {
+            net.mcreator.boh.compat.M.setBlock(world, pos, state.cycle(BlockStateProperties.STAGE), 4);
+        } else if (treeGrower != null) {
+            treeGrower.growTree(world, null, pos, state, random);
+        }
+    }
+
+    @Override
+    public boolean canBlockStay(World w, int x, int y, int z) {
+        Block below = w.getBlock(x, y - 1, z);
+        return below == Blocks.grass || below == Blocks.dirt || below == Blocks.farmland
+            || below.canSustainPlant(w, x, y - 1, z, net.minecraftforge.common.util.ForgeDirection.UP, (net.minecraftforge.common.IPlantable) Blocks.sapling);
+    }
+
+    @Override
+    public boolean canPlaceBlockAt(World w, int x, int y, int z) {
+        return super.canPlaceBlockAt(w, x, y, z) && canBlockStay(w, x, y, z);
+    }
+
+    @Override
+    public void onNeighborBlockChange(World w, int x, int y, int z, Block neighbor) {
+        super.onNeighborBlockChange(w, x, y, z, neighbor);
+        if (!canBlockStay(w, x, y, z)) {
+            dropBlockAsItem(w, x, y, z, w.getBlockMetadata(x, y, z), 0);
+            w.setBlockToAir(x, y, z);
+        }
+    }
+
+    // IGrowable (bone meal)
+    @Override
+    public boolean func_149851_a(World w, int x, int y, int z, boolean client) {
+        return true;
+    }
+
+    @Override
+    public boolean func_149852_a(World w, Random r, int x, int y, int z) {
+        return r.nextFloat() < 0.45F;
+    }
+
+    @Override
+    public void func_149853_b(World w, Random r, int x, int y, int z) {
+        BlockPos pos = new BlockPos(x, y, z);
+        advanceTree(w, pos, stateAt(w, x, y, z), RandomSource.wrap(r));
+    }
+
+    public int getFireSpreadSpeed(BlockState state, IBlockAccess world, BlockPos pos, net.mcreator.boh.compat.mc.core.Direction face) {
+        return 0;
+    }
+}
+//// FILE: mc/world/level/block/FlowerBlock.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+import java.util.function.Supplier;
+
+import net.mcreator.boh.compat.block.BohBlock;
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.mcreator.boh.compat.mc.world.level.block.state.Properties;
+import net.mcreator.boh.compat.mc.world.phys.shapes.CollisionContext;
+import net.mcreator.boh.compat.mc.world.phys.shapes.VoxelShape;
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.potion.Potion;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+
+/** 1.20 FlowerBlock (suspicious stew effect kept for API compatibility). */
+public class FlowerBlock extends BohBlock {
+
+    private final Supplier<? extends Potion> effect;
+    private final int duration;
+
+    public FlowerBlock(Supplier<? extends Potion> effect, int duration, Properties props) {
+        super(props);
+        this.effect = effect;
+        this.duration = duration;
+    }
+
+    public FlowerBlock(Potion effect, int duration, Properties props) {
+        this(() -> effect, duration, props);
+    }
+
+    public Potion getSuspiciousEffect() {
+        return effect.get();
+    }
+
+    public int getEffectDuration() {
+        return duration;
+    }
+
+    @Override
+    public VoxelShape getShape(BlockState state, IBlockAccess world, BlockPos pos, CollisionContext ctx) {
+        return box(5, 0, 5, 11, 10, 11);
+    }
+
+    @Override
+    public boolean canBlockStay(World w, int x, int y, int z) {
+        Block below = w.getBlock(x, y - 1, z);
+        return below == Blocks.grass || below == Blocks.dirt || below == Blocks.farmland;
+    }
+
+    @Override
+    public boolean canPlaceBlockAt(World w, int x, int y, int z) {
+        return super.canPlaceBlockAt(w, x, y, z) && canBlockStay(w, x, y, z);
+    }
+
+    @Override
+    public void onNeighborBlockChange(World w, int x, int y, int z, Block neighbor) {
+        super.onNeighborBlockChange(w, x, y, z, neighbor);
+        if (!canBlockStay(w, x, y, z)) {
+            dropBlockAsItem(w, x, y, z, w.getBlockMetadata(x, y, z), 0);
+            w.setBlockToAir(x, y, z);
+        }
+    }
+}
+//// FILE: mc/world/level/block/FallingBlock.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+import net.mcreator.boh.compat.block.BohBlock;
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.util.RandomSource;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.mcreator.boh.compat.mc.world.level.block.state.Properties;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockFalling;
+import net.minecraft.entity.item.EntityFallingBlock;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+
+/** 1.20 FallingBlock: falls when unsupported (scheduled 2 ticks after placement or a neighbour change). */
+public class FallingBlock extends BohBlock {
+
+    public FallingBlock(Properties props) {
+        super(props);
+    }
+
+    @Override
+    public void onPlace(BlockState state, World world, BlockPos pos, BlockState old, boolean moving) {
+        super.onPlace(state, world, pos, old, moving);
+        schedule(world, pos);
+    }
+
+    @Override
+    public void neighborChanged(BlockState state, World world, BlockPos pos, Block neighbor, BlockPos from, boolean moving) {
+        super.neighborChanged(state, world, pos, neighbor, from, moving);
+        schedule(world, pos);
+    }
+
+    private void schedule(World world, BlockPos pos) {
+        markScheduled(world, pos.getX(), pos.getY(), pos.getZ());
+        world.scheduleBlockUpdate(pos.getX(), pos.getY(), pos.getZ(), this, getDelayAfterPlace());
+    }
+
+    protected int getDelayAfterPlace() {
+        return 2;
+    }
+
+    @Override
+    public void tick(BlockState state, WorldServer world, BlockPos pos, RandomSource random) {
+        super.tick(state, world, pos, random);
+        int x = pos.getX(), y = pos.getY(), z = pos.getZ();
+        if (world.getBlock(x, y, z) != this || y < 1) return;
+        if (!BlockFalling.func_149831_e(world, x, y - 1, z)) return;
+        EntityFallingBlock e = new EntityFallingBlock(world, x + 0.5, y + 0.5, z + 0.5, this, world.getBlockMetadata(x, y, z));
+        world.spawnEntityInWorld(e);
+    }
+}
+//// FILE: mc/world/level/block/BaseEntityBlock.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+import net.mcreator.boh.compat.block.BohBlock;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.mcreator.boh.compat.mc.world.level.block.state.Properties;
+
+/** 1.20 BaseEntityBlock: a block with a block entity; INVISIBLE render shape unless overridden. */
+public abstract class BaseEntityBlock extends BohBlock implements EntityBlock {
+
+    protected BaseEntityBlock(Properties props) {
+        super(props);
+    }
+
+    @Override
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.INVISIBLE;
+    }
+
+    @Override
+    public int getRenderType() {
+        return getRenderShape(defaultBlockState()) == RenderShape.MODEL ? super.getRenderType() : -1;
+    }
+
+    @Override
+    public boolean isOpaqueCube() {
+        return getRenderShape(defaultBlockState()) == RenderShape.MODEL && super.isOpaqueCube();
+    }
+
+    @Override
+    public boolean renderAsNormalBlock() {
+        return getRenderShape(defaultBlockState()) == RenderShape.MODEL && super.renderAsNormalBlock();
+    }
+}
+//// FILE: world/TreePlacer.java
+package net.mcreator.boh.compat.world;
+
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Random;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import net.mcreator.boh.compat.M;
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
+
+/**
+ * Places "minecraft:tree" configured features from data/&lt;ns&gt;/worldgen/configured_feature: straight trunk of the
+ * trunk placer's height, a rounded foliage blob of the foliage placer's radius, plus short branches for
+ * cherry/fancy trunk placers.
+ */
+public final class TreePlacer {
+
+    private TreePlacer() {}
+
+    public static JsonObject read(ResourceLocation id) {
+        String path = "/data/" + id.getResourceDomain() + "/worldgen/configured_feature/" + id.getResourcePath() + ".json";
+        try (InputStream in = TreePlacer.class.getResourceAsStream(path)) {
+            if (in == null) return null;
+            return new JsonParser().parse(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonObject();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static boolean place(ResourceLocation feature, World w, BlockPos pos, Random r) {
+        JsonObject f = read(feature);
+        if (f == null || !f.get("type").getAsString().endsWith("tree")) return false;
+        JsonObject c = f.getAsJsonObject("config");
+        BlockState log = StateParser.provider(c.getAsJsonObject("trunk_provider"), r);
+        BlockState leaves = StateParser.provider(c.getAsJsonObject("foliage_provider"), r);
+        if (log == null || leaves == null) return false;
+        JsonObject tp = c.getAsJsonObject("trunk_placer");
+        int height = i(tp, "base_height", 4) + r.nextInt(i(tp, "height_rand_a", 0) + 1) + r.nextInt(i(tp, "height_rand_b", 0) + 1);
+        JsonObject fp = c.getAsJsonObject("foliage_placer");
+        int radius = Math.max(1, i(fp, "radius", 2));
+        int fh = Math.max(2, i(fp, "height", 3));
+        int x = pos.getX(), y = pos.getY(), z = pos.getZ();
+        if (y < 1 || y + height + 2 > w.getHeight()) return false;
+        for (int dy = 1; dy <= height; dy++) if (!replaceable(w, x, y + dy, z)) return false;
+        Block below = w.getBlock(x, y - 1, z);
+        if (below == Blocks.grass || below == Blocks.farmland) w.setBlock(x, y - 1, z, Blocks.dirt, 0, 2);
+        String type = tp.get("type").getAsString();
+        for (int dy = 0; dy < height; dy++) M.setBlock(w, new BlockPos(x, y + dy, z), log, 2);
+        int top = y + height;
+        blob(w, x, top, z, radius, fh, leaves, r);
+        if (type.contains("cherry") || type.contains("fancy") || type.contains("forking") || type.contains("bending")) {
+            int branches = 1 + r.nextInt(3);
+            for (int b = 0; b < branches; b++) {
+                int dx = r.nextInt(3) - 1, dz = dx == 0 ? (r.nextBoolean() ? 1 : -1) : 0;
+                int len = 2 + r.nextInt(2);
+                int by = y + height - 1 - r.nextInt(2);
+                int bx = x, bz = z;
+                for (int s = 1; s <= len; s++) {
+                    bx += dx;
+                    bz += dz;
+                    if (s == len) by++;
+                    if (replaceable(w, bx, by, bz)) M.setBlock(w, new BlockPos(bx, by, bz), log, 2);
+                }
+                blob(w, bx, by + 1, bz, Math.max(1, radius - 1), Math.max(2, fh - 1), leaves, r);
+            }
+        }
+        return true;
+    }
+
+    private static void blob(World w, int cx, int topY, int cz, int radius, int height, BlockState leaves, Random r) {
+        for (int dy = -height + 1; dy <= 1; dy++) {
+            int rad = dy == 1 ? Math.max(1, radius - 1) : radius;
+            for (int dx = -rad; dx <= rad; dx++) {
+                for (int dz = -rad; dz <= rad; dz++) {
+                    boolean corner = Math.abs(dx) == rad && Math.abs(dz) == rad;
+                    if (corner && (dy == 1 || r.nextInt(2) == 0)) continue;
+                    if (dx * dx + dz * dz > rad * rad + 1) continue;
+                    int x = cx + dx, y = topY + dy, z = cz + dz;
+                    if (w.isAirBlock(x, y, z) || w.getBlock(x, y, z).isLeaves(w, x, y, z)) M.setBlock(w, new BlockPos(x, y, z), leaves, 2);
+                }
+            }
+        }
+    }
+
+    private static boolean replaceable(World w, int x, int y, int z) {
+        Block b = w.getBlock(x, y, z);
+        return b.isAir(w, x, y, z) || b.isLeaves(w, x, y, z) || b.getMaterial() == Material.plants || b.getMaterial() == Material.vine
+            || b.isReplaceable(w, x, y, z) || b instanceof net.mcreator.boh.compat.mc.world.level.block.SaplingBlock;
+    }
+
+    static int i(JsonObject o, String key, int def) {
+        if (o == null || !o.has(key)) return def;
+        JsonElement e = o.get(key);
+        if (e.isJsonPrimitive()) return e.getAsInt();
+        if (e.isJsonObject()) {
+            JsonObject v = e.getAsJsonObject();
+            if (v.has("value") && v.get("value").isJsonPrimitive()) return v.get("value").getAsInt();
+            if (v.has("value") && v.get("value").isJsonObject()) {
+                JsonObject u = v.getAsJsonObject("value");
+                if (u.has("min_inclusive")) return u.get("min_inclusive").getAsInt();
+            }
+        }
+        return def;
+    }
+}
+//// FILE: world/StateParser.java
+package net.mcreator.boh.compat.world;
+
+import java.util.Map;
+import java.util.Random;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import net.mcreator.boh.compat.block.BohBlock;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.Property;
+import net.mcreator.boh.compat.registry.LegacyIds;
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+
+/** Parses 1.20 block-state JSON ({Name, Properties}) and state providers into compat BlockStates. */
+public final class StateParser {
+
+    private StateParser() {}
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public static BlockState parse(JsonObject o) {
+        if (o == null || !o.has("Name")) return null;
+        String name = o.get("Name").getAsString();
+        Block b = Block.getBlockFromName(name);
+        int meta = 0;
+        if (b == null || b == Blocks.air && !name.endsWith("air")) {
+            LegacyIds.Target t = LegacyIds.target(name);
+            if (t == null) return null;
+            b = t.block();
+            meta = t.meta;
+        }
+        BlockState s = BlockState.of(b, meta);
+        if (b instanceof BohBlock && o.has("Properties")) {
+            s = ((BohBlock) b).defaultBlockState();
+            for (Map.Entry<String, JsonElement> e : o.getAsJsonObject("Properties").entrySet()) {
+                Property p = s.definition().getProperty(e.getKey());
+                if (p == null) continue;
+                Object v = p.getValue(e.getValue().getAsString()).orElse(null);
+                if (v != null) s = s.setValue(p, (Comparable) v);
+            }
+        } else if (b instanceof BohBlock) {
+            s = ((BohBlock) b).defaultBlockState();
+        }
+        return s;
+    }
+
+    /** simple_state_provider / weighted_state_provider / rotated_block_provider. */
+    public static BlockState provider(JsonObject p, Random r) {
+        if (p == null) return null;
+        if (p.has("state")) return parse(p.getAsJsonObject("state"));
+        if (p.has("entries")) {
+            JsonArray a = p.getAsJsonArray("entries");
+            int total = 0;
+            for (JsonElement e : a) total += e.getAsJsonObject().has("weight") ? e.getAsJsonObject().get("weight").getAsInt() : 1;
+            int pick = r.nextInt(Math.max(1, total));
+            for (JsonElement e : a) {
+                JsonObject eo = e.getAsJsonObject();
+                pick -= eo.has("weight") ? eo.get("weight").getAsInt() : 1;
+                if (pick < 0) return parse(eo.getAsJsonObject("data"));
+            }
+        }
+        return null;
+    }
+}

@@ -1,0 +1,656 @@
+//// FILE: mc/world/level/GameType.java
+package net.mcreator.boh.compat.mc.world.level;
+
+import net.minecraft.world.WorldSettings;
+
+/** 1.20 GameType; SPECTATOR does not exist in 1.7.10 and maps to adventure. */
+public enum GameType {
+
+    SURVIVAL(WorldSettings.GameType.SURVIVAL),
+    CREATIVE(WorldSettings.GameType.CREATIVE),
+    ADVENTURE(WorldSettings.GameType.ADVENTURE),
+    SPECTATOR(WorldSettings.GameType.ADVENTURE);
+
+    private final WorldSettings.GameType legacy;
+
+    GameType(WorldSettings.GameType legacy) {
+        this.legacy = legacy;
+    }
+
+    public WorldSettings.GameType toVanilla() {
+        return legacy;
+    }
+
+    public static GameType of(WorldSettings.GameType t) {
+        if (t == WorldSettings.GameType.CREATIVE) return CREATIVE;
+        if (t == WorldSettings.GameType.ADVENTURE) return ADVENTURE;
+        return SURVIVAL;
+    }
+
+    public boolean isCreative() {
+        return this == CREATIVE;
+    }
+
+    public boolean isSurvival() {
+        return this == SURVIVAL || this == ADVENTURE;
+    }
+
+    public String getName() {
+        return name().toLowerCase();
+    }
+}
+//// FILE: mc/core/NonNullList.java
+package net.mcreator.boh.compat.mc.core;
+
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+/** 1.20 NonNullList: a fixed-size list whose empty slots hold a default value. */
+public class NonNullList<E> extends AbstractList<E> {
+
+    private final List<E> delegate;
+    private final E defaultValue;
+
+    protected NonNullList(List<E> delegate, E defaultValue) {
+        this.delegate = delegate;
+        this.defaultValue = defaultValue;
+    }
+
+    public static <E> NonNullList<E> create() {
+        return new NonNullList<>(new ArrayList<>(), null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <E> NonNullList<E> withSize(int size, E fill) {
+        Object[] arr = new Object[size];
+        Arrays.fill(arr, fill);
+        return new NonNullList<>((List<E>) Arrays.asList(arr), fill);
+    }
+
+    @SafeVarargs
+    public static <E> NonNullList<E> of(E def, E... values) {
+        return new NonNullList<>(Arrays.asList(values), def);
+    }
+
+    @Override
+    public E get(int i) {
+        return delegate.get(i);
+    }
+
+    @Override
+    public E set(int i, E v) {
+        return delegate.set(i, v == null ? defaultValue : v);
+    }
+
+    @Override
+    public void add(int i, E v) {
+        delegate.add(i, v);
+    }
+
+    @Override
+    public E remove(int i) {
+        return delegate.remove(i);
+    }
+
+    @Override
+    public int size() {
+        return delegate.size();
+    }
+
+    @Override
+    public void clear() {
+        if (defaultValue == null) delegate.clear();
+        else for (int i = 0; i < size(); i++) set(i, defaultValue);
+    }
+}
+//// FILE: mc/world/item/ItemDisplayContext.java
+package net.mcreator.boh.compat.mc.world.item;
+
+/** 1.20 ItemDisplayContext. */
+public enum ItemDisplayContext {
+
+    NONE,
+    THIRD_PERSON_LEFT_HAND,
+    THIRD_PERSON_RIGHT_HAND,
+    FIRST_PERSON_LEFT_HAND,
+    FIRST_PERSON_RIGHT_HAND,
+    HEAD,
+    GUI,
+    GROUND,
+    FIXED;
+
+    public boolean firstPerson() {
+        return this == FIRST_PERSON_LEFT_HAND || this == FIRST_PERSON_RIGHT_HAND;
+    }
+}
+//// FILE: mc/commands/arguments/Anchor.java
+package net.mcreator.boh.compat.mc.commands.arguments;
+
+/** 1.20 EntityAnchorArgument.Anchor. */
+public enum Anchor {
+    FEET,
+    EYES
+}
+//// FILE: mc/world/entity/projectile/ItemSupplier.java
+package net.mcreator.boh.compat.mc.world.entity.projectile;
+
+import net.minecraft.item.ItemStack;
+
+/** 1.20 ItemSupplier: projectiles rendered as a flat item. */
+public interface ItemSupplier {
+
+    ItemStack getItem();
+}
+//// FILE: mc/world/entity/monster/RangedAttackMob.java
+package net.mcreator.boh.compat.mc.world.entity.monster;
+
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.IRangedAttackMob;
+
+/** 1.20 RangedAttackMob; bridges to the 1.7.10 interface used by EntityAIArrowAttack. */
+public interface RangedAttackMob extends IRangedAttackMob {
+
+    void performRangedAttack(EntityLivingBase target, float velocity);
+
+    @Override
+    default void attackEntityWithRangedAttack(EntityLivingBase target, float velocity) {
+        performRangedAttack(target, velocity);
+    }
+}
+//// FILE: mc/world/BossBarColor.java
+package net.mcreator.boh.compat.mc.world;
+
+public enum BossBarColor {
+
+    PINK(0xEC00B8),
+    BLUE(0x00B7EC),
+    RED(0xEC3500),
+    GREEN(0x1DEC00),
+    YELLOW(0xE9EC00),
+    PURPLE(0x7B00EC),
+    WHITE(0xECECEC);
+
+    public final int rgb;
+
+    BossBarColor(int rgb) {
+        this.rgb = rgb;
+    }
+}
+//// FILE: mc/world/BossBarOverlay.java
+package net.mcreator.boh.compat.mc.world;
+
+public enum BossBarOverlay {
+
+    PROGRESS(0),
+    NOTCHED_6(6),
+    NOTCHED_10(10),
+    NOTCHED_12(12),
+    NOTCHED_20(20);
+
+    public final int notches;
+
+    BossBarOverlay(int notches) {
+        this.notches = notches;
+    }
+}
+//// FILE: mc/server/level/ServerBossEvent.java
+package net.mcreator.boh.compat.mc.server.level;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+import net.mcreator.boh.compat.mc.network.chat.Component;
+import net.mcreator.boh.compat.mc.world.BossBarColor;
+import net.mcreator.boh.compat.mc.world.BossBarOverlay;
+import net.mcreator.boh.compat.net.CompatNetwork;
+import net.minecraft.entity.player.EntityPlayerMP;
+
+/** 1.20 ServerBossEvent: a boss bar shown to the players added to it (drawn by the client overlay). */
+public class ServerBossEvent {
+
+    private final UUID id = UUID.randomUUID();
+    private final Set<EntityPlayerMP> players = new HashSet<>();
+    private Component name;
+    private final BossBarColor color;
+    private final BossBarOverlay overlay;
+    private float progress = 1.0F;
+    private boolean visible = true;
+
+    public ServerBossEvent(Component name, BossBarColor color, BossBarOverlay overlay) {
+        this.name = name;
+        this.color = color;
+        this.overlay = overlay;
+    }
+
+    public void addPlayer(EntityPlayerMP p) {
+        if (players.add(p)) send(p, true);
+    }
+
+    public void removePlayer(EntityPlayerMP p) {
+        if (players.remove(p)) CompatNetwork.sendBossBar(p, id, null, 0, 0, 0, false);
+    }
+
+    public void removeAllPlayers() {
+        for (EntityPlayerMP p : new HashSet<>(players)) removePlayer(p);
+    }
+
+    public Set<EntityPlayerMP> getPlayers() {
+        return players;
+    }
+
+    public void setProgress(float progress) {
+        if (Math.abs(progress - this.progress) < 0.001F) return;
+        this.progress = progress;
+        for (EntityPlayerMP p : players) send(p, true);
+    }
+
+    public float getProgress() {
+        return progress;
+    }
+
+    public void setName(Component name) {
+        this.name = name;
+        for (EntityPlayerMP p : players) send(p, true);
+    }
+
+    public void setVisible(boolean v) {
+        visible = v;
+        for (EntityPlayerMP p : players) send(p, v);
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setDarkenScreen(boolean b) {}
+
+    public void setPlayBossMusic(boolean b) {}
+
+    public void setCreateWorldFog(boolean b) {}
+
+    private void send(EntityPlayerMP p, boolean show) {
+        CompatNetwork.sendBossBar(p, id, name == null ? "" : name.getFormattedText(), progress, color.rgb, overlay.notches, show && visible);
+    }
+}
+//// FILE: mc/world/item/alchemy/Potions.java
+package net.mcreator.boh.compat.mc.world.item.alchemy;
+
+public final class Potions {
+
+    public static final BrewPotion WATER = new BrewPotion();
+    public static final BrewPotion EMPTY = WATER;
+    public static final BrewPotion AWKWARD = new BrewPotion();
+    public static final BrewPotion MUNDANE = new BrewPotion();
+    public static final BrewPotion THICK = new BrewPotion();
+
+    private Potions() {}
+}
+//// FILE: mc/world/item/alchemy/PotionUtils.java
+package net.mcreator.boh.compat.mc.world.item.alchemy;
+
+import net.mcreator.boh.compat.forge.registries.ForgeRegistries;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.potion.PotionEffect;
+
+/** 1.20 PotionUtils: brewing potions are stored as {"Potion": id} plus the effects 1.7.10 reads. */
+public final class PotionUtils {
+
+    private PotionUtils() {}
+
+    public static ItemStack setPotion(ItemStack stack, BrewPotion potion) {
+        if (stack == null) return null;
+        NBTTagCompound tag = stack.getTagCompound();
+        if (tag == null) stack.setTagCompound(tag = new NBTTagCompound());
+        if (potion == Potions.WATER) {
+            tag.removeTag("Potion");
+            tag.removeTag("CustomPotionEffects");
+            return stack;
+        }
+        if (potion.getId() != null) tag.setString("Potion", potion.getId().toString());
+        NBTTagList list = new NBTTagList();
+        for (PotionEffect e : potion.getEffects()) list.appendTag(e.writeCustomPotionEffectToNBT(new NBTTagCompound()));
+        tag.setTag("CustomPotionEffects", list);
+        return stack;
+    }
+
+    public static BrewPotion getPotion(ItemStack stack) {
+        if (stack == null || !stack.hasTagCompound() || !stack.getTagCompound().hasKey("Potion")) return Potions.WATER;
+        BrewPotion p = ForgeRegistries.POTIONS.getValue(new net.minecraft.util.ResourceLocation(stack.getTagCompound().getString("Potion")));
+        return p == null ? Potions.WATER : p;
+    }
+}
+//// FILE: mc/world/item/enchantment/Enchantments.java
+package net.mcreator.boh.compat.mc.world.item.enchantment;
+
+import net.minecraft.enchantment.Enchantment;
+
+public final class Enchantments {
+
+    public static final Enchantment SHARPNESS = Enchantment.sharpness;
+    public static final Enchantment SMITE = Enchantment.smite;
+    public static final Enchantment BANE_OF_ARTHROPODS = Enchantment.baneOfArthropods;
+    public static final Enchantment KNOCKBACK = Enchantment.knockback;
+    public static final Enchantment FIRE_ASPECT = Enchantment.fireAspect;
+    public static final Enchantment MOB_LOOTING = Enchantment.looting;
+    public static final Enchantment SWEEPING_EDGE = Enchantment.sharpness;
+    public static final Enchantment BLOCK_EFFICIENCY = Enchantment.efficiency;
+    public static final Enchantment SILK_TOUCH = Enchantment.silkTouch;
+    public static final Enchantment UNBREAKING = Enchantment.unbreaking;
+    public static final Enchantment BLOCK_FORTUNE = Enchantment.fortune;
+    public static final Enchantment POWER_ARROWS = Enchantment.power;
+    public static final Enchantment PUNCH_ARROWS = Enchantment.punch;
+    public static final Enchantment FLAMING_ARROWS = Enchantment.flame;
+    public static final Enchantment INFINITY_ARROWS = Enchantment.infinity;
+    public static final Enchantment ALL_DAMAGE_PROTECTION = Enchantment.protection;
+    public static final Enchantment THORNS = Enchantment.thorns;
+    /** Curse of binding does not exist in 1.7.10; the port treats it as a marker enchantment id. */
+    public static final Enchantment BINDING_CURSE = net.mcreator.boh.compat.item.BohEnchantment.bindingCurse();
+
+    private Enchantments() {}
+}
+//// FILE: mc/world/item/enchantment/EnchantmentHelper.java
+package net.mcreator.boh.compat.mc.world.item.enchantment;
+
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.item.ItemStack;
+
+public final class EnchantmentHelper {
+
+    private EnchantmentHelper() {}
+
+    public static int getItemEnchantmentLevel(Enchantment e, ItemStack stack) {
+        return stack == null || stack.getItem() == null ? 0 : net.minecraft.enchantment.EnchantmentHelper.getEnchantmentLevel(e.effectId, stack);
+    }
+
+    public static int getTagEnchantmentLevel(Enchantment e, ItemStack stack) {
+        return getItemEnchantmentLevel(e, stack);
+    }
+
+    public static int getMobLooting(net.minecraft.entity.EntityLivingBase e) {
+        return net.minecraft.enchantment.EnchantmentHelper.getLootingModifier(e);
+    }
+}
+//// FILE: mc/world/item/enchantment/EnchantmentCategory.java
+package net.mcreator.boh.compat.mc.world.item.enchantment;
+
+import java.util.function.Predicate;
+
+import net.minecraft.enchantment.EnumEnchantmentType;
+import net.minecraft.item.Item;
+
+/** 1.20 EnchantmentCategory: a predicate over items (custom ones map onto EnumEnchantmentType.all). */
+public class EnchantmentCategory {
+
+    public static final EnchantmentCategory WEAPON = new EnchantmentCategory(EnumEnchantmentType.weapon, null);
+    public static final EnchantmentCategory DIGGER = new EnchantmentCategory(EnumEnchantmentType.digger, null);
+    public static final EnchantmentCategory BREAKABLE = new EnchantmentCategory(EnumEnchantmentType.breakable, null);
+    public static final EnchantmentCategory ARMOR = new EnchantmentCategory(EnumEnchantmentType.armor, null);
+    public static final EnchantmentCategory BOW = new EnchantmentCategory(EnumEnchantmentType.bow, null);
+
+    public final EnumEnchantmentType legacy;
+    public final Predicate<Item> predicate;
+
+    private EnchantmentCategory(EnumEnchantmentType legacy, Predicate<Item> predicate) {
+        this.legacy = legacy;
+        this.predicate = predicate;
+    }
+
+    public static EnchantmentCategory create(String name, Predicate<Item> predicate) {
+        return new EnchantmentCategory(EnumEnchantmentType.all, predicate);
+    }
+
+    public boolean canEnchant(Item item) {
+        return predicate != null ? predicate.test(item) : legacy.canEnchantItem(item);
+    }
+}
+//// FILE: mc/world/item/enchantment/Rarity.java
+package net.mcreator.boh.compat.mc.world.item.enchantment;
+
+/** 1.20 Enchantment.Rarity with its weight. */
+public enum Rarity {
+
+    COMMON(10),
+    UNCOMMON(5),
+    RARE(2),
+    VERY_RARE(1);
+
+    public final int weight;
+
+    Rarity(int weight) {
+        this.weight = weight;
+    }
+}
+//// FILE: item/BohEnchantment.java
+package net.mcreator.boh.compat.item;
+
+import net.mcreator.boh.compat.mc.world.entity.EquipmentSlot;
+import net.mcreator.boh.compat.mc.world.item.enchantment.EnchantmentCategory;
+import net.mcreator.boh.compat.mc.world.item.enchantment.Rarity;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnumEnchantmentType;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemStack;
+
+/** Compat base for mod enchantments (1.20 Enchantment hooks on a 1.7.10 {@link Enchantment}). */
+public class BohEnchantment extends Enchantment {
+
+    private static BohEnchantment binding;
+    private final EnchantmentCategory category;
+
+    public BohEnchantment(Rarity rarity, EnchantmentCategory category, EquipmentSlot... slots) {
+        super(nextId(), rarity.weight, category.legacy);
+        this.category = category;
+    }
+
+    private static int nextId() {
+        for (int i = 100; i < Enchantment.enchantmentsList.length; i++) if (Enchantment.enchantmentsList[i] == null) return i;
+        for (int i = 0; i < Enchantment.enchantmentsList.length; i++) if (Enchantment.enchantmentsList[i] == null) return i;
+        throw new IllegalStateException("No free enchantment ids");
+    }
+
+    static synchronized Enchantment bindingCurseInternal() {
+        if (binding == null) {
+            binding = new BohEnchantment(Rarity.VERY_RARE, EnchantmentCategory.ARMOR);
+            binding.setName("boh.binding_curse");
+        }
+        return binding;
+    }
+
+    public static Enchantment bindingCurse() {
+        return bindingCurseInternal();
+    }
+
+    // 1.20 hooks
+
+    public int getMaxLevel() {
+        return 1;
+    }
+
+    public int getMinCost(int level) {
+        return 1 + level * 10;
+    }
+
+    public int getMaxCost(int level) {
+        return getMinCost(level) + 5;
+    }
+
+    public boolean checkCompatibility(Enchantment other) {
+        return this != other;
+    }
+
+    public boolean canEnchant(ItemStack stack) {
+        return stack != null && category.canEnchant(stack.getItem());
+    }
+
+    public void doPostAttack(EntityLivingBase attacker, Entity target, int level) {}
+
+    public void doPostHurt(EntityLivingBase target, Entity attacker, int level) {}
+
+    public boolean isTreasureOnly() {
+        return false;
+    }
+
+    public boolean isCurse() {
+        return false;
+    }
+
+    public boolean isTradeable() {
+        return true;
+    }
+
+    public boolean isDiscoverable() {
+        return true;
+    }
+
+    // 1.7.10 bridge
+
+    @Override
+    public int getMinEnchantability(int level) {
+        return getMinCost(level);
+    }
+
+    @Override
+    public int getMaxEnchantability(int level) {
+        return getMaxCost(level);
+    }
+
+    @Override
+    public boolean canApplyTogether(Enchantment other) {
+        return checkCompatibility(other);
+    }
+
+    @Override
+    public boolean canApply(ItemStack stack) {
+        return canEnchant(stack);
+    }
+
+    @Override
+    public boolean canApplyAtEnchantingTable(ItemStack stack) {
+        return !isTreasureOnly() && canEnchant(stack);
+    }
+
+    @Override
+    public boolean isAllowedOnBooks() {
+        return isDiscoverable();
+    }
+
+    @Override
+    public void func_151368_a(EntityLivingBase attacker, Entity target, int level) {
+        doPostAttack(attacker, target, level);
+    }
+
+    @Override
+    public void func_151367_b(EntityLivingBase target, Entity attacker, int level) {
+        doPostHurt(target, attacker, level);
+    }
+}
+//// FILE: mc/world/level/pathfinder/BlockPathTypes.java
+package net.mcreator.boh.compat.mc.world.level.pathfinder;
+
+public enum BlockPathTypes {
+    BLOCKED,
+    OPEN,
+    WALKABLE,
+    WALKABLE_DOOR,
+    TRAPDOOR,
+    POWDER_SNOW,
+    DANGER_POWDER_SNOW,
+    FENCE,
+    LAVA,
+    WATER,
+    WATER_BORDER,
+    RAIL,
+    UNPASSABLE_RAIL,
+    DANGER_FIRE,
+    DAMAGE_FIRE,
+    DANGER_OTHER,
+    DAMAGE_OTHER,
+    DOOR_OPEN,
+    DOOR_WOOD_CLOSED,
+    DOOR_IRON_CLOSED,
+    BREACH,
+    LEAVES,
+    STICKY_HONEY,
+    COCOA,
+    DAMAGE_CAUTIOUS
+}
+//// FILE: mc/world/level/block/state/properties/BlockSetType.java
+package net.mcreator.boh.compat.mc.world.level.block.state.properties;
+
+/** 1.20 BlockSetType: wood/stone family of doors, trapdoors, buttons, plates. */
+public final class BlockSetType {
+
+    public static final BlockSetType OAK = new BlockSetType("oak", true);
+    public static final BlockSetType STONE = new BlockSetType("stone", false);
+    public static final BlockSetType IRON = new BlockSetType("iron", false);
+
+    public final String name;
+    public final boolean wooden;
+
+    private BlockSetType(String name, boolean wooden) {
+        this.name = name;
+        this.wooden = wooden;
+    }
+}
+//// FILE: mc/world/level/block/state/properties/WoodType.java
+package net.mcreator.boh.compat.mc.world.level.block.state.properties;
+
+public final class WoodType {
+
+    public static final WoodType OAK = new WoodType("oak");
+
+    public final String name;
+
+    private WoodType(String name) {
+        this.name = name;
+    }
+}
+//// FILE: mc/world/level/block/Sensitivity.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+/** 1.20 PressurePlateBlock.Sensitivity. */
+public enum Sensitivity {
+    EVERYTHING,
+    MOBS
+}
+//// FILE: mc/world/item/CreativeModeTabs.java
+package net.mcreator.boh.compat.mc.world.item;
+
+/** 1.20 vanilla tab keys; adding to vanilla tabs is a no-op in 1.7.10 (items show in the mod's own tabs). */
+public final class CreativeModeTabs {
+
+    public static final Object FOOD_AND_DRINKS = "food_and_drinks";
+    public static final Object TOOLS_AND_UTILITIES = "tools_and_utilities";
+    public static final Object COMBAT = "combat";
+    public static final Object INGREDIENTS = "ingredients";
+    public static final Object SPAWN_EGGS = "spawn_eggs";
+    public static final Object BUILDING_BLOCKS = "building_blocks";
+    public static final Object NATURAL_BLOCKS = "natural_blocks";
+
+    private CreativeModeTabs() {}
+}
+//// FILE: mc/world/scores/criteria/ObjectiveCriteria.java
+package net.mcreator.boh.compat.mc.world.scores.criteria;
+
+import net.minecraft.scoreboard.IScoreObjectiveCriteria;
+
+public final class ObjectiveCriteria {
+
+    public static final IScoreObjectiveCriteria DUMMY = IScoreObjectiveCriteria.field_96641_b;
+
+    private ObjectiveCriteria() {}
+}
+//// FILE: mc/world/scores/criteria/RenderType.java
+package net.mcreator.boh.compat.mc.world.scores.criteria;
+
+/** 1.20 ObjectiveCriteria.RenderType (display only). */
+public enum RenderType {
+    INTEGER,
+    HEARTS
+}

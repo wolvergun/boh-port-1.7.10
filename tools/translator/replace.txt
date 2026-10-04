@@ -1,0 +1,10 @@
+ResourceKey.create(Registries.DIMENSION, => net.mcreator.boh.compat.world.Dimensions.dimensionKey(
+@OnlyIn(value = Side.CLIENT, _interface = ItemSupplier.class) => /* client-only ItemSupplier */
+M.getId(M.level(net.minecraft.world).block.Block,  => M.blockStateId(
+net.minecraft.world.level.storage.loot.LootParams.Builder => Object
+M\.getInventory\(([A-Za-z_]+)\)\.add\( =~> M.add(M.getInventory($1), 
+PacketDistributor.DIMENSION.with(level::dimension) => PacketDistributor.DIMENSION.with(() -> M.dimension(level))
+(yield [^;\n]*;)\s*\n\s*break; =~> $1
+, -63.0,  => , 1.0, 
+_serverworld.random,  => M.random(_serverworld), 
+return world instanceof World serverLevelAcc ? (BohModVariables.MapVariables) => return world instanceof World serverLevelAcc && !M.isClientSide(serverLevelAcc) ? (BohModVariables.MapVariables)

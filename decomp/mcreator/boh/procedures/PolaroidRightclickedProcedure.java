@@ -1,0 +1,122 @@
+package net.mcreator.boh.procedures;
+
+import net.mcreator.boh.BohMod;
+import net.mcreator.boh.init.BohModEntities;
+import net.mcreator.boh.init.BohModItems;
+import net.mcreator.boh.init.BohModMobEffects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraftforge.registries.ForgeRegistries;
+
+public class PolaroidRightclickedProcedure {
+   public static void execute(LevelAccessor world, double x, double y, double z, Entity entity) {
+      if (entity != null) {
+         if (entity instanceof Player _player) {
+            ItemStack _stktoremove = new ItemStack((ItemLike)BohModItems.POLAROID.get());
+            _player.getInventory().clearOrCountMatchingItems(p -> _stktoremove.getItem() == p.getItem(), 999, _player.inventoryMenu.getCraftSlots());
+         }
+
+         if (world instanceof Level _level) {
+            if (!_level.isClientSide()) {
+               _level.playSound(
+                  null,
+                  BlockPos.containing(x, y, z),
+                  (SoundEvent)ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("item.book.page_turn")),
+                  SoundSource.PLAYERS,
+                  1.0F,
+                  1.0F
+               );
+            } else {
+               _level.playLocalSound(
+                  x,
+                  y,
+                  z,
+                  (SoundEvent)ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("item.book.page_turn")),
+                  SoundSource.PLAYERS,
+                  1.0F,
+                  1.0F,
+                  false
+               );
+            }
+         }
+
+         if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide()) {
+            _entity.addEffect(new MobEffectInstance((MobEffect)BohModMobEffects.WITNESS.get(), 120, 0, false, false));
+         }
+
+         if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide()) {
+            _entity.addEffect(new MobEffectInstance(MobEffects.WITHER, 120, 3, false, false));
+         }
+
+         if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide()) {
+            _entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 120, 1, false, false));
+         }
+
+         if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide()) {
+            _entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 120, 1, false, false));
+         }
+
+         if (entity instanceof LivingEntity _entity && !_entity.level().isClientSide()) {
+            _entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 60, 1, false, false));
+         }
+
+         entity.getPersistentData().putDouble("smile_dog", 1.0);
+         BohMod.queueServerWork(
+            80,
+            () -> {
+               if (entity instanceof Player _player && !_player.level().isClientSide()) {
+                  _player.displayClientMessage(Component.literal("what the dog doing?"), true);
+               }
+
+               entity.getPersistentData().putDouble("smile_dog", 0.0);
+               if (world instanceof Level _level) {
+                  if (!_level.isClientSide()) {
+                     _level.playSound(
+                        null,
+                        BlockPos.containing(x, y, z),
+                        (SoundEvent)ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("entity.wolf.howl")),
+                        SoundSource.HOSTILE,
+                        1.0F,
+                        1.0F
+                     );
+                  } else {
+                     _level.playLocalSound(
+                        x,
+                        y,
+                        z,
+                        (SoundEvent)ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("entity.wolf.howl")),
+                        SoundSource.HOSTILE,
+                        1.0F,
+                        1.0F,
+                        false
+                     );
+                  }
+               }
+
+               if (world instanceof ServerLevel _level) {
+                  Entity entityToSpawn = ((EntityType)BohModEntities.DECOY_DOG.get()).spawn(_level, BlockPos.containing(x, y, z), MobSpawnType.MOB_SUMMONED);
+                  if (entityToSpawn != null) {
+                     entityToSpawn.setDeltaMovement(0.0, 0.0, 0.0);
+                  }
+               }
+            }
+         );
+      }
+   }
+}

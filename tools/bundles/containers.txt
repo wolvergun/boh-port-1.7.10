@@ -1,0 +1,1893 @@
+//// FILE: forge/common/util/NonNullSupplier.java
+package net.mcreator.boh.compat.forge.common.util;
+
+/** Forge NonNullSupplier. */
+@FunctionalInterface
+public interface NonNullSupplier<T> {
+
+    T get();
+}
+//// FILE: forge/common/util/LazyOptional.java
+package net.mcreator.boh.compat.forge.common.util;
+
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+/** Forge LazyOptional: a lazily-resolved, invalidatable capability value. */
+public final class LazyOptional<T> {
+
+    private static final LazyOptional<Void> EMPTY = new LazyOptional<>(null);
+
+    private Supplier<? extends T> supplier;
+    private T value;
+    private boolean resolved, valid = true;
+
+    private LazyOptional(Supplier<? extends T> supplier) {
+        this.supplier = supplier;
+        if (supplier == null) valid = false;
+    }
+
+    public static <T> LazyOptional<T> of(NonNullSupplier<T> s) {
+        return s == null ? empty() : new LazyOptional<>(s::get);
+    }
+
+    public static <T> LazyOptional<T> ofObject(T v) {
+        return v == null ? empty() : new LazyOptional<>(() -> v);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> LazyOptional<T> empty() {
+        return (LazyOptional<T>) EMPTY;
+    }
+
+    private T get() {
+        if (!valid) return null;
+        if (!resolved) {
+            value = supplier.get();
+            resolved = true;
+        }
+        return value;
+    }
+
+    public boolean isPresent() {
+        return get() != null;
+    }
+
+    public void ifPresent(Consumer<? super T> c) {
+        T v = get();
+        if (v != null) c.accept(v);
+    }
+
+    public T orElse(T other) {
+        T v = get();
+        return v != null ? v : other;
+    }
+
+    public T orElseGet(Supplier<? extends T> other) {
+        T v = get();
+        return v != null ? v : other.get();
+    }
+
+    public <X extends Throwable> T orElseThrow(Supplier<? extends X> ex) throws X {
+        T v = get();
+        if (v == null) throw ex.get();
+        return v;
+    }
+
+    public Optional<T> resolve() {
+        return Optional.ofNullable(get());
+    }
+
+    public <U> LazyOptional<U> lazyMap(Function<? super T, ? extends U> f) {
+        return isPresent() ? new LazyOptional<>(() -> f.apply(get())) : empty();
+    }
+
+    public <U> Optional<U> map(Function<? super T, ? extends U> f) {
+        return resolve().map(f);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <X> LazyOptional<X> cast() {
+        return (LazyOptional<X>) this;
+    }
+
+    public void invalidate() {
+        valid = false;
+    }
+}
+//// FILE: forge/common/capabilities/Capability.java
+package net.mcreator.boh.compat.forge.common.capabilities;
+
+/** Forge Capability key. */
+public final class Capability<T> {
+
+    private final String name;
+
+    Capability(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean isRegistered() {
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+}
+//// FILE: forge/common/capabilities/CapabilityToken.java
+package net.mcreator.boh.compat.forge.common.capabilities;
+
+/** Forge CapabilityToken (subclassed anonymously to capture the type). */
+public abstract class CapabilityToken<T> {
+
+    String name() {
+        java.lang.reflect.Type t = getClass().getGenericSuperclass();
+        return t.getTypeName();
+    }
+}
+//// FILE: forge/common/capabilities/CapabilityManager.java
+package net.mcreator.boh.compat.forge.common.capabilities;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/** Forge CapabilityManager: one Capability per type name. */
+public final class CapabilityManager {
+
+    private static final Map<String, Capability<?>> CAPS = new HashMap<>();
+
+    private CapabilityManager() {}
+
+    @SuppressWarnings("unchecked")
+    public static <T> Capability<T> get(CapabilityToken<T> token) {
+        return (Capability<T>) CAPS.computeIfAbsent(token.name(), Capability::new);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> Capability<T> named(String name) {
+        return (Capability<T>) CAPS.computeIfAbsent(name, Capability::new);
+    }
+}
+//// FILE: forge/common/capabilities/ICapabilityProvider.java
+package net.mcreator.boh.compat.forge.common.capabilities;
+
+import net.mcreator.boh.compat.forge.common.util.LazyOptional;
+import net.mcreator.boh.compat.mc.core.Direction;
+
+/** Forge ICapabilityProvider. */
+public interface ICapabilityProvider {
+
+    <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side);
+
+    default <T> LazyOptional<T> getCapability(Capability<T> cap) {
+        return getCapability(cap, null);
+    }
+}
+//// FILE: forge/common/capabilities/ICapabilitySerializable.java
+package net.mcreator.boh.compat.forge.common.capabilities;
+
+import net.minecraft.nbt.NBTBase;
+
+/** Forge ICapabilitySerializable. */
+public interface ICapabilitySerializable<T extends NBTBase> extends ICapabilityProvider {
+
+    T serializeNBT();
+
+    void deserializeNBT(T nbt);
+}
+//// FILE: forge/common/capabilities/ForgeCapabilities.java
+package net.mcreator.boh.compat.forge.common.capabilities;
+
+import net.mcreator.boh.compat.forge.items.IItemHandler;
+
+/** Forge ForgeCapabilities. */
+public final class ForgeCapabilities {
+
+    public static final Capability<IItemHandler> ITEM_HANDLER = CapabilityManager.named("forge:item_handler");
+
+    private ForgeCapabilities() {}
+}
+//// FILE: forge/common/capabilities/RegisterCapabilitiesEvent.java
+package net.mcreator.boh.compat.forge.common.capabilities;
+
+import cpw.mods.fml.common.eventhandler.Event;
+
+/** Forge RegisterCapabilitiesEvent (registration is implicit here). */
+public class RegisterCapabilitiesEvent extends Event {
+
+    public <T> void register(Class<T> type) {}
+}
+//// FILE: forge/common/capabilities/EntityCapabilities.java
+package net.mcreator.boh.compat.forge.common.capabilities;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import net.mcreator.boh.compat.forge.common.util.LazyOptional;
+import net.mcreator.boh.compat.forge.event.AttachCapabilitiesEvent;
+import net.mcreator.boh.compat.mc.core.Direction;
+import net.minecraft.entity.Entity;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
+import net.minecraftforge.common.IExtendedEntityProperties;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+
+/** Capabilities attached to entities via AttachCapabilitiesEvent, persisted as extended entity properties. */
+public final class EntityCapabilities implements IExtendedEntityProperties {
+
+    public static final String KEY = "boh_caps";
+
+    final Map<ResourceLocation, ICapabilityProvider> providers = new LinkedHashMap<>();
+
+    public static EntityCapabilities of(Entity e) {
+        return (EntityCapabilities) e.getExtendedProperties(KEY);
+    }
+
+    public static <T> LazyOptional<T> get(Entity e, Capability<T> cap, Direction side) {
+        EntityCapabilities c = e == null ? null : of(e);
+        if (c != null) {
+            for (ICapabilityProvider p : c.providers.values()) {
+                LazyOptional<T> o = p.getCapability(cap, side);
+                if (o != null && o.isPresent()) return o;
+            }
+        }
+        return LazyOptional.empty();
+    }
+
+    @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public void saveNBTData(NBTTagCompound tag) {
+        NBTTagCompound out = new NBTTagCompound();
+        for (Map.Entry<ResourceLocation, ICapabilityProvider> e : providers.entrySet())
+            if (e.getValue() instanceof ICapabilitySerializable) out.setTag(e.getKey().toString(), ((ICapabilitySerializable) e.getValue()).serializeNBT());
+        tag.setTag("ForgeCaps", out);
+    }
+
+    @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public void loadNBTData(NBTTagCompound tag) {
+        NBTTagCompound in = tag.getCompoundTag("ForgeCaps");
+        for (Map.Entry<ResourceLocation, ICapabilityProvider> e : providers.entrySet()) {
+            NBTBase b = in.getTag(e.getKey().toString());
+            if (b != null && e.getValue() instanceof ICapabilitySerializable) ((ICapabilitySerializable) e.getValue()).deserializeNBT(b);
+        }
+    }
+
+    @Override
+    public void init(Entity entity, World world) {}
+
+    public static void install() {
+        MinecraftForge.EVENT_BUS.register(new Hooks());
+    }
+
+    public static final class Hooks {
+
+        @SubscribeEvent
+        public void construct(EntityEvent.EntityConstructing e) {
+            AttachCapabilitiesEvent<Entity> ev = new AttachCapabilitiesEvent<>(e.entity);
+            MinecraftForge.EVENT_BUS.post(ev);
+            if (ev.getCapabilities().isEmpty()) return;
+            EntityCapabilities c = new EntityCapabilities();
+            c.providers.putAll(ev.getCapabilities());
+            e.entity.registerExtendedProperties(KEY, c);
+        }
+    }
+}
+//// FILE: forge/event/AttachCapabilitiesEvent.java
+package net.mcreator.boh.compat.forge.event;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import net.mcreator.boh.compat.forge.common.capabilities.ICapabilityProvider;
+import net.minecraft.util.ResourceLocation;
+import cpw.mods.fml.common.eventhandler.Event;
+
+/** Forge AttachCapabilitiesEvent (entities only). */
+public class AttachCapabilitiesEvent<T> extends Event {
+
+    private final T object;
+    private final Map<ResourceLocation, ICapabilityProvider> caps = new LinkedHashMap<>();
+
+    public AttachCapabilitiesEvent(T object) {
+        this.object = object;
+    }
+
+    public T getObject() {
+        return object;
+    }
+
+    public void addCapability(ResourceLocation key, ICapabilityProvider p) {
+        caps.put(key, p);
+    }
+
+    public Map<ResourceLocation, ICapabilityProvider> getCapabilities() {
+        return caps;
+    }
+
+    public void addListener(Runnable r) {}
+}
+//// FILE: forge/items/IItemHandler.java
+package net.mcreator.boh.compat.forge.items;
+
+import net.minecraft.item.ItemStack;
+
+/** Forge IItemHandler (empty stacks are M.EMPTY, never null). */
+public interface IItemHandler {
+
+    int getSlots();
+
+    ItemStack getStackInSlot(int slot);
+
+    ItemStack insertItem(int slot, ItemStack stack, boolean simulate);
+
+    ItemStack extractItem(int slot, int amount, boolean simulate);
+
+    int getSlotLimit(int slot);
+
+    boolean isItemValid(int slot, ItemStack stack);
+}
+//// FILE: forge/items/IItemHandlerModifiable.java
+package net.mcreator.boh.compat.forge.items;
+
+import net.minecraft.item.ItemStack;
+
+/** Forge IItemHandlerModifiable. */
+public interface IItemHandlerModifiable extends IItemHandler {
+
+    void setStackInSlot(int slot, ItemStack stack);
+}
+//// FILE: forge/items/ItemHandlerHelper.java
+package net.mcreator.boh.compat.forge.items;
+
+import net.mcreator.boh.compat.M;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+
+/** Forge ItemHandlerHelper. */
+public final class ItemHandlerHelper {
+
+    private ItemHandlerHelper() {}
+
+    public static boolean canItemStacksStack(ItemStack a, ItemStack b) {
+        a = M.legacy(a);
+        b = M.legacy(b);
+        if (a == null || b == null || a.getItem() != b.getItem() || a.getItemDamage() != b.getItemDamage()) return false;
+        return ItemStack.areItemStackTagsEqual(a, b);
+    }
+
+    public static ItemStack copyStackWithSize(ItemStack s, int size) {
+        if (size <= 0 || M.legacy(s) == null) return M.EMPTY;
+        ItemStack c = s.copy();
+        c.stackSize = size;
+        return c;
+    }
+
+    public static void giveItemToPlayer(EntityPlayer p, ItemStack stack) {
+        ItemStack s = M.legacy(stack);
+        if (s == null) return;
+        if (!p.inventory.addItemStackToInventory(s) || s.stackSize > 0) {
+            if (!p.worldObj.isRemote && s.stackSize > 0) p.dropPlayerItemWithRandomChoice(s, false);
+        }
+        p.inventoryContainer.detectAndSendChanges();
+    }
+
+    public static void giveItemToPlayer(EntityPlayer p, ItemStack stack, int slot) {
+        giveItemToPlayer(p, stack);
+    }
+
+    public static ItemStack insertItem(IItemHandler h, ItemStack stack, boolean simulate) {
+        if (h == null || M.legacy(stack) == null) return stack;
+        for (int i = 0; i < h.getSlots(); i++) {
+            stack = h.insertItem(i, stack, simulate);
+            if (M.legacy(stack) == null) return M.EMPTY;
+        }
+        return stack;
+    }
+}
+//// FILE: forge/items/ItemStackHandler.java
+package net.mcreator.boh.compat.forge.items;
+
+import net.mcreator.boh.compat.M;
+import net.mcreator.boh.compat.mc.core.NonNullList;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+
+/** Forge ItemStackHandler. */
+public class ItemStackHandler implements IItemHandlerModifiable {
+
+    protected NonNullList<ItemStack> stacks;
+
+    public ItemStackHandler() {
+        this(1);
+    }
+
+    public ItemStackHandler(int size) {
+        stacks = NonNullList.withSize(size, M.EMPTY);
+    }
+
+    public ItemStackHandler(NonNullList<ItemStack> stacks) {
+        this.stacks = stacks;
+    }
+
+    public void setSize(int size) {
+        stacks = NonNullList.withSize(size, M.EMPTY);
+    }
+
+    @Override
+    public int getSlots() {
+        return stacks.size();
+    }
+
+    @Override
+    public ItemStack getStackInSlot(int slot) {
+        return M.stack(stacks.get(slot));
+    }
+
+    @Override
+    public void setStackInSlot(int slot, ItemStack stack) {
+        stacks.set(slot, M.stack(stack));
+        onContentsChanged(slot);
+    }
+
+    @Override
+    public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+        ItemStack in = M.legacy(stack);
+        if (in == null) return M.EMPTY;
+        if (!isItemValid(slot, in)) return stack;
+        ItemStack cur = M.legacy(stacks.get(slot));
+        int limit = Math.min(getSlotLimit(slot), in.getMaxStackSize());
+        if (cur != null) {
+            if (!ItemHandlerHelper.canItemStacksStack(in, cur)) return stack;
+            limit -= cur.stackSize;
+        }
+        if (limit <= 0) return stack;
+        boolean reached = in.stackSize > limit;
+        if (!simulate) {
+            if (cur == null) stacks.set(slot, reached ? ItemHandlerHelper.copyStackWithSize(in, limit) : in.copy());
+            else cur.stackSize += reached ? limit : in.stackSize;
+            onContentsChanged(slot);
+        }
+        return reached ? ItemHandlerHelper.copyStackWithSize(in, in.stackSize - limit) : M.EMPTY;
+    }
+
+    @Override
+    public ItemStack extractItem(int slot, int amount, boolean simulate) {
+        ItemStack cur = M.legacy(stacks.get(slot));
+        if (amount <= 0 || cur == null) return M.EMPTY;
+        int n = Math.min(amount, cur.stackSize);
+        if (simulate) return ItemHandlerHelper.copyStackWithSize(cur, n);
+        if (n >= cur.stackSize) {
+            stacks.set(slot, M.EMPTY);
+            onContentsChanged(slot);
+            return cur;
+        }
+        cur.stackSize -= n;
+        onContentsChanged(slot);
+        return ItemHandlerHelper.copyStackWithSize(cur, n);
+    }
+
+    @Override
+    public int getSlotLimit(int slot) {
+        return 64;
+    }
+
+    @Override
+    public boolean isItemValid(int slot, ItemStack stack) {
+        return true;
+    }
+
+    protected void onContentsChanged(int slot) {}
+
+    protected void onLoad() {}
+
+    public NBTTagCompound serializeNBT() {
+        NBTTagList list = new NBTTagList();
+        for (int i = 0; i < stacks.size(); i++) {
+            ItemStack s = M.legacy(stacks.get(i));
+            if (s == null) continue;
+            NBTTagCompound t = new NBTTagCompound();
+            t.setInteger("Slot", i);
+            s.writeToNBT(t);
+            list.appendTag(t);
+        }
+        NBTTagCompound nbt = new NBTTagCompound();
+        nbt.setTag("Items", list);
+        nbt.setInteger("Size", stacks.size());
+        return nbt;
+    }
+
+    public void deserializeNBT(NBTTagCompound nbt) {
+        setSize(nbt.hasKey("Size") ? nbt.getInteger("Size") : stacks.size());
+        NBTTagList list = nbt.getTagList("Items", 10);
+        for (int i = 0; i < list.tagCount(); i++) {
+            NBTTagCompound t = list.getCompoundTagAt(i);
+            int slot = t.getInteger("Slot");
+            if (slot >= 0 && slot < stacks.size()) stacks.set(slot, M.stack(ItemStack.loadItemStackFromNBT(t)));
+        }
+        onLoad();
+    }
+}
+//// FILE: forge/items/wrapper/InvWrapper.java
+package net.mcreator.boh.compat.forge.items.wrapper;
+
+import net.mcreator.boh.compat.M;
+import net.mcreator.boh.compat.forge.items.IItemHandlerModifiable;
+import net.mcreator.boh.compat.forge.items.ItemHandlerHelper;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
+
+/** Forge InvWrapper over a 1.7.10 IInventory. */
+public class InvWrapper implements IItemHandlerModifiable {
+
+    protected final IInventory inv;
+
+    public InvWrapper(IInventory inv) {
+        this.inv = inv;
+    }
+
+    public IInventory getInv() {
+        return inv;
+    }
+
+    @Override
+    public int getSlots() {
+        return inv.getSizeInventory();
+    }
+
+    @Override
+    public ItemStack getStackInSlot(int slot) {
+        return M.stack(inv.getStackInSlot(slot));
+    }
+
+    @Override
+    public void setStackInSlot(int slot, ItemStack stack) {
+        inv.setInventorySlotContents(slot, M.legacy(stack));
+    }
+
+    @Override
+    public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+        ItemStack in = M.legacy(stack);
+        if (in == null) return M.EMPTY;
+        if (!inv.isItemValidForSlot(slot, in)) return stack;
+        ItemStack cur = inv.getStackInSlot(slot);
+        int limit = Math.min(getSlotLimit(slot), in.getMaxStackSize());
+        if (cur != null) {
+            if (!ItemHandlerHelper.canItemStacksStack(in, cur)) return stack;
+            limit -= cur.stackSize;
+        }
+        if (limit <= 0) return stack;
+        int n = Math.min(limit, in.stackSize);
+        if (!simulate) {
+            if (cur == null) inv.setInventorySlotContents(slot, ItemHandlerHelper.copyStackWithSize(in, n));
+            else cur.stackSize += n;
+            inv.markDirty();
+        }
+        return n >= in.stackSize ? M.EMPTY : ItemHandlerHelper.copyStackWithSize(in, in.stackSize - n);
+    }
+
+    @Override
+    public ItemStack extractItem(int slot, int amount, boolean simulate) {
+        ItemStack cur = inv.getStackInSlot(slot);
+        if (amount <= 0 || cur == null) return M.EMPTY;
+        int n = Math.min(amount, cur.stackSize);
+        if (simulate) return ItemHandlerHelper.copyStackWithSize(cur, n);
+        ItemStack out = inv.decrStackSize(slot, n);
+        inv.markDirty();
+        return M.stack(out);
+    }
+
+    @Override
+    public int getSlotLimit(int slot) {
+        return inv.getInventoryStackLimit();
+    }
+
+    @Override
+    public boolean isItemValid(int slot, ItemStack stack) {
+        return inv.isItemValidForSlot(slot, M.legacy(stack));
+    }
+}
+//// FILE: forge/items/wrapper/SidedInvWrapper.java
+package net.mcreator.boh.compat.forge.items.wrapper;
+
+import net.mcreator.boh.compat.forge.common.util.LazyOptional;
+import net.mcreator.boh.compat.forge.items.IItemHandlerModifiable;
+import net.mcreator.boh.compat.mc.core.Direction;
+import net.mcreator.boh.compat.mc.world.WorldlyContainer;
+
+/** Forge SidedInvWrapper (all faces share the container's slots here). */
+public class SidedInvWrapper extends InvWrapper {
+
+    public SidedInvWrapper(WorldlyContainer inv, Direction side) {
+        super(inv);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static LazyOptional<IItemHandlerModifiable>[] create(WorldlyContainer inv, Direction... sides) {
+        LazyOptional<IItemHandlerModifiable>[] out = new LazyOptional[sides.length];
+        for (int i = 0; i < sides.length; i++) {
+            Direction d = sides[i];
+            out[i] = LazyOptional.of(() -> new SidedInvWrapper(inv, d));
+        }
+        return out;
+    }
+}
+//// FILE: forge/items/SlotItemHandler.java
+package net.mcreator.boh.compat.forge.items;
+
+import net.mcreator.boh.compat.M;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.InventoryBasic;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
+
+/** Forge SlotItemHandler: a 1.7.10 Slot backed by an IItemHandler; 1.20 mayPlace/mayPickup are honoured. */
+public class SlotItemHandler extends Slot {
+
+    private static final InventoryBasic EMPTY_INV = new InventoryBasic("", false, 0);
+    private final IItemHandler handler;
+    private final int index;
+
+    public SlotItemHandler(IItemHandler handler, int index, int x, int y) {
+        super(EMPTY_INV, index, x, y);
+        this.handler = handler;
+        this.index = index;
+    }
+
+    public IItemHandler getItemHandler() {
+        return handler;
+    }
+
+    public boolean mayPlace(ItemStack stack) {
+        return M.legacy(stack) != null && handler.isItemValid(index, stack);
+    }
+
+    public boolean mayPickup(EntityPlayer player) {
+        return M.legacy(handler.extractItem(index, 1, true)) != null;
+    }
+
+    public void onTake(EntityPlayer player, ItemStack stack) {
+        super.onPickupFromSlot(player, M.legacy(stack));
+    }
+
+    @Override
+    public boolean isItemValid(ItemStack stack) {
+        return mayPlace(M.stack(stack));
+    }
+
+    @Override
+    public boolean canTakeStack(EntityPlayer player) {
+        return mayPickup(player);
+    }
+
+    @Override
+    public void onPickupFromSlot(EntityPlayer player, ItemStack stack) {
+        onTake(player, M.stack(stack));
+    }
+
+    @Override
+    public ItemStack getStack() {
+        return M.legacy(handler.getStackInSlot(index));
+    }
+
+    @Override
+    public void putStack(ItemStack stack) {
+        if (handler instanceof IItemHandlerModifiable) ((IItemHandlerModifiable) handler).setStackInSlot(index, M.stack(stack));
+        onSlotChanged();
+    }
+
+    @Override
+    public int getSlotStackLimit() {
+        return handler.getSlotLimit(index);
+    }
+
+    @Override
+    public ItemStack decrStackSize(int amount) {
+        return M.legacy(handler.extractItem(index, amount, false));
+    }
+
+    @Override
+    public boolean isSlotInInventory(net.minecraft.inventory.IInventory inv, int slot) {
+        return false;
+    }
+}
+//// FILE: mc/world/WorldlyContainer.java
+package net.mcreator.boh.compat.mc.world;
+
+import net.mcreator.boh.compat.M;
+import net.mcreator.boh.compat.mc.core.Direction;
+import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.item.ItemStack;
+
+/** 1.20 WorldlyContainer as a 1.7.10 ISidedInventory. */
+public interface WorldlyContainer extends ISidedInventory {
+
+    int[] getSlotsForFace(Direction side);
+
+    boolean canPlaceItemThroughFace(int index, ItemStack stack, Direction direction);
+
+    boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction);
+
+    @Override
+    default int[] getAccessibleSlotsFromSide(int side) {
+        return getSlotsForFace(Direction.from3DDataValue(side));
+    }
+
+    @Override
+    default boolean canInsertItem(int slot, ItemStack stack, int side) {
+        return canPlaceItemThroughFace(slot, M.stack(stack), Direction.from3DDataValue(side));
+    }
+
+    @Override
+    default boolean canExtractItem(int slot, ItemStack stack, int side) {
+        return canTakeItemThroughFace(slot, M.stack(stack), Direction.from3DDataValue(side));
+    }
+}
+//// FILE: mc/world/MenuProvider.java
+package net.mcreator.boh.compat.mc.world;
+
+import net.mcreator.boh.compat.mc.network.chat.Component;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Container;
+
+/** 1.20 MenuProvider. */
+public interface MenuProvider {
+
+    Component getDisplayName();
+
+    Container createMenu(int id, InventoryPlayer inventory, EntityPlayer player);
+}
+//// FILE: mc/world/ContainerHelper.java
+package net.mcreator.boh.compat.mc.world;
+
+import java.util.List;
+
+import net.mcreator.boh.compat.M;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+
+/** 1.20 ContainerHelper: "Items" list with byte "Slot". */
+public final class ContainerHelper {
+
+    private ContainerHelper() {}
+
+    public static NBTTagCompound saveAllItems(NBTTagCompound tag, List<ItemStack> items) {
+        return saveAllItems(tag, items, true);
+    }
+
+    public static NBTTagCompound saveAllItems(NBTTagCompound tag, List<ItemStack> items, boolean saveEmpty) {
+        NBTTagList list = new NBTTagList();
+        for (int i = 0; i < items.size(); i++) {
+            ItemStack s = M.legacy(items.get(i));
+            if (s == null) continue;
+            NBTTagCompound t = new NBTTagCompound();
+            t.setByte("Slot", (byte) i);
+            s.writeToNBT(t);
+            list.appendTag(t);
+        }
+        if (list.tagCount() > 0 || saveEmpty) tag.setTag("Items", list);
+        return tag;
+    }
+
+    public static void loadAllItems(NBTTagCompound tag, List<ItemStack> items) {
+        NBTTagList list = tag.getTagList("Items", 10);
+        for (int i = 0; i < list.tagCount(); i++) {
+            NBTTagCompound t = list.getCompoundTagAt(i);
+            int slot = t.getByte("Slot") & 255;
+            if (slot < items.size()) items.set(slot, M.stack(ItemStack.loadItemStackFromNBT(t)));
+        }
+    }
+
+    public static ItemStack removeItem(List<ItemStack> items, int slot, int amount) {
+        ItemStack s = M.legacy(items.get(slot));
+        if (s == null || amount <= 0) return M.EMPTY;
+        ItemStack out = s.splitStack(amount);
+        if (s.stackSize <= 0) items.set(slot, M.EMPTY);
+        return out;
+    }
+
+    public static ItemStack takeItem(List<ItemStack> items, int slot) {
+        ItemStack s = items.get(slot);
+        items.set(slot, M.EMPTY);
+        return s;
+    }
+}
+//// FILE: mc/world/Containers.java
+package net.mcreator.boh.compat.mc.world;
+
+import java.util.List;
+
+import net.mcreator.boh.compat.M;
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+
+/** 1.20 Containers: drop container contents into the world. */
+public final class Containers {
+
+    private Containers() {}
+
+    public static void dropContents(World w, BlockPos pos, IInventory inv) {
+        for (int i = 0; i < inv.getSizeInventory(); i++) {
+            dropItemStack(w, pos.getX(), pos.getY(), pos.getZ(), inv.getStackInSlot(i));
+            inv.setInventorySlotContents(i, null);
+        }
+    }
+
+    public static void dropContents(World w, BlockPos pos, List<ItemStack> items) {
+        for (ItemStack s : items) dropItemStack(w, pos.getX(), pos.getY(), pos.getZ(), s);
+    }
+
+    public static void dropItemStack(World w, double x, double y, double z, ItemStack stack) {
+        ItemStack s = M.legacy(stack);
+        if (s == null || w.isRemote) return;
+        s = s.copy();
+        while (s.stackSize > 0) {
+            int n = Math.min(s.stackSize, 10 + w.rand.nextInt(21));
+            ItemStack part = s.splitStack(n);
+            EntityItem e = new EntityItem(w, x + 0.5 + w.rand.nextFloat() * 0.8 - 0.4, y + 0.5 + w.rand.nextFloat() * 0.8 - 0.4,
+                z + 0.5 + w.rand.nextFloat() * 0.8 - 0.4, part);
+            e.motionX = w.rand.nextGaussian() * 0.05;
+            e.motionY = w.rand.nextGaussian() * 0.05 + 0.2;
+            e.motionZ = w.rand.nextGaussian() * 0.05;
+            w.spawnEntityInWorld(e);
+        }
+    }
+}
+//// FILE: mc/world/level/block/entity/RandomizableContainerBlockEntity.java
+package net.mcreator.boh.compat.mc.world.level.block.entity;
+
+import net.mcreator.boh.compat.M;
+import net.mcreator.boh.compat.forge.common.capabilities.Capability;
+import net.mcreator.boh.compat.forge.common.util.LazyOptional;
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.core.Direction;
+import net.mcreator.boh.compat.mc.core.NonNullList;
+import net.mcreator.boh.compat.mc.network.chat.Component;
+import net.mcreator.boh.compat.mc.world.MenuProvider;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.mcreator.boh.compat.loot.LootTables;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
+
+/** 1.20 RandomizableContainerBlockEntity on a 1.7.10 TileEntity + IInventory. */
+public abstract class RandomizableContainerBlockEntity extends TileEntity implements IInventory, MenuProvider {
+
+    protected final BlockEntityType<?> type;
+    protected BlockPos worldPosition;
+    protected boolean remove;
+    protected ResourceLocation lootTable;
+    protected long lootTableSeed;
+
+    protected RandomizableContainerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        this.type = type;
+        this.worldPosition = pos == null ? BlockPos.ZERO : pos;
+    }
+
+    // ------------------------------------------------------------------ 1.20 API
+
+    public BlockEntityType<?> getType() {
+        return type;
+    }
+
+    public World getLevel() {
+        return worldObj;
+    }
+
+    public BlockPos getBlockPos() {
+        return new BlockPos(xCoord, yCoord, zCoord);
+    }
+
+    public BlockState getBlockState() {
+        return worldObj == null ? BlockState.of(getBlockType()) : M.getBlockState(worldObj, getBlockPos());
+    }
+
+    public boolean hasLevel() {
+        return worldObj != null;
+    }
+
+    public void load(NBTTagCompound tag) {}
+
+    protected void saveAdditional(NBTTagCompound tag) {}
+
+    public NBTTagCompound saveWithFullMetadata() {
+        NBTTagCompound t = new NBTTagCompound();
+        writeToNBT(t);
+        return t;
+    }
+
+    public NBTTagCompound saveWithoutMetadata() {
+        NBTTagCompound t = new NBTTagCompound();
+        saveAdditional(t);
+        return t;
+    }
+
+    public NBTTagCompound getUpdateTag() {
+        return saveWithoutMetadata();
+    }
+
+    public Object getUpdatePacket() {
+        return null;
+    }
+
+    public void setChanged() {
+        markDirty();
+    }
+
+    public void setRemoved() {
+        remove = true;
+    }
+
+    public boolean isRemoved() {
+        return remove;
+    }
+
+    public void clearRemoved() {
+        remove = false;
+    }
+
+    protected boolean tryLoadLootTable(NBTTagCompound tag) {
+        if (tag.hasKey("LootTable", 8)) {
+            lootTable = new ResourceLocation(tag.getString("LootTable"));
+            lootTableSeed = tag.getLong("LootTableSeed");
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean trySaveLootTable(NBTTagCompound tag) {
+        if (lootTable == null) return false;
+        tag.setString("LootTable", lootTable.toString());
+        if (lootTableSeed != 0) tag.setLong("LootTableSeed", lootTableSeed);
+        return true;
+    }
+
+    public void setLootTable(ResourceLocation table, long seed) {
+        lootTable = table;
+        lootTableSeed = seed;
+    }
+
+    public void unpackLootTable(EntityPlayer player) {
+        if (lootTable == null || worldObj == null || worldObj.isRemote) return;
+        ResourceLocation t = lootTable;
+        lootTable = null;
+        LootTables.fill(this, t, lootTableSeed == 0 ? worldObj.rand : new java.util.Random(lootTableSeed));
+        markDirty();
+    }
+
+    protected abstract NonNullList<ItemStack> getItems();
+
+    protected abstract void setItems(NonNullList<ItemStack> items);
+
+    public abstract int getContainerSize();
+
+    protected abstract Component getDefaultName();
+
+    public Component getDisplayName() {
+        return getDefaultName();
+    }
+
+    public Component getName() {
+        return getDisplayName();
+    }
+
+    protected Container createMenu(int id, InventoryPlayer inventory) {
+        return null;
+    }
+
+    @Override
+    public Container createMenu(int id, InventoryPlayer inventory, EntityPlayer player) {
+        unpackLootTable(player);
+        return createMenu(id, inventory);
+    }
+
+    public boolean canPlaceItem(int index, ItemStack stack) {
+        return true;
+    }
+
+    public int getMaxStackSize() {
+        return 64;
+    }
+
+    public boolean isEmpty() {
+        for (ItemStack s : getItems()) if (M.legacy(s) != null) return false;
+        return true;
+    }
+
+    public ItemStack getItem(int slot) {
+        unpackLootTable(null);
+        return M.stack(getItems().get(slot));
+    }
+
+    public ItemStack removeItem(int slot, int amount) {
+        unpackLootTable(null);
+        ItemStack s = net.mcreator.boh.compat.mc.world.ContainerHelper.removeItem(getItems(), slot, amount);
+        if (M.legacy(s) != null) setChanged();
+        return s;
+    }
+
+    public void setItem(int slot, ItemStack stack) {
+        unpackLootTable(null);
+        getItems().set(slot, M.stack(stack));
+        setChanged();
+    }
+
+    public boolean stillValid(EntityPlayer player) {
+        return worldObj != null && worldObj.getTileEntity(xCoord, yCoord, zCoord) == this
+            && player.getDistanceSq(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5) <= 64;
+    }
+
+    public void clearContent() {
+        getItems().clear();
+    }
+
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+        return LazyOptional.empty();
+    }
+
+    public <T> LazyOptional<T> getCapability(Capability<T> cap) {
+        return getCapability(cap, null);
+    }
+
+    // ------------------------------------------------------------------ 1.7.10 bridge
+
+    @Override
+    public void readFromNBT(NBTTagCompound tag) {
+        super.readFromNBT(tag);
+        load(tag);
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound tag) {
+        super.writeToNBT(tag);
+        saveAdditional(tag);
+    }
+
+    @Override
+    public Packet getDescriptionPacket() {
+        NBTTagCompound t = getUpdateTag();
+        return t == null ? null : new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, t);
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
+        load(pkt.func_148857_g());
+    }
+
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        setRemoved();
+    }
+
+    @Override
+    public void validate() {
+        super.validate();
+        clearRemoved();
+    }
+
+    @Override
+    public int getSizeInventory() {
+        return getContainerSize();
+    }
+
+    @Override
+    public ItemStack getStackInSlot(int slot) {
+        return M.legacy(getItem(slot));
+    }
+
+    @Override
+    public ItemStack decrStackSize(int slot, int amount) {
+        return M.legacy(removeItem(slot, amount));
+    }
+
+    @Override
+    public ItemStack getStackInSlotOnClosing(int slot) {
+        ItemStack s = getItems().get(slot);
+        getItems().set(slot, M.EMPTY);
+        return M.legacy(s);
+    }
+
+    @Override
+    public void setInventorySlotContents(int slot, ItemStack stack) {
+        setItem(slot, stack);
+    }
+
+    @Override
+    public String getInventoryName() {
+        return getDisplayName().getString();
+    }
+
+    @Override
+    public boolean hasCustomInventoryName() {
+        return true;
+    }
+
+    @Override
+    public int getInventoryStackLimit() {
+        return getMaxStackSize();
+    }
+
+    @Override
+    public boolean isUseableByPlayer(EntityPlayer p) {
+        return stillValid(p);
+    }
+
+    @Override
+    public void openInventory() {}
+
+    @Override
+    public void closeInventory() {}
+
+    @Override
+    public boolean isItemValidForSlot(int slot, ItemStack stack) {
+        return canPlaceItem(slot, M.stack(stack));
+    }
+}
+//// FILE: mc/world/inventory/ContainerLevelAccess.java
+package net.mcreator.boh.compat.mc.world.inventory;
+
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.minecraft.world.World;
+
+/** 1.20 ContainerLevelAccess. */
+public final class ContainerLevelAccess {
+
+    public static final ContainerLevelAccess NULL = new ContainerLevelAccess(null, null);
+
+    public final World world;
+    public final BlockPos pos;
+
+    private ContainerLevelAccess(World world, BlockPos pos) {
+        this.world = world;
+        this.pos = pos;
+    }
+
+    public static ContainerLevelAccess create(World w, BlockPos p) {
+        return new ContainerLevelAccess(w, p);
+    }
+}
+//// FILE: mc/world/inventory/AbstractContainerMenu.java
+package net.mcreator.boh.compat.mc.world.inventory;
+
+import java.util.List;
+
+import net.mcreator.boh.compat.M;
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
+
+/** 1.20 AbstractContainerMenu on 1.7.10 Container. */
+public abstract class AbstractContainerMenu extends Container {
+
+    public final List<Slot> slots;
+    public int containerId;
+    private final MenuType<?> menuType;
+
+    @SuppressWarnings("unchecked")
+    protected AbstractContainerMenu(MenuType<?> type, int id) {
+        menuType = type;
+        containerId = id;
+        windowId = id;
+        slots = inventorySlots;
+    }
+
+    public MenuType<?> getType() {
+        return menuType;
+    }
+
+    public Slot addSlot(Slot s) {
+        return addSlotToContainer(s);
+    }
+
+    public abstract boolean stillValid(EntityPlayer player);
+
+    public ItemStack quickMoveStack(EntityPlayer player, int index) {
+        return M.EMPTY;
+    }
+
+    public void removed(EntityPlayer player) {
+        super.onContainerClosed(player);
+    }
+
+    public void broadcastChanges() {
+        detectAndSendChanges();
+    }
+
+    protected boolean moveItemStackTo(ItemStack stack, int start, int end, boolean reverse) {
+        ItemStack s = M.legacy(stack);
+        return s != null && mergeItemStack(s, start, end, reverse);
+    }
+
+    public static boolean stillValid(ContainerLevelAccess access, EntityPlayer player, Block block) {
+        if (access == null || access.world == null) return true;
+        return access.world.getBlock(access.pos.getX(), access.pos.getY(), access.pos.getZ()) == block
+            && player.getDistanceSq(access.pos.getX() + 0.5, access.pos.getY() + 0.5, access.pos.getZ() + 0.5) <= 64;
+    }
+
+    // ------------------------------------------------------------------ 1.7.10 bridge
+
+    @Override
+    public boolean canInteractWith(EntityPlayer player) {
+        return stillValid(player);
+    }
+
+    @Override
+    public ItemStack transferStackInSlot(EntityPlayer player, int index) {
+        return M.legacy(quickMoveStack(player, index));
+    }
+
+    @Override
+    public void onContainerClosed(EntityPlayer player) {
+        removed(player);
+    }
+}
+//// FILE: mc/world/inventory/ChestMenu.java
+package net.mcreator.boh.compat.mc.world.inventory;
+
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.ContainerChest;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryBasic;
+
+/** 1.20 ChestMenu as a 1.7.10 ContainerChest (opened with the vanilla chest GUI). */
+public class ChestMenu extends ContainerChest {
+
+    public final IInventory container;
+
+    public ChestMenu(InventoryPlayer player, IInventory container) {
+        super(player, container);
+        this.container = container;
+    }
+
+    public static ChestMenu threeRows(int id, InventoryPlayer inv) {
+        ChestMenu m = new ChestMenu(inv, new InventoryBasic("container.chest", false, 27));
+        m.windowId = id;
+        return m;
+    }
+
+    public static ChestMenu threeRows(int id, InventoryPlayer inv, IInventory container) {
+        ChestMenu m = new ChestMenu(inv, container);
+        m.windowId = id;
+        return m;
+    }
+
+    public static ChestMenu sixRows(int id, InventoryPlayer inv) {
+        ChestMenu m = new ChestMenu(inv, new InventoryBasic("container.chestDouble", false, 54));
+        m.windowId = id;
+        return m;
+    }
+}
+//// FILE: mc/world/level/saveddata/SavedData.java
+package net.mcreator.boh.compat.mc.world.level.saveddata;
+
+import net.minecraft.nbt.NBTTagCompound;
+
+/** 1.20 SavedData; stored inside a 1.7.10 WorldSavedData holder (see DimensionDataStorage). */
+public abstract class SavedData {
+
+    DataHolder holder;
+
+    public abstract NBTTagCompound save(NBTTagCompound tag);
+
+    public void setDirty() {
+        if (holder != null) holder.markDirty();
+    }
+
+    public void setDirty(boolean dirty) {
+        if (dirty) setDirty();
+    }
+
+    public boolean isDirty() {
+        return holder != null && holder.isDirty();
+    }
+}
+//// FILE: mc/world/level/saveddata/DataHolder.java
+package net.mcreator.boh.compat.mc.world.level.saveddata;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.WorldSavedData;
+
+/** 1.7.10 WorldSavedData wrapper around a 1.20 SavedData. */
+public final class DataHolder extends WorldSavedData {
+
+    static final Map<String, Function<NBTTagCompound, ? extends SavedData>> LOADERS = new HashMap<>();
+
+    SavedData data;
+
+    public DataHolder(String name) {
+        super(name);
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound tag) {
+        Function<NBTTagCompound, ? extends SavedData> f = LOADERS.get(mapName);
+        if (f != null) {
+            data = f.apply(tag.getCompoundTag("data"));
+            if (data != null) data.holder = this;
+        }
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound tag) {
+        if (data != null) tag.setTag("data", data.save(new NBTTagCompound()));
+    }
+}
+//// FILE: mc/world/level/saveddata/DimensionDataStorage.java
+package net.mcreator.boh.compat.mc.world.level.saveddata;
+
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.World;
+import net.minecraft.world.storage.MapStorage;
+
+/** 1.20 DimensionDataStorage over a 1.7.10 MapStorage (per-dimension or global). */
+public final class DimensionDataStorage {
+
+    private final MapStorage storage;
+
+    public DimensionDataStorage(MapStorage storage) {
+        this.storage = storage;
+    }
+
+    public static DimensionDataStorage of(World w) {
+        return new DimensionDataStorage(w.perWorldStorage);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends SavedData> T computeIfAbsent(Function<NBTTagCompound, T> load, Supplier<T> create, String name) {
+        DataHolder.LOADERS.put(name, load);
+        DataHolder h = (DataHolder) storage.loadData(DataHolder.class, name);
+        if (h == null) {
+            h = new DataHolder(name);
+            storage.setData(name, h);
+        }
+        if (h.data == null) {
+            h.data = create.get();
+            h.data.holder = h;
+            h.markDirty();
+        }
+        return (T) h.data;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends SavedData> T get(Function<NBTTagCompound, T> load, String name) {
+        DataHolder.LOADERS.put(name, load);
+        DataHolder h = (DataHolder) storage.loadData(DataHolder.class, name);
+        return h == null ? null : (T) h.data;
+    }
+}
+//// FILE: forge/network/Context.java
+package net.mcreator.boh.compat.forge.network;
+
+import net.minecraft.entity.player.EntityPlayerMP;
+
+/** Forge NetworkEvent.Context. */
+public final class Context {
+
+    private final EntityPlayerMP sender;
+    private final NetworkDirection direction;
+    private boolean handled;
+
+    public Context(EntityPlayerMP sender, NetworkDirection direction) {
+        this.sender = sender;
+        this.direction = direction;
+    }
+
+    public EntityPlayerMP getSender() {
+        return sender;
+    }
+
+    public NetworkDirection getDirection() {
+        return direction;
+    }
+
+    /** 1.7.10 handlers already run on the game thread. */
+    public void enqueueWork(Runnable r) {
+        r.run();
+    }
+
+    public void setPacketHandled(boolean b) {
+        handled = b;
+    }
+
+    public boolean getPacketHandled() {
+        return handled;
+    }
+}
+//// FILE: forge/network/NetworkDirection.java
+package net.mcreator.boh.compat.forge.network;
+
+/** Forge NetworkDirection. */
+public enum NetworkDirection {
+
+    PLAY_TO_SERVER,
+    PLAY_TO_CLIENT;
+
+    public LogicalSide getReceptionSide() {
+        return this == PLAY_TO_SERVER ? LogicalSide.SERVER : LogicalSide.CLIENT;
+    }
+
+    public enum LogicalSide {
+        CLIENT,
+        SERVER;
+
+        public boolean isServer() {
+            return this == SERVER;
+        }
+
+        public boolean isClient() {
+            return this == CLIENT;
+        }
+    }
+}
+//// FILE: forge/network/PacketDistributor.java
+package net.mcreator.boh.compat.forge.network;
+
+import java.util.function.Supplier;
+
+import net.minecraft.entity.player.EntityPlayerMP;
+
+/** Forge PacketDistributor (PLAYER, ALL, DIMENSION, SERVER). */
+public final class PacketDistributor<T> {
+
+    public static final PacketDistributor<EntityPlayerMP> PLAYER = new PacketDistributor<>("player");
+    public static final PacketDistributor<Void> ALL = new PacketDistributor<>("all");
+    public static final PacketDistributor<Object> DIMENSION = new PacketDistributor<>("dimension");
+    public static final PacketDistributor<Void> SERVER = new PacketDistributor<>("server");
+
+    final String kind;
+
+    private PacketDistributor(String kind) {
+        this.kind = kind;
+    }
+
+    public Target with(Supplier<T> s) {
+        return new Target(kind, s.get());
+    }
+
+    public Target noArg() {
+        return new Target(kind, null);
+    }
+
+    public static final class Target {
+
+        public final String kind;
+        public final Object arg;
+
+        Target(String kind, Object arg) {
+            this.kind = kind;
+            this.arg = arg;
+        }
+    }
+}
+//// FILE: forge/network/simple/SimpleChannel.java
+package net.mcreator.boh.compat.forge.network.simple;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import net.mcreator.boh.compat.forge.network.Context;
+import net.mcreator.boh.compat.forge.network.NetworkDirection;
+import net.mcreator.boh.compat.forge.network.PacketDistributor;
+import net.mcreator.boh.compat.mc.network.FriendlyByteBuf;
+import net.mcreator.boh.compat.mc.resources.ResourceKey;
+import net.mcreator.boh.compat.world.Dimensions;
+import net.minecraft.entity.player.EntityPlayerMP;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
+import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import cpw.mods.fml.relauncher.Side;
+
+/** Forge SimpleChannel over one FML SimpleNetworkWrapper carrying (message index, payload) envelopes. */
+public final class SimpleChannel {
+
+    static final class Codec<M> {
+
+        final Class<M> type;
+        final BiConsumer<M, FriendlyByteBuf> encoder;
+        final Function<FriendlyByteBuf, M> decoder;
+        final BiConsumer<M, Supplier<Context>> handler;
+
+        Codec(Class<M> type, BiConsumer<M, FriendlyByteBuf> e, Function<FriendlyByteBuf, M> d, BiConsumer<M, Supplier<Context>> h) {
+            this.type = type;
+            encoder = e;
+            decoder = d;
+            handler = h;
+        }
+    }
+
+    private static final Map<String, SimpleChannel> CHANNELS = new HashMap<>();
+
+    private final String name;
+    private final SimpleNetworkWrapper wrapper;
+    private final List<Codec<?>> codecs = new ArrayList<>();
+    private final Map<Class<?>, Integer> index = new HashMap<>();
+
+    public SimpleChannel(String name) {
+        this.name = name;
+        wrapper = NetworkRegistry.INSTANCE.newSimpleChannel(name);
+        CHANNELS.put(name, this);
+        wrapper.registerMessage(ServerHandler.class, Envelope.class, 0, Side.SERVER);
+        wrapper.registerMessage(ClientHandler.class, Envelope.class, 1, Side.CLIENT);
+    }
+
+    public <M> void registerMessage(int id, Class<M> type, BiConsumer<M, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, M> decoder,
+        BiConsumer<M, Supplier<Context>> handler) {
+        index.put(type, codecs.size());
+        codecs.add(new Codec<>(type, encoder, decoder, handler));
+    }
+
+    public <M> void registerMessage(int id, Class<M> type, BiConsumer<M, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, M> decoder,
+        BiConsumer<M, Supplier<Context>> handler, java.util.Optional<?> direction) {
+        registerMessage(id, type, encoder, decoder, handler);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <M> Envelope wrap(M msg) {
+        Integer i = index.get(msg.getClass());
+        if (i == null) for (Map.Entry<Class<?>, Integer> e : index.entrySet()) if (e.getKey().isInstance(msg)) i = e.getValue();
+        if (i == null) throw new IllegalArgumentException("Unregistered message " + msg.getClass());
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+        ((Codec<M>) codecs.get(i)).encoder.accept(msg, buf);
+        Envelope env = new Envelope();
+        env.channel = name;
+        env.id = i;
+        env.payload = new byte[buf.unwrap().readableBytes()];
+        buf.unwrap().readBytes(env.payload);
+        return env;
+    }
+
+    public <M> void sendToServer(M msg) {
+        wrapper.sendToServer(wrap(msg));
+    }
+
+    public <M> void send(PacketDistributor.Target target, M msg) {
+        Envelope env = wrap(msg);
+        switch (target.kind) {
+            case "player":
+                wrapper.sendTo(env, (EntityPlayerMP) target.arg);
+                break;
+            case "dimension":
+                Object a = target.arg;
+                int dim = a instanceof ResourceKey ? Dimensions.id((ResourceKey<?>) a) : a instanceof Integer ? (Integer) a : 0;
+                wrapper.sendToDimension(env, dim);
+                break;
+            case "server":
+                wrapper.sendToServer(env);
+                break;
+            default:
+                wrapper.sendToAll(env);
+        }
+    }
+
+    public <M> void sendTo(M msg, Object connection, Object direction) {
+        if (connection instanceof EntityPlayerMP) wrapper.sendTo(wrap(msg), (EntityPlayerMP) connection);
+    }
+
+    @SuppressWarnings("unchecked")
+    void dispatch(Envelope env, Context ctx) {
+        Codec<Object> c = (Codec<Object>) codecs.get(env.id);
+        Object msg = c.decoder.apply(new FriendlyByteBuf(Unpooled.wrappedBuffer(env.payload)));
+        c.handler.accept(msg, () -> ctx);
+    }
+
+    public static final class Envelope implements IMessage {
+
+        String channel;
+        int id;
+        byte[] payload;
+
+        public Envelope() {}
+
+        @Override
+        public void fromBytes(ByteBuf b) {
+            byte[] n = new byte[b.readUnsignedByte()];
+            b.readBytes(n);
+            channel = new String(n, java.nio.charset.StandardCharsets.UTF_8);
+            id = b.readUnsignedShort();
+            payload = new byte[b.readInt()];
+            b.readBytes(payload);
+        }
+
+        @Override
+        public void toBytes(ByteBuf b) {
+            byte[] n = channel.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+            b.writeByte(n.length);
+            b.writeBytes(n);
+            b.writeShort(id);
+            b.writeInt(payload.length);
+            b.writeBytes(payload);
+        }
+    }
+
+    public static final class ServerHandler implements IMessageHandler<Envelope, IMessage> {
+
+        @Override
+        public IMessage onMessage(Envelope m, MessageContext ctx) {
+            SimpleChannel c = CHANNELS.get(m.channel);
+            EntityPlayerMP p = ctx.getServerHandler().playerEntity;
+            if (c != null) p.mcServer.func_152344_a(() -> c.dispatch(m, new Context(p, NetworkDirection.PLAY_TO_SERVER)));
+            return null;
+        }
+    }
+
+    public static final class ClientHandler implements IMessageHandler<Envelope, IMessage> {
+
+        @Override
+        public IMessage onMessage(Envelope m, MessageContext ctx) {
+            SimpleChannel c = CHANNELS.get(m.channel);
+            if (c != null) c.dispatch(m, new Context(null, NetworkDirection.PLAY_TO_CLIENT));
+            return null;
+        }
+    }
+}
+//// FILE: forge/network/NetworkRegistry.java
+package net.mcreator.boh.compat.forge.network;
+
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
+import net.mcreator.boh.compat.forge.network.simple.SimpleChannel;
+import net.minecraft.util.ResourceLocation;
+
+/** Forge NetworkRegistry. */
+public final class NetworkRegistry {
+
+    private NetworkRegistry() {}
+
+    public static SimpleChannel newSimpleChannel(ResourceLocation name, Supplier<String> version, Predicate<String> client,
+        Predicate<String> server) {
+        return new SimpleChannel(name.getResourceDomain() + "_" + name.getResourcePath());
+    }
+}
+//// FILE: forge/network/NetworkHooks.java
+package net.mcreator.boh.compat.forge.network;
+
+import java.util.function.Consumer;
+
+import io.netty.buffer.Unpooled;
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.network.FriendlyByteBuf;
+import net.mcreator.boh.compat.mc.world.MenuProvider;
+import net.mcreator.boh.compat.mc.world.inventory.AbstractContainerMenu;
+import net.mcreator.boh.compat.mc.world.inventory.ChestMenu;
+import net.mcreator.boh.compat.net.MenuNetwork;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.Container;
+
+/** Forge NetworkHooks.openScreen: opens the menu server-side and tells the client to build menu + screen. */
+public final class NetworkHooks {
+
+    private NetworkHooks() {}
+
+    public static void openScreen(EntityPlayerMP player, MenuProvider provider) {
+        openScreen(player, provider, buf -> {});
+    }
+
+    public static void openScreen(EntityPlayerMP player, MenuProvider provider, BlockPos pos) {
+        openScreen(player, provider, buf -> buf.writeBlockPos(pos));
+    }
+
+    public static void openScreen(EntityPlayerMP player, MenuProvider provider, Consumer<FriendlyByteBuf> extra) {
+        if (player.worldObj.isRemote) return;
+        player.getNextWindowId();
+        player.closeContainer();
+        int windowId = player.currentWindowId;
+        Container c = provider.createMenu(windowId, player.inventory, player);
+        if (c == null) return;
+        if (c instanceof ChestMenu) {
+            player.displayGUIChest(((ChestMenu) c).container);
+            return;
+        }
+        if (!(c instanceof AbstractContainerMenu)) return;
+        AbstractContainerMenu menu = (AbstractContainerMenu) c;
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+        extra.accept(buf);
+        byte[] data = new byte[buf.unwrap().readableBytes()];
+        buf.unwrap().readBytes(data);
+        MenuNetwork.sendOpen(player, menu.getType(), windowId, provider.getDisplayName().getFormattedText(), data);
+        player.openContainer = menu;
+        menu.windowId = windowId;
+        menu.containerId = windowId;
+        menu.addCraftingToCrafters(player);
+    }
+}
+//// FILE: net/MenuNetwork.java
+package net.mcreator.boh.compat.net;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import net.mcreator.boh.compat.mc.network.FriendlyByteBuf;
+import net.mcreator.boh.compat.mc.world.inventory.MenuType;
+import net.minecraft.entity.player.EntityPlayerMP;
+import cpw.mods.fml.common.network.ByteBufUtils;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
+import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import cpw.mods.fml.relauncher.Side;
+
+/** Opens 1.20-style menus (menu type id + window id + extra data) on the client. */
+public final class MenuNetwork {
+
+    private static SimpleNetworkWrapper channel;
+
+    private MenuNetwork() {}
+
+    public static void init() {
+        if (channel != null) return;
+        channel = NetworkRegistry.INSTANCE.newSimpleChannel("boh_menu");
+        channel.registerMessage(OpenMsg.Handler.class, OpenMsg.class, 0, Side.CLIENT);
+    }
+
+    public static void sendOpen(EntityPlayerMP p, MenuType<?> type, int windowId, String title, byte[] data) {
+        OpenMsg m = new OpenMsg();
+        m.type = type.getId() == null ? "" : type.getId().toString();
+        m.windowId = windowId;
+        m.title = title;
+        m.data = data;
+        channel.sendTo(m, p);
+    }
+
+    public static final class OpenMsg implements IMessage {
+
+        String type, title;
+        int windowId;
+        byte[] data;
+
+        public OpenMsg() {}
+
+        @Override
+        public void fromBytes(ByteBuf b) {
+            type = ByteBufUtils.readUTF8String(b);
+            windowId = b.readInt();
+            title = ByteBufUtils.readUTF8String(b);
+            data = new byte[b.readInt()];
+            b.readBytes(data);
+        }
+
+        @Override
+        public void toBytes(ByteBuf b) {
+            ByteBufUtils.writeUTF8String(b, type);
+            b.writeInt(windowId);
+            ByteBufUtils.writeUTF8String(b, title);
+            b.writeInt(data.length);
+            b.writeBytes(data);
+        }
+
+        public static final class Handler implements IMessageHandler<OpenMsg, IMessage> {
+
+            @Override
+            public IMessage onMessage(OpenMsg m, MessageContext ctx) {
+                net.mcreator.boh.compat.client.MenuScreensImpl.open(m.type, m.windowId, m.title,
+                    new FriendlyByteBuf(Unpooled.wrappedBuffer(m.data)));
+                return null;
+            }
+        }
+    }
+}
+//// FILE: mc/client/gui/screens/MenuScreens.java
+package net.mcreator.boh.compat.mc.client.gui.screens;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import net.mcreator.boh.compat.mc.network.chat.Component;
+import net.mcreator.boh.compat.mc.world.inventory.MenuType;
+import net.minecraft.entity.player.InventoryPlayer;
+
+/** 1.20 MenuScreens: menu type -> screen constructor. */
+public final class MenuScreens {
+
+    @FunctionalInterface
+    public interface ScreenConstructor<M, S> {
+
+        S create(M menu, InventoryPlayer inv, Component title);
+    }
+
+    public static final Map<MenuType<?>, ScreenConstructor<?, ?>> SCREENS = new HashMap<>();
+
+    private MenuScreens() {}
+
+    public static <M, S> void register(MenuType<? extends M> type, ScreenConstructor<M, S> ctor) {
+        SCREENS.put(type, ctor);
+    }
+}
+//// FILE: client/MenuScreensImpl.java
+package net.mcreator.boh.compat.client;
+
+import net.mcreator.boh.compat.forge.registries.ForgeRegistries;
+import net.mcreator.boh.compat.mc.client.gui.screens.MenuScreens;
+import net.mcreator.boh.compat.mc.network.FriendlyByteBuf;
+import net.mcreator.boh.compat.mc.network.chat.Component;
+import net.mcreator.boh.compat.mc.world.inventory.AbstractContainerMenu;
+import net.mcreator.boh.compat.mc.world.inventory.MenuType;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.ResourceLocation;
+
+/** Client side of menu opening: build the menu and its registered screen. */
+public final class MenuScreensImpl {
+
+    private MenuScreensImpl() {}
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public static void open(String typeId, int windowId, String title, FriendlyByteBuf data) {
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc.thePlayer == null || typeId.isEmpty()) return;
+        MenuType<?> type = ForgeRegistries.MENU_TYPES.getValue(new ResourceLocation(typeId));
+        if (type == null) return;
+        Object menu = type.create(windowId, mc.thePlayer.inventory, data);
+        if (!(menu instanceof AbstractContainerMenu)) return;
+        AbstractContainerMenu m = (AbstractContainerMenu) menu;
+        m.windowId = windowId;
+        m.containerId = windowId;
+        MenuScreens.ScreenConstructor ctor = MenuScreens.SCREENS.get(type);
+        if (ctor == null) return;
+        Object screen = ctor.create(m, mc.thePlayer.inventory, Component.literal(title));
+        if (screen instanceof GuiScreen) {
+            mc.displayGuiScreen((GuiScreen) screen);
+            mc.thePlayer.openContainer = m;
+        }
+    }
+}
+//// FILE: mc/network/protocol/game/ClientboundBlockEntityDataPacket.java
+package net.mcreator.boh.compat.mc.network.protocol.game;
+
+import net.minecraft.tileentity.TileEntity;
+
+/** 1.20 ClientboundBlockEntityDataPacket; 1.7.10 tiles sync through getDescriptionPacket instead. */
+public final class ClientboundBlockEntityDataPacket {
+
+    private ClientboundBlockEntityDataPacket() {}
+
+    public static ClientboundBlockEntityDataPacket create(TileEntity te) {
+        return null;
+    }
+}

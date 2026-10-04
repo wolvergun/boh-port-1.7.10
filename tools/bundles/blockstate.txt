@@ -1,0 +1,601 @@
+//// FILE: mc/world/level/block/state/properties/Property.java
+package net.mcreator.boh.compat.mc.world.level.block.state.properties;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+
+/** 1.20 block state property with a fixed, ordered value list. */
+public abstract class Property<T extends Comparable<T>> {
+
+    private final String name;
+    private final Class<T> clazz;
+    protected final List<T> values = new ArrayList<>();
+
+    protected Property(String name, Class<T> clazz) {
+        this.name = name;
+        this.clazz = clazz;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Class<T> getValueClass() {
+        return clazz;
+    }
+
+    public Collection<T> getPossibleValues() {
+        return values;
+    }
+
+    public int indexOf(T value) {
+        int i = values.indexOf(value);
+        return i < 0 ? 0 : i;
+    }
+
+    public T byIndex(int i) {
+        return values.get(Math.max(0, Math.min(values.size() - 1, i)));
+    }
+
+    public int size() {
+        return values.size();
+    }
+
+    public abstract String getName(T value);
+
+    public Optional<T> getValue(String s) {
+        for (T v : values) if (getName(v).equals(s)) return Optional.of(v);
+        return Optional.empty();
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+}
+//// FILE: mc/world/level/block/state/properties/BooleanProperty.java
+package net.mcreator.boh.compat.mc.world.level.block.state.properties;
+
+public class BooleanProperty extends Property<Boolean> {
+
+    protected BooleanProperty(String name) {
+        super(name, Boolean.class);
+        values.add(false);
+        values.add(true);
+    }
+
+    public static BooleanProperty create(String name) {
+        return new BooleanProperty(name);
+    }
+
+    @Override
+    public String getName(Boolean v) {
+        return v.toString();
+    }
+}
+//// FILE: mc/world/level/block/state/properties/IntegerProperty.java
+package net.mcreator.boh.compat.mc.world.level.block.state.properties;
+
+public class IntegerProperty extends Property<Integer> {
+
+    private final int min, max;
+
+    protected IntegerProperty(String name, int min, int max) {
+        super(name, Integer.class);
+        this.min = min;
+        this.max = max;
+        for (int i = min; i <= max; i++) values.add(i);
+    }
+
+    public static IntegerProperty create(String name, int min, int max) {
+        return new IntegerProperty(name, min, max);
+    }
+
+    @Override
+    public String getName(Integer v) {
+        return v.toString();
+    }
+
+    @Override
+    public int indexOf(Integer v) {
+        return v == null ? 0 : Math.max(0, Math.min(max - min, v - min));
+    }
+
+    @Override
+    public Integer byIndex(int i) {
+        return min + Math.max(0, Math.min(max - min, i));
+    }
+}
+//// FILE: mc/world/level/block/state/properties/EnumProperty.java
+package net.mcreator.boh.compat.mc.world.level.block.state.properties;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+public class EnumProperty<T extends Enum<T>> extends Property<T> {
+
+    protected EnumProperty(String name, Class<T> clazz, Collection<T> allowed) {
+        super(name, clazz);
+        values.addAll(allowed);
+    }
+
+    public static <T extends Enum<T>> EnumProperty<T> create(String name, Class<T> clazz) {
+        return new EnumProperty<>(name, clazz, Arrays.asList(clazz.getEnumConstants()));
+    }
+
+    @SafeVarargs
+    public static <T extends Enum<T>> EnumProperty<T> create(String name, Class<T> clazz, T... allowed) {
+        return new EnumProperty<>(name, clazz, Arrays.asList(allowed));
+    }
+
+    @Override
+    public String getName(T v) {
+        return v.name().toLowerCase();
+    }
+}
+//// FILE: mc/world/level/block/state/properties/DirectionProperty.java
+package net.mcreator.boh.compat.mc.world.level.block.state.properties;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.function.Predicate;
+
+import net.mcreator.boh.compat.mc.core.Direction;
+
+public class DirectionProperty extends EnumProperty<Direction> {
+
+    protected DirectionProperty(String name, Collection<Direction> values) {
+        super(name, Direction.class, values);
+    }
+
+    public static DirectionProperty create(String name, Direction... values) {
+        return new DirectionProperty(name, Arrays.asList(values));
+    }
+
+    public static DirectionProperty create(String name, Predicate<Direction> filter) {
+        return new DirectionProperty(name, Arrays.stream(Direction.values()).filter(filter).collect(java.util.stream.Collectors.toList()));
+    }
+
+    public static DirectionProperty create(String name) {
+        return create(name, d -> true);
+    }
+}
+//// FILE: mc/world/level/block/state/properties/AttachFace.java
+package net.mcreator.boh.compat.mc.world.level.block.state.properties;
+
+public enum AttachFace {
+    FLOOR,
+    WALL,
+    CEILING
+}
+//// FILE: mc/world/level/block/state/properties/BlockStateProperties.java
+package net.mcreator.boh.compat.mc.world.level.block.state.properties;
+
+import net.mcreator.boh.compat.mc.core.Axis;
+import net.mcreator.boh.compat.mc.core.Direction;
+
+public final class BlockStateProperties {
+
+    public static final DirectionProperty FACING = DirectionProperty.create("facing");
+    public static final DirectionProperty HORIZONTAL_FACING = DirectionProperty.create("facing", Direction.NORTH,
+        Direction.EAST, Direction.SOUTH, Direction.WEST);
+    public static final EnumProperty<Axis> AXIS = EnumProperty.create("axis", Axis.class);
+    public static final EnumProperty<Axis> HORIZONTAL_AXIS = EnumProperty.create("axis", Axis.class, Axis.X, Axis.Z);
+    public static final BooleanProperty WATERLOGGED = BooleanProperty.create("waterlogged");
+    public static final BooleanProperty POWERED = BooleanProperty.create("powered");
+    public static final BooleanProperty OPEN = BooleanProperty.create("open");
+    public static final BooleanProperty LIT = BooleanProperty.create("lit");
+    public static final EnumProperty<AttachFace> ATTACH_FACE = EnumProperty.create("face", AttachFace.class);
+    public static final IntegerProperty AGE_7 = IntegerProperty.create("age", 0, 7);
+    public static final IntegerProperty AGE_3 = IntegerProperty.create("age", 0, 3);
+    public static final IntegerProperty STAGE = IntegerProperty.create("stage", 0, 1);
+    public static final IntegerProperty DISTANCE = IntegerProperty.create("distance", 1, 7);
+    public static final BooleanProperty PERSISTENT = BooleanProperty.create("persistent");
+
+    private BlockStateProperties() {}
+}
+//// FILE: mc/world/level/block/state/StateDefinition.java
+package net.mcreator.boh.compat.mc.world.level.block.state;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.Property;
+import net.minecraft.block.Block;
+
+/**
+ * Property layout of a block. Properties are packed in declaration order; the ones that fit go into the 4-bit
+ * block metadata, the rest into an "extended" int kept by {@link ExtendedStateStore}.
+ */
+public final class StateDefinition {
+
+    private final Block block;
+    private final List<Property<?>> properties;
+    private final int[] radix;
+    private final int metaProps;
+    private final int metaCapacity;
+
+    StateDefinition(Block block, List<Property<?>> properties) {
+        this.block = block;
+        this.properties = Collections.unmodifiableList(new ArrayList<>(properties));
+        radix = new int[properties.size()];
+        int product = 1, n = 0;
+        for (int i = 0; i < properties.size(); i++) {
+            radix[i] = properties.get(i).size();
+            if (n == i && product * radix[i] <= 16) {
+                product *= radix[i];
+                n++;
+            }
+        }
+        metaProps = n;
+        metaCapacity = product;
+    }
+
+    public static StateDefinition empty(Block block) {
+        return new StateDefinition(block, Collections.emptyList());
+    }
+
+    public Block getOwner() {
+        return block;
+    }
+
+    public Collection<Property<?>> getProperties() {
+        return properties;
+    }
+
+    public Property<?> getProperty(String name) {
+        for (Property<?> p : properties) if (p.getName().equals(name)) return p;
+        return null;
+    }
+
+    public boolean has(Property<?> p) {
+        return properties.contains(p);
+    }
+
+    public int indexOf(Property<?> p) {
+        return properties.indexOf(p);
+    }
+
+    public boolean needsExtended() {
+        return metaProps < properties.size();
+    }
+
+    /** Value indices -> (meta, ext). */
+    public int[] encode(int[] idx) {
+        int meta = 0, mul = 1;
+        for (int i = 0; i < metaProps; i++) {
+            meta += idx[i] * mul;
+            mul *= radix[i];
+        }
+        int ext = 0;
+        mul = 1;
+        for (int i = metaProps; i < properties.size(); i++) {
+            ext += idx[i] * mul;
+            mul *= radix[i];
+        }
+        return new int[] { meta, ext };
+    }
+
+    /** (meta, ext) -> value indices. */
+    public int[] decode(int meta, int ext) {
+        int[] idx = new int[properties.size()];
+        int m = metaCapacity == 0 ? 0 : meta % Math.max(1, metaCapacity);
+        for (int i = 0; i < metaProps; i++) {
+            idx[i] = m % radix[i];
+            m /= radix[i];
+        }
+        for (int i = metaProps; i < properties.size(); i++) {
+            idx[i] = ext % radix[i];
+            ext /= radix[i];
+        }
+        return idx;
+    }
+
+    public BlockState any() {
+        return BlockState.of(block, 0);
+    }
+
+    public List<BlockState> getPossibleStates() {
+        List<BlockState> out = new ArrayList<>();
+        int total = 1;
+        for (int r : radix) total *= r;
+        for (int i = 0; i < Math.min(total, 4096); i++) {
+            int[] idx = new int[radix.length];
+            int v = i;
+            for (int k = 0; k < radix.length; k++) {
+                idx[k] = v % radix[k];
+                v /= radix[k];
+            }
+            int[] enc = encode(idx);
+            out.add(new BlockState(block, enc[0], enc[1]));
+        }
+        return out;
+    }
+}
+//// FILE: mc/world/level/block/state/Builder.java
+package net.mcreator.boh.compat.mc.world.level.block.state;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.Property;
+import net.minecraft.block.Block;
+
+/** 1.20 StateDefinition.Builder. */
+public class Builder<O, S> {
+
+    private final Block owner;
+    private final List<Property<?>> properties = new ArrayList<>();
+
+    public Builder(Block owner) {
+        this.owner = owner;
+    }
+
+    public Builder<O, S> add(Property<?>... props) {
+        for (Property<?> p : props) if (!properties.contains(p)) properties.add(p);
+        return this;
+    }
+
+    public StateDefinition create() {
+        return new StateDefinition(owner, properties);
+    }
+}
+//// FILE: mc/world/level/block/state/StateHolder.java
+package net.mcreator.boh.compat.mc.world.level.block.state;
+
+/** Marker for the 1.20 StateHolder supertype. */
+public interface StateHolder {}
+//// FILE: mc/world/level/block/state/ExtendedStateStore.java
+package net.mcreator.boh.compat.mc.world.level.block.state;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldSavedData;
+
+/** Per-world storage for block state properties that do not fit into metadata. */
+public class ExtendedStateStore extends WorldSavedData {
+
+    private static final String NAME = "boh_extended_states";
+    private final Map<Long, Integer> values = new HashMap<>();
+
+    public ExtendedStateStore(String name) {
+        super(name);
+    }
+
+    public static ExtendedStateStore get(World world) {
+        ExtendedStateStore s = (ExtendedStateStore) world.perWorldStorage.loadData(ExtendedStateStore.class, NAME);
+        if (s == null) {
+            s = new ExtendedStateStore(NAME);
+            world.perWorldStorage.setData(NAME, s);
+        }
+        return s;
+    }
+
+    private static long key(int x, int y, int z) {
+        return ((long) x & 0x3FFFFFFL) << 38 | ((long) z & 0x3FFFFFFL) << 12 | ((long) y & 0xFFFL);
+    }
+
+    public int getExt(int x, int y, int z) {
+        Integer v = values.get(key(x, y, z));
+        return v == null ? 0 : v;
+    }
+
+    public void setExt(int x, int y, int z, int ext) {
+        Integer old = ext == 0 ? values.remove(key(x, y, z)) : values.put(key(x, y, z), ext);
+        if (old == null || old != ext) markDirty();
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound tag) {
+        values.clear();
+        long[] keys = toLongs(tag.getIntArray("k_hi"), tag.getIntArray("k_lo"));
+        int[] vals = tag.getIntArray("v");
+        for (int i = 0; i < Math.min(keys.length, vals.length); i++) values.put(keys[i], vals[i]);
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound tag) {
+        int n = values.size(), i = 0;
+        int[] hi = new int[n], lo = new int[n], v = new int[n];
+        for (Map.Entry<Long, Integer> e : values.entrySet()) {
+            hi[i] = (int) (e.getKey() >>> 32);
+            lo[i] = (int) (long) e.getKey();
+            v[i++] = e.getValue();
+        }
+        tag.setIntArray("k_hi", hi);
+        tag.setIntArray("k_lo", lo);
+        tag.setIntArray("v", v);
+    }
+
+    private static long[] toLongs(int[] hi, int[] lo) {
+        long[] out = new long[Math.min(hi.length, lo.length)];
+        for (int i = 0; i < out.length; i++) out[i] = ((long) hi[i] << 32) | (lo[i] & 0xFFFFFFFFL);
+        return out;
+    }
+}
+//// FILE: mc/world/level/block/state/BlockState.java
+package net.mcreator.boh.compat.mc.world.level.block.state;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+
+import net.mcreator.boh.compat.mc.tags.TagKey;
+import net.mcreator.boh.compat.mc.world.level.block.state.properties.Property;
+import net.mcreator.boh.compat.registry.LegacyIds;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.init.Blocks;
+
+/** 1.20 BlockState: block + metadata (+ extended properties for mod blocks with large state spaces). */
+public final class BlockState implements StateHolder {
+
+    private final Block block;
+    private final int meta;
+    private final int ext;
+
+    public BlockState(Block block, int meta, int ext) {
+        this.block = block == null ? Blocks.air : block;
+        this.meta = meta & 15;
+        this.ext = ext;
+    }
+
+    public static BlockState of(Block block, int meta) {
+        return new BlockState(block, meta, 0);
+    }
+
+    public static BlockState of(Block block) {
+        return new BlockState(block, 0, 0);
+    }
+
+    public static BlockState of(Block block, int meta, int ext) {
+        return new BlockState(block, meta, ext);
+    }
+
+    /** The definition of the block: mod blocks carry their own, everything else has no properties. */
+    public StateDefinition definition() {
+        return block instanceof HasStateDefinition ? ((HasStateDefinition) block).getStateDefinition()
+            : StateDefinition.empty(block);
+    }
+
+    public Block getBlock() {
+        return block;
+    }
+
+    public int meta() {
+        return meta;
+    }
+
+    public int ext() {
+        return ext;
+    }
+
+    public boolean hasProperty(Property<?> p) {
+        return definition().has(p);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Comparable<T>> T getValue(Property<T> p) {
+        StateDefinition def = definition();
+        int i = def.indexOf(p);
+        if (i < 0) {
+            Object legacy = LegacyIds.legacyPropertyValue(block, meta, p);
+            if (legacy != null) return (T) legacy;
+            return p.byIndex(0);
+        }
+        return p.byIndex(def.decode(meta, ext)[i]);
+    }
+
+    public <T extends Comparable<T>> java.util.Optional<T> getOptionalValue(Property<T> p) {
+        return hasProperty(p) ? java.util.Optional.of(getValue(p)) : java.util.Optional.empty();
+    }
+
+    public <T extends Comparable<T>, V extends T> BlockState setValue(Property<T> p, V value) {
+        StateDefinition def = definition();
+        int i = def.indexOf(p);
+        if (i < 0) {
+            Integer legacyMeta = LegacyIds.legacyPropertyMeta(block, meta, p, value);
+            return legacyMeta == null ? this : new BlockState(block, legacyMeta, ext);
+        }
+        int[] idx = def.decode(meta, ext);
+        idx[i] = p.indexOf(value);
+        int[] enc = def.encode(idx);
+        return new BlockState(block, enc[0], enc[1]);
+    }
+
+    public <T extends Comparable<T>> BlockState cycle(Property<T> p) {
+        java.util.List<T> vals = new java.util.ArrayList<>(p.getPossibleValues());
+        T cur = getValue(p);
+        return setValue(p, vals.get((vals.indexOf(cur) + 1) % vals.size()));
+    }
+
+    public Map<Property<?>, Comparable<?>> getValues() {
+        Map<Property<?>, Comparable<?>> out = new LinkedHashMap<>();
+        for (Property<?> p : definition().getProperties()) out.put(p, getValue((Property) p));
+        return out;
+    }
+
+    public Collection<Property<?>> getProperties() {
+        return definition().getProperties();
+    }
+
+    public boolean is(Block b) {
+        return block == b;
+    }
+
+    public boolean is(TagKey<?> tag) {
+        return tag.contains(LegacyIds.blockKey(block));
+    }
+
+    public boolean isAir() {
+        return block.getMaterial() == Material.air;
+    }
+
+    public boolean liquid() {
+        return block.getMaterial().isLiquid();
+    }
+
+    public boolean isSolid() {
+        return block.getMaterial().isSolid();
+    }
+
+    public boolean blocksMotion() {
+        return block.getMaterial().blocksMovement();
+    }
+
+    public boolean canOcclude() {
+        return block.isOpaqueCube();
+    }
+
+    public boolean isCollisionShapeFullBlock(Object world, Object pos) {
+        return block.renderAsNormalBlock();
+    }
+
+    public boolean canBeReplaced() {
+        return block.getMaterial().isReplaceable();
+    }
+
+    public int getLightEmission() {
+        return block.getLightValue();
+    }
+
+    public boolean ignitedByLava() {
+        return block.getMaterial().getCanBurn();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof BlockState)) return false;
+        BlockState s = (BlockState) o;
+        return s.block == block && s.meta == meta && s.ext == ext;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(System.identityHashCode(block), meta, ext);
+    }
+
+    @Override
+    public String toString() {
+        return "Block{" + Block.blockRegistry.getNameForObject(block) + "}" + (getValues().isEmpty() ? "[" + meta + "]" : getValues());
+    }
+
+    /** Implemented by blocks that declare 1.20 properties (the compat BohBlock). */
+    public interface HasStateDefinition {
+
+        StateDefinition getStateDefinition();
+    }
+
+    static Map<Property<?>, Comparable<?>> none() {
+        return Collections.emptyMap();
+    }
+}

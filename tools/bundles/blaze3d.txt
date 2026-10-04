@@ -1,0 +1,729 @@
+//// FILE: mojang/blaze3d/platform/SourceFactor.java
+package net.mcreator.boh.compat.mojang.blaze3d.platform;
+
+import org.lwjgl.opengl.GL11;
+
+/** 1.20 GlStateManager.SourceFactor. */
+public enum SourceFactor {
+
+    CONSTANT_ALPHA(0x8003),
+    CONSTANT_COLOR(0x8001),
+    DST_ALPHA(GL11.GL_DST_ALPHA),
+    DST_COLOR(GL11.GL_DST_COLOR),
+    ONE(GL11.GL_ONE),
+    ONE_MINUS_CONSTANT_ALPHA(0x8004),
+    ONE_MINUS_CONSTANT_COLOR(0x8002),
+    ONE_MINUS_DST_ALPHA(GL11.GL_ONE_MINUS_DST_ALPHA),
+    ONE_MINUS_DST_COLOR(GL11.GL_ONE_MINUS_DST_COLOR),
+    ONE_MINUS_SRC_ALPHA(GL11.GL_ONE_MINUS_SRC_ALPHA),
+    ONE_MINUS_SRC_COLOR(GL11.GL_ONE_MINUS_SRC_COLOR),
+    SRC_ALPHA(GL11.GL_SRC_ALPHA),
+    SRC_ALPHA_SATURATE(GL11.GL_SRC_ALPHA_SATURATE),
+    SRC_COLOR(GL11.GL_SRC_COLOR),
+    ZERO(GL11.GL_ZERO);
+
+    public final int value;
+
+    SourceFactor(int v) {
+        value = v;
+    }
+}
+//// FILE: mojang/blaze3d/platform/DestFactor.java
+package net.mcreator.boh.compat.mojang.blaze3d.platform;
+
+import org.lwjgl.opengl.GL11;
+
+/** 1.20 GlStateManager.DestFactor. */
+public enum DestFactor {
+
+    CONSTANT_ALPHA(0x8003),
+    CONSTANT_COLOR(0x8001),
+    DST_ALPHA(GL11.GL_DST_ALPHA),
+    DST_COLOR(GL11.GL_DST_COLOR),
+    ONE(GL11.GL_ONE),
+    ONE_MINUS_CONSTANT_ALPHA(0x8004),
+    ONE_MINUS_CONSTANT_COLOR(0x8002),
+    ONE_MINUS_DST_ALPHA(GL11.GL_ONE_MINUS_DST_ALPHA),
+    ONE_MINUS_DST_COLOR(GL11.GL_ONE_MINUS_DST_COLOR),
+    ONE_MINUS_SRC_ALPHA(GL11.GL_ONE_MINUS_SRC_ALPHA),
+    ONE_MINUS_SRC_COLOR(GL11.GL_ONE_MINUS_SRC_COLOR),
+    SRC_ALPHA(GL11.GL_SRC_ALPHA),
+    SRC_COLOR(GL11.GL_SRC_COLOR),
+    ZERO(GL11.GL_ZERO);
+
+    public final int value;
+
+    DestFactor(int v) {
+        value = v;
+    }
+}
+//// FILE: mc/client/renderer/ShaderInstance.java
+package net.mcreator.boh.compat.mc.client.renderer;
+
+/** Fixed-function stand-in for a 1.20 core shader: which vertex attributes it consumes. */
+public enum ShaderInstance {
+
+    POSITION(false, false),
+    POSITION_COLOR(false, true),
+    POSITION_TEX(true, false),
+    POSITION_TEX_COLOR(true, true),
+    POSITION_COLOR_TEX(true, true);
+
+    public final boolean textured, colored;
+
+    ShaderInstance(boolean textured, boolean colored) {
+        this.textured = textured;
+        this.colored = colored;
+    }
+}
+//// FILE: mc/client/renderer/GameRenderer.java
+package net.mcreator.boh.compat.mc.client.renderer;
+
+/** 1.20 GameRenderer static shader getters. */
+public final class GameRenderer {
+
+    private GameRenderer() {}
+
+    public static ShaderInstance getPositionShader() {
+        return ShaderInstance.POSITION;
+    }
+
+    public static ShaderInstance getPositionColorShader() {
+        return ShaderInstance.POSITION_COLOR;
+    }
+
+    public static ShaderInstance getPositionTexShader() {
+        return ShaderInstance.POSITION_TEX;
+    }
+
+    public static ShaderInstance getPositionTexColorShader() {
+        return ShaderInstance.POSITION_TEX_COLOR;
+    }
+
+    public static ShaderInstance getPositionColorTexShader() {
+        return ShaderInstance.POSITION_COLOR_TEX;
+    }
+
+    public static ShaderInstance getPositionColorTexLightmapShader() {
+        return ShaderInstance.POSITION_COLOR_TEX;
+    }
+
+    public static ShaderInstance getRendertypeCutoutShader() {
+        return ShaderInstance.POSITION_TEX_COLOR;
+    }
+}
+//// FILE: mc/client/renderer/FogRenderer.java
+package net.mcreator.boh.compat.mc.client.renderer;
+
+/** 1.20 FogRenderer: fog state is owned by 1.7.10's EntityRenderer, so these are no-ops. */
+public final class FogRenderer {
+
+    private FogRenderer() {}
+
+    public static void levelFogColor() {}
+
+    public static void setupNoFog() {
+        org.lwjgl.opengl.GL11.glDisable(org.lwjgl.opengl.GL11.GL_FOG);
+    }
+}
+//// FILE: mojang/blaze3d/systems/RenderSystem.java
+package net.mcreator.boh.compat.mojang.blaze3d.systems;
+
+import java.util.function.Supplier;
+
+import net.mcreator.boh.compat.mc.client.renderer.ShaderInstance;
+import net.mcreator.boh.compat.mojang.blaze3d.platform.DestFactor;
+import net.mcreator.boh.compat.mojang.blaze3d.platform.SourceFactor;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.util.ResourceLocation;
+
+import org.lwjgl.opengl.GL11;
+
+/** 1.20 RenderSystem over 1.7.10 fixed-function GL. */
+public final class RenderSystem {
+
+    public static ShaderInstance shader = ShaderInstance.POSITION_TEX;
+    public static final float[] COLOR = { 1, 1, 1, 1 };
+
+    private RenderSystem() {}
+
+    public static void setShader(Supplier<ShaderInstance> s) {
+        ShaderInstance i = s == null ? null : s.get();
+        shader = i == null ? ShaderInstance.POSITION_TEX : i;
+    }
+
+    public static void setShaderColor(float r, float g, float b, float a) {
+        COLOR[0] = r;
+        COLOR[1] = g;
+        COLOR[2] = b;
+        COLOR[3] = a;
+        GL11.glColor4f(r, g, b, a);
+    }
+
+    public static float[] getShaderColor() {
+        return COLOR;
+    }
+
+    public static void setShaderTexture(int unit, ResourceLocation tex) {
+        Minecraft.getMinecraft().getTextureManager().bindTexture(tex);
+    }
+
+    public static void enableBlend() {
+        GL11.glEnable(GL11.GL_BLEND);
+    }
+
+    public static void disableBlend() {
+        GL11.glDisable(GL11.GL_BLEND);
+    }
+
+    public static void defaultBlendFunc() {
+        OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+    }
+
+    public static void blendFunc(SourceFactor s, DestFactor d) {
+        GL11.glBlendFunc(s.value, d.value);
+    }
+
+    public static void blendFuncSeparate(SourceFactor s, DestFactor d, SourceFactor sa, DestFactor da) {
+        OpenGlHelper.glBlendFunc(s.value, d.value, sa.value, da.value);
+    }
+
+    public static void depthMask(boolean b) {
+        GL11.glDepthMask(b);
+    }
+
+    public static void enableDepthTest() {
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+    }
+
+    public static void disableDepthTest() {
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+    }
+
+    public static void enableCull() {
+        GL11.glEnable(GL11.GL_CULL_FACE);
+    }
+
+    public static void disableCull() {
+        GL11.glDisable(GL11.GL_CULL_FACE);
+    }
+
+    public static void enableTexture() {
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+    }
+
+    public static void disableTexture() {
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+    }
+
+    public static void setShaderFogColor(float r, float g, float b) {}
+
+    public static void setShaderFogStart(float f) {
+        GL11.glFogf(GL11.GL_FOG_START, f);
+    }
+
+    public static void setShaderFogEnd(float f) {
+        GL11.glFogf(GL11.GL_FOG_END, f);
+    }
+}
+//// FILE: mojang/blaze3d/vertex/Mode.java
+package net.mcreator.boh.compat.mojang.blaze3d.vertex;
+
+import org.lwjgl.opengl.GL11;
+
+/** 1.20 VertexFormat.Mode. */
+public enum Mode {
+
+    LINES(GL11.GL_LINES),
+    LINE_STRIP(GL11.GL_LINE_STRIP),
+    DEBUG_LINES(GL11.GL_LINES),
+    DEBUG_LINE_STRIP(GL11.GL_LINE_STRIP),
+    TRIANGLES(GL11.GL_TRIANGLES),
+    TRIANGLE_STRIP(GL11.GL_TRIANGLE_STRIP),
+    TRIANGLE_FAN(GL11.GL_TRIANGLE_FAN),
+    QUADS(GL11.GL_QUADS);
+
+    public final int gl;
+
+    Mode(int gl) {
+        this.gl = gl;
+    }
+}
+//// FILE: mojang/blaze3d/vertex/DefaultVertexFormat.java
+package net.mcreator.boh.compat.mojang.blaze3d.vertex;
+
+/** 1.20 DefaultVertexFormat constants. */
+public enum DefaultVertexFormat {
+    POSITION,
+    POSITION_COLOR,
+    POSITION_TEX,
+    POSITION_TEX_COLOR,
+    POSITION_COLOR_TEX,
+    POSITION_COLOR_NORMAL,
+    POSITION_COLOR_LIGHTMAP,
+    POSITION_COLOR_TEX_LIGHTMAP,
+    POSITION_TEX_COLOR_NORMAL,
+    NEW_ENTITY,
+    BLOCK
+}
+//// FILE: mojang/blaze3d/vertex/Usage.java
+package net.mcreator.boh.compat.mojang.blaze3d.vertex;
+
+/** 1.20 VertexBuffer.Usage. */
+public enum Usage {
+    STATIC,
+    DYNAMIC
+}
+//// FILE: mojang/blaze3d/vertex/RenderedBuffer.java
+package net.mcreator.boh.compat.mojang.blaze3d.vertex;
+
+/** Finished vertex data (positions, uvs, colors) for one draw. */
+public final class RenderedBuffer {
+
+    final Mode mode;
+    final float[] data;
+    final int count;
+    final boolean hasUv, hasColor;
+
+    RenderedBuffer(Mode mode, float[] data, int count, boolean hasUv, boolean hasColor) {
+        this.mode = mode;
+        this.data = data;
+        this.count = count;
+        this.hasUv = hasUv;
+        this.hasColor = hasColor;
+    }
+
+    public void release() {}
+}
+//// FILE: mojang/blaze3d/vertex/BufferBuilder.java
+package net.mcreator.boh.compat.mojang.blaze3d.vertex;
+
+import java.util.Arrays;
+
+import net.mcreator.boh.compat.client.VertexConsumer;
+
+/** 1.20 BufferBuilder recording position/uv/color vertices for immediate GL drawing. */
+public class BufferBuilder implements VertexConsumer {
+
+    static final int STRIDE = 9; // x y z u v r g b a
+
+    private Mode mode = Mode.QUADS;
+    private float[] data = new float[STRIDE * 256];
+    private int count;
+    private boolean building, hasUv, hasColor;
+    private final float[] cur = new float[STRIDE];
+
+    public void begin(Mode mode, DefaultVertexFormat format) {
+        this.mode = mode;
+        count = 0;
+        building = true;
+        hasUv = false;
+        hasColor = false;
+        resetCurrent();
+    }
+
+    public boolean building() {
+        return building;
+    }
+
+    private void resetCurrent() {
+        Arrays.fill(cur, 0);
+        cur[5] = cur[6] = cur[7] = cur[8] = 1;
+    }
+
+    @Override
+    public VertexConsumer vertex(double x, double y, double z) {
+        cur[0] = (float) x;
+        cur[1] = (float) y;
+        cur[2] = (float) z;
+        return this;
+    }
+
+    @Override
+    public VertexConsumer color(float r, float g, float b, float a) {
+        hasColor = true;
+        cur[5] = r;
+        cur[6] = g;
+        cur[7] = b;
+        cur[8] = a;
+        return this;
+    }
+
+    @Override
+    public VertexConsumer uv(float u, float v) {
+        hasUv = true;
+        cur[3] = u;
+        cur[4] = v;
+        return this;
+    }
+
+    @Override
+    public VertexConsumer overlayCoords(int overlay) {
+        return this;
+    }
+
+    @Override
+    public VertexConsumer uv2(int light) {
+        return this;
+    }
+
+    @Override
+    public VertexConsumer normal(float x, float y, float z) {
+        return this;
+    }
+
+    @Override
+    public void endVertex() {
+        if ((count + 1) * STRIDE > data.length) data = Arrays.copyOf(data, data.length * 2);
+        System.arraycopy(cur, 0, data, count * STRIDE, STRIDE);
+        count++;
+        float u = cur[3], v = cur[4];
+        float r = cur[5], g = cur[6], b = cur[7], a = cur[8];
+        resetCurrent();
+        // uv and color persist only per vertex in 1.20; keep defaults for the next one
+        if (!hasColor) {
+            cur[5] = r;
+            cur[6] = g;
+            cur[7] = b;
+            cur[8] = a;
+        }
+        if (!hasUv) {
+            cur[3] = u;
+            cur[4] = v;
+        }
+    }
+
+    public RenderedBuffer end() {
+        building = false;
+        return new RenderedBuffer(mode, Arrays.copyOf(data, count * STRIDE), count, hasUv, hasColor);
+    }
+
+    public RenderedBuffer endOrDiscardIfEmpty() {
+        return count == 0 ? null : end();
+    }
+}
+//// FILE: mojang/blaze3d/vertex/Tesselator.java
+package net.mcreator.boh.compat.mojang.blaze3d.vertex;
+
+/** 1.20 Tesselator: holds one BufferBuilder. */
+public final class Tesselator {
+
+    private static final Tesselator INSTANCE = new Tesselator();
+    private final BufferBuilder builder = new BufferBuilder();
+
+    public static Tesselator getInstance() {
+        return INSTANCE;
+    }
+
+    public BufferBuilder getBuilder() {
+        return builder;
+    }
+
+    public void end() {
+        BufferUploader.drawWithShader(builder.end());
+    }
+}
+//// FILE: mojang/blaze3d/vertex/BufferUploader.java
+package net.mcreator.boh.compat.mojang.blaze3d.vertex;
+
+import net.mcreator.boh.compat.mc.client.renderer.ShaderInstance;
+import net.mcreator.boh.compat.mojang.blaze3d.systems.RenderSystem;
+
+import org.lwjgl.opengl.GL11;
+
+/** 1.20 BufferUploader: draws a finished buffer with the current "shader" (fixed-function attributes). */
+public final class BufferUploader {
+
+    private BufferUploader() {}
+
+    public static void drawWithShader(RenderedBuffer b) {
+        draw(b, RenderSystem.shader);
+    }
+
+    public static void draw(RenderedBuffer b) {
+        draw(b, RenderSystem.shader);
+    }
+
+    static void draw(RenderedBuffer b, ShaderInstance shader) {
+        if (b == null || b.count == 0) return;
+        boolean tex = shader.textured && b.hasUv;
+        boolean col = shader.colored && b.hasColor;
+        boolean texWas = GL11.glIsEnabled(GL11.GL_TEXTURE_2D);
+        if (tex) GL11.glEnable(GL11.GL_TEXTURE_2D);
+        else GL11.glDisable(GL11.GL_TEXTURE_2D);
+        float[] c = RenderSystem.COLOR;
+        GL11.glBegin(b.mode.gl);
+        float[] d = b.data;
+        for (int i = 0; i < b.count; i++) {
+            int o = i * BufferBuilder.STRIDE;
+            if (col) GL11.glColor4f(d[o + 5] * c[0], d[o + 6] * c[1], d[o + 7] * c[2], d[o + 8] * c[3]);
+            if (tex) GL11.glTexCoord2f(d[o + 3], d[o + 4]);
+            GL11.glVertex3f(d[o], d[o + 1], d[o + 2]);
+        }
+        GL11.glEnd();
+        if (col) GL11.glColor4f(c[0], c[1], c[2], c[3]);
+        if (texWas) GL11.glEnable(GL11.GL_TEXTURE_2D);
+        else GL11.glDisable(GL11.GL_TEXTURE_2D);
+    }
+}
+//// FILE: mojang/blaze3d/vertex/VertexBuffer.java
+package net.mcreator.boh.compat.mojang.blaze3d.vertex;
+
+import java.nio.FloatBuffer;
+
+import net.mcreator.boh.compat.client.Matrix4f;
+import net.mcreator.boh.compat.mc.client.renderer.ShaderInstance;
+
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+
+/** 1.20 VertexBuffer: keeps an uploaded buffer and replays it under a model-view matrix. */
+public class VertexBuffer {
+
+    private RenderedBuffer buffer;
+    private static final FloatBuffer MATRIX = BufferUtils.createFloatBuffer(16);
+
+    public VertexBuffer(Usage usage) {}
+
+    public VertexBuffer() {}
+
+    public void bind() {}
+
+    public static void unbind() {}
+
+    public void upload(RenderedBuffer b) {
+        buffer = b;
+    }
+
+    public void draw() {
+        BufferUploader.drawWithShader(buffer);
+    }
+
+    public void drawWithShader(Matrix4f modelView, Matrix4f projection, ShaderInstance shader) {
+        if (buffer == null) return;
+        GL11.glPushMatrix();
+        MATRIX.clear();
+        MATRIX.put(new float[] { modelView.m00, modelView.m10, modelView.m20, modelView.m30, modelView.m01, modelView.m11,
+            modelView.m21, modelView.m31, modelView.m02, modelView.m12, modelView.m22, modelView.m32, modelView.m03,
+            modelView.m13, modelView.m23, modelView.m33 });
+        MATRIX.flip();
+        GL11.glMultMatrix(MATRIX);
+        BufferUploader.draw(buffer, shader == null ? ShaderInstance.POSITION : shader);
+        GL11.glPopMatrix();
+    }
+
+    public void close() {
+        buffer = null;
+    }
+}
+//// FILE: mojang/math/Vector3f.java
+package net.mcreator.boh.compat.mojang.math;
+
+/** joml Vector3f (lightmap color adjustments). */
+public class Vector3f {
+
+    public float x, y, z;
+
+    public Vector3f() {}
+
+    public Vector3f(float x, float y, float z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    public float x() {
+        return x;
+    }
+
+    public float y() {
+        return y;
+    }
+
+    public float z() {
+        return z;
+    }
+
+    public Vector3f set(float x, float y, float z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        return this;
+    }
+
+    public Vector3f mul(float f) {
+        x *= f;
+        y *= f;
+        z *= f;
+        return this;
+    }
+
+    public Vector3f lerp(Vector3f o, float t) {
+        x += (o.x - x) * t;
+        y += (o.y - y) * t;
+        z += (o.z - z) * t;
+        return this;
+    }
+}
+//// FILE: mc/client/renderer/SkyType.java
+package net.mcreator.boh.compat.mc.client.renderer;
+
+/** 1.20 DimensionSpecialEffects.SkyType. */
+public enum SkyType {
+    NONE,
+    NORMAL,
+    END
+}
+//// FILE: mc/client/renderer/DimensionSpecialEffects.java
+package net.mcreator.boh.compat.mc.client.renderer;
+
+import net.mcreator.boh.compat.client.Matrix4f;
+import net.mcreator.boh.compat.client.PoseStack;
+import net.mcreator.boh.compat.mc.client.Camera;
+import net.mcreator.boh.compat.mc.world.phys.Vec3;
+import net.mcreator.boh.compat.mojang.math.Vector3f;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
+
+/** 1.20 DimensionSpecialEffects; invoked from the 1.7.10 sky render hook in DimensionEffectsHooks. */
+public abstract class DimensionSpecialEffects {
+
+    private final float cloudLevel;
+    private final boolean hasGround;
+    private final SkyType skyType;
+    private final boolean forceBrightLightmap;
+    private final boolean constantAmbientLight;
+    private final float[] sunriseCol = new float[4];
+
+    public DimensionSpecialEffects(float cloudLevel, boolean hasGround, SkyType skyType, boolean forceBrightLightmap,
+        boolean constantAmbientLight) {
+        this.cloudLevel = cloudLevel;
+        this.hasGround = hasGround;
+        this.skyType = skyType;
+        this.forceBrightLightmap = forceBrightLightmap;
+        this.constantAmbientLight = constantAmbientLight;
+    }
+
+    public float[] getSunriseColor(float timeOfDay, float partialTick) {
+        float c = MathHelper.cos(timeOfDay * (float) Math.PI * 2) - 0.0F;
+        if (c >= -0.4F && c <= 0.4F) {
+            float f3 = c / 0.4F * 0.5F + 0.5F;
+            float f4 = 1.0F - (1.0F - MathHelper.sin(f3 * (float) Math.PI)) * 0.99F;
+            f4 *= f4;
+            sunriseCol[0] = f3 * 0.3F + 0.7F;
+            sunriseCol[1] = f3 * f3 * 0.7F + 0.2F;
+            sunriseCol[2] = f3 * f3 * 0.0F + 0.2F;
+            sunriseCol[3] = f4;
+            return sunriseCol;
+        }
+        return null;
+    }
+
+    public float getCloudHeight() {
+        return cloudLevel;
+    }
+
+    public boolean hasGround() {
+        return hasGround;
+    }
+
+    public SkyType skyType() {
+        return skyType;
+    }
+
+    public boolean forceBrightLightmap() {
+        return forceBrightLightmap;
+    }
+
+    public boolean constantAmbientLight() {
+        return constantAmbientLight;
+    }
+
+    public abstract Vec3 getBrightnessDependentFogColor(Vec3 color, float sunHeight);
+
+    public abstract boolean isFoggyAt(int x, int y);
+
+    public boolean renderClouds(net.minecraft.client.multiplayer.WorldClient level, int ticks, float partialTick, PoseStack poseStack, double camX, double camY,
+        double camZ, Matrix4f projection) {
+        return false;
+    }
+
+    public boolean renderSky(net.minecraft.client.multiplayer.WorldClient level, int ticks, float partialTick, PoseStack poseStack, Camera camera, Matrix4f projection,
+        boolean isFoggy, Runnable setupFog) {
+        return false;
+    }
+
+    public boolean renderSnowAndRain(net.minecraft.client.multiplayer.WorldClient level, int ticks, float partialTick, Object lightTexture, double camX, double camY,
+        double camZ) {
+        return false;
+    }
+
+    public boolean tickRain(net.minecraft.client.multiplayer.WorldClient level, int ticks, Camera camera) {
+        return false;
+    }
+
+    public void adjustLightmapColors(net.minecraft.client.multiplayer.WorldClient level, float partialTick, float skyDarken, float blockLightRedFlicker, float skyLight,
+        int pixelX, int pixelY, Vector3f colors) {}
+
+    /** Default overworld effects used for dimensions without registered effects. */
+    public static final DimensionSpecialEffects OVERWORLD = new DimensionSpecialEffects(192, true, SkyType.NORMAL, false, false) {
+
+        @Override
+        public Vec3 getBrightnessDependentFogColor(Vec3 c, float h) {
+            return new Vec3(c.x * (h * 0.94F + 0.06F), c.y * (h * 0.94F + 0.06F), c.z * (h * 0.91F + 0.09F));
+        }
+
+        @Override
+        public boolean isFoggyAt(int x, int y) {
+            return false;
+        }
+    };
+}
+//// FILE: forge/client/DimensionSpecialEffectsManager.java
+package net.mcreator.boh.compat.forge.client;
+
+import com.google.common.collect.ImmutableMap;
+
+import net.mcreator.boh.compat.mc.client.renderer.DimensionSpecialEffects;
+import net.minecraft.util.ResourceLocation;
+
+/** 1.20 DimensionSpecialEffectsManager; EFFECTS is read reflectively by the mod's sky procedures. */
+public final class DimensionSpecialEffectsManager {
+
+    private static ImmutableMap<ResourceLocation, DimensionSpecialEffects> EFFECTS = ImmutableMap.of();
+
+    private DimensionSpecialEffectsManager() {}
+
+    public static void set(ImmutableMap<ResourceLocation, DimensionSpecialEffects> effects) {
+        EFFECTS = effects;
+    }
+
+    public static DimensionSpecialEffects getForType(ResourceLocation type) {
+        DimensionSpecialEffects e = EFFECTS.get(type);
+        return e != null ? e : DimensionSpecialEffects.OVERWORLD;
+    }
+
+    public static ImmutableMap<ResourceLocation, DimensionSpecialEffects> all() {
+        return EFFECTS;
+    }
+}
+//// FILE: forge/client/event/RegisterDimensionSpecialEffectsEvent.java
+package net.mcreator.boh.compat.forge.client.event;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import net.mcreator.boh.compat.mc.client.renderer.DimensionSpecialEffects;
+import net.minecraft.util.ResourceLocation;
+import cpw.mods.fml.common.eventhandler.Event;
+
+/** 1.20 RegisterDimensionSpecialEffectsEvent. */
+public class RegisterDimensionSpecialEffectsEvent extends Event {
+
+    public final Map<ResourceLocation, DimensionSpecialEffects> effects = new LinkedHashMap<>();
+
+    public void register(ResourceLocation id, DimensionSpecialEffects e) {
+        effects.put(id, e);
+    }
+}

@@ -1,0 +1,551 @@
+//// FILE: mc/world/entity/ai/control/Operation.java
+package net.mcreator.boh.compat.mc.world.entity.ai.control;
+
+/** 1.20 MoveControl.Operation. */
+public enum Operation {
+    WAIT,
+    MOVE_TO,
+    STRAFE,
+    JUMPING
+}
+//// FILE: mc/world/entity/ai/control/MoveControl.java
+package net.mcreator.boh.compat.mc.world.entity.ai.control;
+
+import net.minecraft.entity.EntityLiving;
+
+/** 1.20 MoveControl over the entity's 1.7.10 EntityMoveHelper. */
+public class MoveControl {
+
+    protected final EntityLiving mob;
+    public double wantedX, wantedY, wantedZ;
+    protected double speedModifier;
+    protected Operation operation = Operation.WAIT;
+
+    public MoveControl(EntityLiving mob) {
+        this.mob = mob;
+    }
+
+    public boolean hasWanted() {
+        return operation == Operation.MOVE_TO || mob.getMoveHelper().isUpdating();
+    }
+
+    public double getSpeedModifier() {
+        return speedModifier;
+    }
+
+    public void setWantedPosition(double x, double y, double z, double speed) {
+        wantedX = x;
+        wantedY = y;
+        wantedZ = z;
+        speedModifier = speed;
+        operation = Operation.MOVE_TO;
+        mob.getMoveHelper().setMoveTo(x, y, z, speed);
+    }
+
+    public void strafe(float forward, float strafe) {
+        operation = Operation.STRAFE;
+        mob.moveForward = forward;
+        mob.moveStrafing = strafe;
+    }
+
+    public double getWantedX() {
+        return wantedX;
+    }
+
+    public double getWantedY() {
+        return wantedY;
+    }
+
+    public double getWantedZ() {
+        return wantedZ;
+    }
+
+    /** Called by the vanilla move helper once the target was handed over. */
+    public void tick() {
+        if (operation == Operation.MOVE_TO && !mob.getMoveHelper().isUpdating()) operation = Operation.WAIT;
+    }
+}
+//// FILE: mc/world/entity/ai/control/FlyingMoveControl.java
+package net.mcreator.boh.compat.mc.world.entity.ai.control;
+
+import net.mcreator.boh.compat.entity.BohMob;
+import net.mcreator.boh.compat.mc.world.entity.ai.attributes.Attributes;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.EntityMoveHelper;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.util.MathHelper;
+
+/**
+ * 1.20 FlyingMoveControl. Installs a flying {@link EntityMoveHelper} on the mob so that vanilla AI tasks and the
+ * flying navigator both steer it through the air.
+ */
+public class FlyingMoveControl extends MoveControl {
+
+    private final int maxTurn;
+    private final boolean hoversInPlace;
+
+    public FlyingMoveControl(EntityLiving mob, int maxTurn, boolean hoversInPlace) {
+        super(mob);
+        this.maxTurn = maxTurn;
+        this.hoversInPlace = hoversInPlace;
+        mob.moveHelper = new Helper();
+    }
+
+    @Override
+    public void setWantedPosition(double x, double y, double z, double speed) {
+        wantedX = x;
+        wantedY = y;
+        wantedZ = z;
+        speedModifier = speed;
+        operation = Operation.MOVE_TO;
+    }
+
+    @Override
+    public boolean hasWanted() {
+        return operation == Operation.MOVE_TO;
+    }
+
+    @Override
+    public void tick() {
+        if (operation == Operation.MOVE_TO) {
+            operation = Operation.WAIT;
+            BohMob.setNoGravity(mob, true);
+            double dx = wantedX - mob.posX, dy = wantedY - mob.posY, dz = wantedZ - mob.posZ;
+            double distSqr = dx * dx + dy * dy + dz * dz;
+            if (distSqr < 2.5E-7) {
+                mob.moveForward = 0;
+                return;
+            }
+            float yaw = (float) (Math.atan2(dz, dx) * 180.0 / Math.PI) - 90.0F;
+            mob.rotationYaw = rotlerp(mob.rotationYaw, yaw, 90.0F);
+            double speed = (mob.onGround ? attr(SharedMonsterAttributes.movementSpeed.getAttributeUnlocalizedName(), 0.25)
+                : attr(Attributes.FLYING_SPEED.getAttributeUnlocalizedName(), 0.4)) * speedModifier;
+            double dist = Math.sqrt(distSqr);
+            double horizontal = Math.sqrt(dx * dx + dz * dz);
+            if (Math.abs(dy) > 1.0E-5 || horizontal > 1.0E-5) {
+                float pitch = (float) (-(Math.atan2(dy, horizontal) * 180.0 / Math.PI));
+                mob.rotationPitch = rotlerp(mob.rotationPitch, pitch, maxTurn);
+            }
+            double accel = Math.min(speed, dist) * 0.25;
+            mob.motionX += (dx / dist * speed - mob.motionX) * 0.25 + 0 * accel;
+            mob.motionY += (dy / dist * speed - mob.motionY) * 0.25;
+            mob.motionZ += (dz / dist * speed - mob.motionZ) * 0.25;
+            mob.setAIMoveSpeed((float) speed);
+        } else {
+            if (!hoversInPlace) BohMob.setNoGravity(mob, false);
+            mob.moveForward = 0;
+        }
+    }
+
+    private double attr(String name, double fallback) {
+        IAttributeInstance inst = mob.getAttributeMap().getAttributeInstanceByName(name);
+        return inst == null ? fallback : inst.getAttributeValue();
+    }
+
+    private static float rotlerp(float from, float to, float max) {
+        float d = MathHelper.wrapAngleTo180_float(to - from);
+        if (d > max) d = max;
+        if (d < -max) d = -max;
+        return from + d;
+    }
+
+    /** Vanilla-facing helper: tasks call setMoveTo, the entity ticks onUpdateMoveHelper. */
+    private final class Helper extends EntityMoveHelper {
+
+        Helper() {
+            super(FlyingMoveControl.this.mob);
+        }
+
+        @Override
+        public void setMoveTo(double x, double y, double z, double speed) {
+            FlyingMoveControl.this.setWantedPosition(x, y, z, speed);
+        }
+
+        @Override
+        public boolean isUpdating() {
+            return FlyingMoveControl.this.operation == Operation.MOVE_TO;
+        }
+
+        @Override
+        public double getSpeed() {
+            return FlyingMoveControl.this.speedModifier;
+        }
+
+        @Override
+        public void onUpdateMoveHelper() {
+            FlyingMoveControl.this.tick();
+        }
+    }
+}
+//// FILE: mc/world/entity/ai/control/LookControl.java
+package net.mcreator.boh.compat.mc.world.entity.ai.control;
+
+import net.mcreator.boh.compat.mc.world.phys.Vec3;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+
+/** 1.20 LookControl over the 1.7.10 EntityLookHelper. */
+public class LookControl {
+
+    protected final EntityLiving mob;
+
+    public LookControl(EntityLiving mob) {
+        this.mob = mob;
+    }
+
+    public void setLookAt(Entity e) {
+        mob.getLookHelper().setLookPositionWithEntity(e, 10f, mob.getVerticalFaceSpeed());
+    }
+
+    public void setLookAt(Entity e, float yawSpeed, float pitchSpeed) {
+        mob.getLookHelper().setLookPositionWithEntity(e, yawSpeed, pitchSpeed);
+    }
+
+    public void setLookAt(double x, double y, double z) {
+        mob.getLookHelper().setLookPosition(x, y, z, 10f, mob.getVerticalFaceSpeed());
+    }
+
+    public void setLookAt(double x, double y, double z, float yawSpeed, float pitchSpeed) {
+        mob.getLookHelper().setLookPosition(x, y, z, yawSpeed, pitchSpeed);
+    }
+
+    public void setLookAt(Vec3 v) {
+        setLookAt(v.x, v.y, v.z);
+    }
+
+    public boolean isLookingAtTarget() {
+        return mob.getLookHelper().getIsLooking();
+    }
+
+    public double getWantedX() {
+        return mob.getLookHelper().getLookPosX();
+    }
+
+    public double getWantedY() {
+        return mob.getLookHelper().getLookPosY();
+    }
+
+    public double getWantedZ() {
+        return mob.getLookHelper().getLookPosZ();
+    }
+}
+//// FILE: mc/world/level/pathfinder/Path.java
+package net.mcreator.boh.compat.mc.world.level.pathfinder;
+
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.minecraft.pathfinding.PathEntity;
+import net.minecraft.pathfinding.PathPoint;
+
+/** 1.20 Path wrapping a 1.7.10 {@link PathEntity}. */
+public class Path {
+
+    private final PathEntity handle;
+
+    public Path(PathEntity handle) {
+        this.handle = handle;
+    }
+
+    public static Path of(PathEntity p) {
+        return p == null ? null : new Path(p);
+    }
+
+    public PathEntity toVanilla() {
+        return handle;
+    }
+
+    public boolean isDone() {
+        return handle.isFinished();
+    }
+
+    public boolean canReach() {
+        return true;
+    }
+
+    public int getNodeCount() {
+        return handle.getCurrentPathLength();
+    }
+
+    public BlockPos getTarget() {
+        PathPoint p = handle.getFinalPathPoint();
+        return p == null ? BlockPos.ZERO : new BlockPos(p.xCoord, p.yCoord, p.zCoord);
+    }
+
+    public BlockPos getEndNodePos() {
+        return getTarget();
+    }
+}
+//// FILE: mc/world/entity/ai/navigation/PathNavigation.java
+package net.mcreator.boh.compat.mc.world.entity.ai.navigation;
+
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.world.level.pathfinder.Path;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.pathfinding.PathNavigate;
+import net.minecraft.world.World;
+
+/** 1.20 PathNavigation facade over a 1.7.10 {@link PathNavigate}. */
+public class PathNavigation {
+
+    protected final EntityLiving mob;
+    protected final PathNavigate nav;
+    protected double speedModifier = 1.0;
+
+    public PathNavigation(EntityLiving mob, World world) {
+        this(mob, new PathNavigate(mob, world));
+    }
+
+    public PathNavigation(EntityLiving mob, PathNavigate nav) {
+        this.mob = mob;
+        this.nav = nav;
+    }
+
+    public static PathNavigation of(EntityLiving mob) {
+        return new PathNavigation(mob, mob.getNavigator());
+    }
+
+    public PathNavigate vanilla() {
+        return nav;
+    }
+
+    public boolean moveTo(double x, double y, double z, double speed) {
+        speedModifier = speed;
+        return nav.tryMoveToXYZ(x, y, z, speed);
+    }
+
+    public boolean moveTo(Entity e, double speed) {
+        speedModifier = speed;
+        if (e instanceof EntityLivingBase) return nav.tryMoveToEntityLiving(e, speed);
+        return nav.tryMoveToXYZ(e.posX, e.posY, e.posZ, speed);
+    }
+
+    public boolean moveTo(Path path, double speed) {
+        speedModifier = speed;
+        return path != null && nav.setPath(path.toVanilla(), speed);
+    }
+
+    public Path createPath(double x, double y, double z, int accuracy) {
+        return Path.of(nav.getPathToXYZ(x, y, z));
+    }
+
+    public Path createPath(BlockPos pos, int accuracy) {
+        return createPath(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, accuracy);
+    }
+
+    public Path createPath(Entity e, int accuracy) {
+        if (e instanceof EntityLivingBase) return Path.of(nav.getPathToEntityLiving(e));
+        return createPath(e.posX, e.posY, e.posZ, accuracy);
+    }
+
+    public Path getPath() {
+        return Path.of(nav.getPath());
+    }
+
+    public void stop() {
+        nav.clearPathEntity();
+    }
+
+    public boolean isDone() {
+        return nav.noPath();
+    }
+
+    public boolean isInProgress() {
+        return !nav.noPath();
+    }
+
+    public void setSpeedModifier(double speed) {
+        speedModifier = speed;
+        nav.setSpeed(speed);
+    }
+
+    public void setCanFloat(boolean b) {
+        nav.setCanSwim(b);
+    }
+
+    public boolean canFloat() {
+        return nav.getCanSwim();
+    }
+
+    public void setCanOpenDoors(boolean b) {
+        nav.setEnterDoors(b);
+    }
+
+    public void setCanPassDoors(boolean b) {
+        nav.setEnterDoors(b);
+    }
+
+    public void recomputePath() {}
+
+    public void tick() {}
+
+    public boolean isStableDestination(BlockPos pos) {
+        return World.doesBlockHaveSolidTopSurface(mob.worldObj, pos.getX(), pos.getY() - 1, pos.getZ());
+    }
+}
+//// FILE: mc/world/entity/ai/navigation/GroundPathNavigation.java
+package net.mcreator.boh.compat.mc.world.entity.ai.navigation;
+
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.world.World;
+
+public class GroundPathNavigation extends PathNavigation {
+
+    public GroundPathNavigation(EntityLiving mob, World world) {
+        super(mob, world);
+    }
+}
+//// FILE: mc/world/entity/ai/navigation/WaterBoundPathNavigation.java
+package net.mcreator.boh.compat.mc.world.entity.ai.navigation;
+
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.world.World;
+
+public class WaterBoundPathNavigation extends PathNavigation {
+
+    public WaterBoundPathNavigation(EntityLiving mob, World world) {
+        super(mob, new FlyingNavigator(mob, world));
+        nav.setCanSwim(true);
+    }
+}
+//// FILE: mc/world/entity/ai/navigation/FlyingPathNavigation.java
+package net.mcreator.boh.compat.mc.world.entity.ai.navigation;
+
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.world.World;
+
+/** 1.20 FlyingPathNavigation: direct 3D steering through {@link FlyingNavigator}. */
+public class FlyingPathNavigation extends PathNavigation {
+
+    public FlyingPathNavigation(EntityLiving mob, World world) {
+        super(mob, new FlyingNavigator(mob, world));
+    }
+}
+//// FILE: mc/world/entity/ai/navigation/FlyingNavigator.java
+package net.mcreator.boh.compat.mc.world.entity.ai.navigation;
+
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.pathfinding.PathEntity;
+import net.minecraft.pathfinding.PathNavigate;
+import net.minecraft.pathfinding.PathPoint;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
+
+/**
+ * A {@link PathNavigate} for flying/swimming mobs: no ground pathfinding, the mob steers straight at its target
+ * through its move helper (see FlyingMoveControl), rising over obstacles in the way.
+ */
+public class FlyingNavigator extends PathNavigate {
+
+    private final EntityLiving mob;
+    private double tx, ty, tz;
+    private Entity targetEntity;
+    private boolean active;
+    private double speed;
+    private int stuckTicks;
+    private double lastDist = Double.MAX_VALUE;
+
+    public FlyingNavigator(EntityLiving mob, World world) {
+        super(mob, world);
+        this.mob = mob;
+    }
+
+    private PathEntity pathTo(double x, double y, double z) {
+        return new PathEntity(new PathPoint[] {
+            new PathPoint(MathHelper.floor_double(x), MathHelper.floor_double(y), MathHelper.floor_double(z)) });
+    }
+
+    @Override
+    public PathEntity getPathToXYZ(double x, double y, double z) {
+        return pathTo(x, y, z);
+    }
+
+    @Override
+    public PathEntity getPathToEntityLiving(Entity e) {
+        return pathTo(e.posX, e.posY, e.posZ);
+    }
+
+    @Override
+    public boolean tryMoveToXYZ(double x, double y, double z, double speed) {
+        targetEntity = null;
+        tx = x;
+        ty = y;
+        tz = z;
+        return start(speed);
+    }
+
+    @Override
+    public boolean tryMoveToEntityLiving(Entity e, double speed) {
+        targetEntity = e;
+        return start(speed);
+    }
+
+    @Override
+    public boolean setPath(PathEntity path, double speed) {
+        if (path == null) return false;
+        PathPoint p = path.getFinalPathPoint();
+        if (p == null) return false;
+        return tryMoveToXYZ(p.xCoord + 0.5, p.yCoord, p.zCoord + 0.5, speed);
+    }
+
+    private boolean start(double speed) {
+        this.speed = speed;
+        active = true;
+        stuckTicks = 0;
+        lastDist = Double.MAX_VALUE;
+        return true;
+    }
+
+    @Override
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
+
+    @Override
+    public boolean noPath() {
+        return !active;
+    }
+
+    @Override
+    public void clearPathEntity() {
+        active = false;
+        targetEntity = null;
+    }
+
+    @Override
+    public PathEntity getPath() {
+        return active ? pathTo(tx, ty, tz) : null;
+    }
+
+    @Override
+    public void onUpdateNavigation() {
+        if (!active) return;
+        if (targetEntity != null) {
+            if (targetEntity.isDead) {
+                clearPathEntity();
+                return;
+            }
+            tx = targetEntity.posX;
+            ty = targetEntity.posY + targetEntity.height * 0.5;
+            tz = targetEntity.posZ;
+        }
+        double dx = tx - mob.posX, dy = ty - mob.posY, dz = tz - mob.posZ;
+        double dist = dx * dx + dy * dy + dz * dz;
+        if (targetEntity == null && dist < Math.max(1.0, mob.width * mob.width)) {
+            clearPathEntity();
+            return;
+        }
+        if (dist > lastDist - 0.01) stuckTicks++;
+        else stuckTicks = 0;
+        lastDist = dist;
+        double aimY = ty;
+        if (mob.isCollidedHorizontally || stuckTicks > 20) aimY = mob.posY + 2.0;
+        if (stuckTicks > 100) {
+            clearPathEntity();
+            return;
+        }
+        mob.getMoveHelper().setMoveTo(tx, aimY, tz, speed);
+    }
+}

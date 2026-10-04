@@ -1,0 +1,2 @@
+net.mcreator.boh.compat.mc.world.level.block.SoundType
+net.mcreator.boh.compat.mc.world.level.block.Sensitivity

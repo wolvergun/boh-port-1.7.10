@@ -1,0 +1,433 @@
+//// FILE: mc/world/effect/MobEffectCategory.java
+package net.mcreator.boh.compat.mc.world.effect;
+
+public enum MobEffectCategory {
+    BENEFICIAL,
+    HARMFUL,
+    NEUTRAL
+}
+//// FILE: effect/BohMobEffect.java
+package net.mcreator.boh.compat.effect;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
+import net.mcreator.boh.compat.mc.world.effect.MobEffectCategory;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.attributes.BaseAttributeMap;
+import net.minecraft.entity.ai.attributes.IAttribute;
+import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.ResourceLocation;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+/**
+ * Compat base for mod effects: a 1.7.10 {@link Potion} (id from {@link PotionIds}) exposing the 1.20 MobEffect hooks.
+ * Inventory icons come from the original textures/mob_effect/<name>.png.
+ */
+public class BohMobEffect extends Potion {
+
+    private final MobEffectCategory category;
+    private ResourceLocation iconTexture;
+    private boolean visibleInInventory = true, visibleInGui = true, renderInventoryText = true;
+    private boolean clientInitialized;
+
+    public BohMobEffect(MobEffectCategory category, int color) {
+        super(PotionIds.next(), category == MobEffectCategory.HARMFUL, color);
+        this.category = category;
+    }
+
+    public MobEffectCategory getCategory() {
+        return category;
+    }
+
+    public boolean isBeneficial() {
+        return category == MobEffectCategory.BENEFICIAL;
+    }
+
+    public void setIconTexture(ResourceLocation tex) {
+        iconTexture = tex;
+    }
+
+    // ------------------------------------------------------------------ 1.20 hooks
+
+    public void applyEffectTick(EntityLivingBase entity, int amplifier) {}
+
+    public void applyInstantenousEffect(net.minecraft.entity.Entity source, net.minecraft.entity.Entity indirect, EntityLivingBase target,
+        int amplifier, double health) {
+        applyEffectTick(target, amplifier);
+    }
+
+    public boolean isDurationEffectTick(int duration, int amplifier) {
+        return false;
+    }
+
+    public boolean isInstantenous() {
+        return false;
+    }
+
+    public void addAttributeModifiers(EntityLivingBase entity, BaseAttributeMap map, int amplifier) {
+        super.applyAttributesModifiersToEntity(entity, map, amplifier);
+    }
+
+    public void removeAttributeModifiers(EntityLivingBase entity, BaseAttributeMap map, int amplifier) {
+        super.removeAttributesModifiersFromEntity(entity, map, amplifier);
+    }
+
+    public BohMobEffect addAttributeModifier(IAttribute attr, String uuid, double amount,
+        net.mcreator.boh.compat.mc.world.entity.ai.attributes.Operation op) {
+        func_111184_a(attr, uuid, amount, op.ordinal());
+        return this;
+    }
+
+    public List<ItemStack> getCurativeItems() {
+        List<ItemStack> l = new ArrayList<>();
+        l.add(new ItemStack(net.minecraft.init.Items.milk_bucket));
+        return l;
+    }
+
+    public void initializeClient(Consumer<?> consumer) {}
+
+    public String getDescriptionId() {
+        return getName();
+    }
+
+    // ------------------------------------------------------------------ 1.7.10 bridge
+
+    @Override
+    public void performEffect(EntityLivingBase entity, int amplifier) {
+        applyEffectTick(entity, amplifier);
+    }
+
+    @Override
+    public void affectEntity(EntityLivingBase source, EntityLivingBase target, int amplifier, double health) {
+        applyInstantenousEffect(source, source, target, amplifier, health);
+    }
+
+    @Override
+    public boolean isReady(int duration, int amplifier) {
+        return isDurationEffectTick(duration, amplifier);
+    }
+
+    @Override
+    public boolean isInstant() {
+        return isInstantenous();
+    }
+
+    @Override
+    public void applyAttributesModifiersToEntity(EntityLivingBase entity, BaseAttributeMap map, int amplifier) {
+        addAttributeModifiers(entity, map, amplifier);
+    }
+
+    @Override
+    public void removeAttributesModifiersFromEntity(EntityLivingBase entity, BaseAttributeMap map, int amplifier) {
+        removeAttributeModifiers(entity, map, amplifier);
+    }
+
+    @SideOnly(Side.CLIENT)
+    private void ensureClientInit() {
+        if (clientInitialized) return;
+        clientInitialized = true;
+        initializeClient(ext -> {
+            if (ext instanceof net.mcreator.boh.compat.forge.client.extensions.common.IClientMobEffectExtensions) {
+                net.mcreator.boh.compat.forge.client.extensions.common.IClientMobEffectExtensions e =
+                    (net.mcreator.boh.compat.forge.client.extensions.common.IClientMobEffectExtensions) ext;
+                PotionEffect probe = new PotionEffect(id, 1, 0);
+                visibleInInventory = e.isVisibleInInventory(probe);
+                visibleInGui = e.isVisibleInGui(probe);
+                renderInventoryText = visibleInInventory;
+            }
+        });
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean shouldRender(PotionEffect effect) {
+        ensureClientInit();
+        return visibleInInventory;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean shouldRenderInvText(PotionEffect effect) {
+        ensureClientInit();
+        return renderInventoryText;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean hasStatusIcon() {
+        return false;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
+        if (iconTexture == null) return;
+        mc.getTextureManager().bindTexture(iconTexture);
+        net.minecraft.client.renderer.Tessellator t = net.minecraft.client.renderer.Tessellator.instance;
+        int ix = x + 6, iy = y + 7;
+        t.startDrawingQuads();
+        t.addVertexWithUV(ix, iy + 18, 0, 0, 1);
+        t.addVertexWithUV(ix + 18, iy + 18, 0, 1, 1);
+        t.addVertexWithUV(ix + 18, iy, 0, 1, 0);
+        t.addVertexWithUV(ix, iy, 0, 0, 0);
+        t.draw();
+    }
+}
+//// FILE: effect/PotionIds.java
+package net.mcreator.boh.compat.effect;
+
+import net.minecraft.potion.Potion;
+
+/** Hands out free potion ids above the vanilla range (EndlessIDs extends the array in the pack). */
+public final class PotionIds {
+
+    private static int next = 64;
+
+    private PotionIds() {}
+
+    public static synchronized int next() {
+        while (next < Potion.potionTypes.length && Potion.potionTypes[next] != null) next++;
+        if (next >= Potion.potionTypes.length) {
+            for (int i = 32; i < Potion.potionTypes.length; i++) if (Potion.potionTypes[i] == null) return i;
+            throw new IllegalStateException("No free potion ids; install a potion id extender such as EndlessIDs");
+        }
+        return next++;
+    }
+}
+//// FILE: effect/ExtraEffects.java
+package net.mcreator.boh.compat.effect;
+
+import net.mcreator.boh.compat.mc.world.effect.MobEffectCategory;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.potion.Potion;
+
+/** 1.20 effects that 1.7.10 lacks, implemented with their 1.20 behaviour. */
+public final class ExtraEffects {
+
+    private ExtraEffects() {}
+
+    /** Floats upward 0.05 * (amplifier+1) blocks/tick like 1.20 levitation. */
+    public static final class Levitation extends BohMobEffect {
+
+        public Levitation() {
+            super(MobEffectCategory.HARMFUL, 0xCEFFFF);
+            setPotionName("effect.levitation");
+        }
+
+        @Override
+        public void applyEffectTick(EntityLivingBase e, int amp) {
+            if (e instanceof EntityPlayer && ((EntityPlayer) e).capabilities.isFlying) return;
+            e.motionY += (0.05 * (amp + 1) - e.motionY) * 0.2;
+            e.fallDistance = 0;
+        }
+
+        @Override
+        public boolean isDurationEffectTick(int d, int a) {
+            return true;
+        }
+    }
+
+    /** Caps falling speed and cancels fall damage like 1.20 slow falling. */
+    public static final class SlowFalling extends BohMobEffect {
+
+        public SlowFalling() {
+            super(MobEffectCategory.BENEFICIAL, 0xFEFFE2);
+            setPotionName("effect.slowFalling");
+        }
+
+        @Override
+        public void applyEffectTick(EntityLivingBase e, int amp) {
+            if (e.motionY < -0.07) e.motionY = -0.07;
+            e.fallDistance = 0;
+        }
+
+        @Override
+        public boolean isDurationEffectTick(int d, int a) {
+            return true;
+        }
+    }
+
+    /** Outlined through walls on the client (see the glowing render hook). */
+    public static final class Glowing extends BohMobEffect {
+
+        public Glowing() {
+            super(MobEffectCategory.NEUTRAL, 0x94A061);
+            setPotionName("effect.glowing");
+        }
+    }
+
+    /** Pulsing darkness: rendered by the client fog hook, otherwise like a weak blindness. */
+    public static final class Darkness extends BohMobEffect {
+
+        public Darkness() {
+            super(MobEffectCategory.HARMFUL, 0x292721);
+            setPotionName("effect.darkness");
+        }
+    }
+
+    public static final class Luck extends BohMobEffect {
+
+        public Luck() {
+            super(MobEffectCategory.BENEFICIAL, 0x339900);
+            setPotionName("effect.luck");
+        }
+    }
+
+    public static final class BadOmen extends BohMobEffect {
+
+        public BadOmen() {
+            super(MobEffectCategory.NEUTRAL, 0x0B6138);
+            setPotionName("effect.badOmen");
+        }
+    }
+
+    /** Faster swimming like dolphin's grace. */
+    public static final class DolphinsGrace extends BohMobEffect {
+
+        public DolphinsGrace() {
+            super(MobEffectCategory.BENEFICIAL, 0x88A3BE);
+            setPotionName("effect.dolphinsGrace");
+        }
+
+        @Override
+        public void applyEffectTick(EntityLivingBase e, int amp) {
+            if (e.isInWater()) {
+                e.motionX *= 1.06;
+                e.motionZ *= 1.06;
+            }
+        }
+
+        @Override
+        public boolean isDurationEffectTick(int d, int a) {
+            return true;
+        }
+    }
+
+    /** Water breathing + night vision + haste underwater, like conduit power. */
+    public static final class ConduitPower extends BohMobEffect {
+
+        public ConduitPower() {
+            super(MobEffectCategory.BENEFICIAL, 0x1DC2D1);
+            setPotionName("effect.conduitPower");
+        }
+
+        @Override
+        public void applyEffectTick(EntityLivingBase e, int amp) {
+            if (e.isInWater()) e.setAir(300);
+        }
+
+        @Override
+        public boolean isDurationEffectTick(int d, int a) {
+            return true;
+        }
+    }
+
+    public static Potion levitation, slowFalling, glowing, darkness, luck, badOmen, dolphinsGrace, conduitPower;
+
+    /** Creates the extra effects once (called during preInit). */
+    public static synchronized void init() {
+        if (levitation != null) return;
+        levitation = new Levitation();
+        slowFalling = new SlowFalling();
+        glowing = new Glowing();
+        darkness = new Darkness();
+        luck = new Luck();
+        badOmen = new BadOmen();
+        dolphinsGrace = new DolphinsGrace();
+        conduitPower = new ConduitPower();
+    }
+}
+//// FILE: mc/world/effect/MobEffects.java
+package net.mcreator.boh.compat.mc.world.effect;
+
+import net.mcreator.boh.compat.effect.ExtraEffects;
+import net.minecraft.potion.Potion;
+
+/** 1.20 MobEffects: vanilla 1.7.10 potions plus the port's implementations of newer ones. */
+public final class MobEffects {
+
+    public static final Potion MOVEMENT_SPEED = Potion.moveSpeed;
+    public static final Potion MOVEMENT_SLOWDOWN = Potion.moveSlowdown;
+    public static final Potion DIG_SPEED = Potion.digSpeed;
+    public static final Potion DIG_SLOWDOWN = Potion.digSlowdown;
+    public static final Potion DAMAGE_BOOST = Potion.damageBoost;
+    public static final Potion HEAL = Potion.heal;
+    public static final Potion HARM = Potion.harm;
+    public static final Potion JUMP = Potion.jump;
+    public static final Potion CONFUSION = Potion.confusion;
+    public static final Potion REGENERATION = Potion.regeneration;
+    public static final Potion DAMAGE_RESISTANCE = Potion.resistance;
+    public static final Potion FIRE_RESISTANCE = Potion.fireResistance;
+    public static final Potion WATER_BREATHING = Potion.waterBreathing;
+    public static final Potion INVISIBILITY = Potion.invisibility;
+    public static final Potion BLINDNESS = Potion.blindness;
+    public static final Potion NIGHT_VISION = Potion.nightVision;
+    public static final Potion HUNGER = Potion.hunger;
+    public static final Potion WEAKNESS = Potion.weakness;
+    public static final Potion POISON = Potion.poison;
+    public static final Potion WITHER = Potion.wither;
+    public static final Potion HEALTH_BOOST = Potion.field_76434_w;
+    public static final Potion ABSORPTION = Potion.field_76444_x;
+    public static final Potion SATURATION = Potion.field_76443_y;
+
+    static {
+        ExtraEffects.init();
+    }
+
+    public static final Potion GLOWING = ExtraEffects.glowing;
+    public static final Potion LEVITATION = ExtraEffects.levitation;
+    public static final Potion LUCK = ExtraEffects.luck;
+    public static final Potion UNLUCK = ExtraEffects.luck;
+    public static final Potion SLOW_FALLING = ExtraEffects.slowFalling;
+    public static final Potion CONDUIT_POWER = ExtraEffects.conduitPower;
+    public static final Potion DOLPHINS_GRACE = ExtraEffects.dolphinsGrace;
+    public static final Potion BAD_OMEN = ExtraEffects.badOmen;
+    public static final Potion HERO_OF_THE_VILLAGE = ExtraEffects.luck;
+    public static final Potion DARKNESS = ExtraEffects.darkness;
+
+    private MobEffects() {}
+}
+//// FILE: forge/client/extensions/common/IClientMobEffectExtensions.java
+package net.mcreator.boh.compat.forge.client.extensions.common;
+
+import net.minecraft.potion.PotionEffect;
+
+/** 1.20 IClientMobEffectExtensions: only the visibility flags are honoured. */
+public interface IClientMobEffectExtensions {
+
+    default boolean isVisibleInInventory(PotionEffect effect) {
+        return true;
+    }
+
+    default boolean isVisibleInGui(PotionEffect effect) {
+        return true;
+    }
+
+    default boolean renderInventoryText(PotionEffect instance, Object screen, Object guiGraphics, int x, int y, int blitOffset) {
+        return false;
+    }
+
+    default boolean renderInventoryIcon(PotionEffect instance, Object screen, Object guiGraphics, int x, int y, int blitOffset) {
+        return false;
+    }
+
+    default boolean renderGuiIcon(PotionEffect instance, Object gui, Object guiGraphics, int x, int y, float z, float alpha) {
+        return false;
+    }
+}
+//// FILE: mc/world/entity/ai/attributes/Operation.java
+package net.mcreator.boh.compat.mc.world.entity.ai.attributes;
+
+/** 1.20 AttributeModifier.Operation; ordinal matches the 1.7.10 operation int. */
+public enum Operation {
+    ADDITION,
+    MULTIPLY_BASE,
+    MULTIPLY_TOTAL
+}

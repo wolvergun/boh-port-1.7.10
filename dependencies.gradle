@@ -1,7 +1,0 @@
-/*
- * Add your dependencies here. See https://github.com/GTNewHorizons/ExampleMod1.7.10 for the supported configurations.
- */
-dependencies {
-    // @Nullable annotations used throughout the port
-    compileOnly("com.google.code.findbugs:jsr305:3.0.2")
-}

@@ -1,4 +1,4 @@
-* text eol=lf
+* text=auto eol=lf
 
 *.[jJ][aA][rR]          binary
 
@@ -44,3 +44,5 @@
 *[aA][uU][tT][oO][gG][eE][nN][eE][rR][aA][tT][eE][dD]* binary
 *.[oO][gG][gG]          binary
 *.nbt                   binary
+*.dat                   binary
+*.mcmeta                text

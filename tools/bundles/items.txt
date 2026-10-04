@@ -1,0 +1,946 @@
+//// FILE: mc/world/item/Rarity.java
+package net.mcreator.boh.compat.mc.world.item;
+
+import net.minecraft.item.EnumRarity;
+
+public enum Rarity {
+
+    COMMON(EnumRarity.common),
+    UNCOMMON(EnumRarity.uncommon),
+    RARE(EnumRarity.rare),
+    EPIC(EnumRarity.epic);
+
+    private final EnumRarity legacy;
+
+    Rarity(EnumRarity legacy) {
+        this.legacy = legacy;
+    }
+
+    public EnumRarity toVanilla() {
+        return legacy;
+    }
+}
+//// FILE: mc/world/item/UseAnim.java
+package net.mcreator.boh.compat.mc.world.item;
+
+import net.minecraft.item.EnumAction;
+
+public enum UseAnim {
+
+    NONE(EnumAction.none),
+    EAT(EnumAction.eat),
+    DRINK(EnumAction.drink),
+    BLOCK(EnumAction.block),
+    BOW(EnumAction.bow),
+    SPEAR(EnumAction.bow),
+    CROSSBOW(EnumAction.bow),
+    SPYGLASS(EnumAction.none),
+    TOOT_HORN(EnumAction.none),
+    BRUSH(EnumAction.none);
+
+    private final EnumAction legacy;
+
+    UseAnim(EnumAction legacy) {
+        this.legacy = legacy;
+    }
+
+    public EnumAction toVanilla() {
+        return legacy;
+    }
+}
+//// FILE: mc/world/item/TooltipFlag.java
+package net.mcreator.boh.compat.mc.world.item;
+
+public interface TooltipFlag {
+
+    TooltipFlag NORMAL = () -> false;
+    TooltipFlag ADVANCED = () -> true;
+
+    boolean isAdvanced();
+}
+//// FILE: mc/world/item/Properties.java
+package net.mcreator.boh.compat.mc.world.item;
+
+import net.mcreator.boh.compat.mc.world.food.FoodProperties;
+import net.minecraft.item.Item;
+
+/** 1.20 Item.Properties. */
+public class Properties {
+
+    public int maxStackSize = 64;
+    public int maxDamage;
+    public Rarity rarity = Rarity.COMMON;
+    public FoodProperties food;
+    public boolean fireResistant;
+    public Item craftingRemainder;
+    public boolean canRepair = true;
+
+    public Properties stacksTo(int n) {
+        maxStackSize = n;
+        return this;
+    }
+
+    public Properties durability(int d) {
+        maxDamage = d;
+        maxStackSize = 1;
+        return this;
+    }
+
+    public Properties defaultDurability(int d) {
+        if (maxDamage == 0) durability(d);
+        return this;
+    }
+
+    public Properties rarity(Rarity r) {
+        rarity = r;
+        return this;
+    }
+
+    public Properties food(FoodProperties f) {
+        food = f;
+        return this;
+    }
+
+    public Properties fireResistant() {
+        fireResistant = true;
+        return this;
+    }
+
+    public Properties craftRemainder(Item item) {
+        craftingRemainder = item;
+        return this;
+    }
+
+    public Properties setNoRepair() {
+        canRepair = false;
+        return this;
+    }
+}
+//// FILE: mc/world/item/Tier.java
+package net.mcreator.boh.compat.mc.world.item;
+
+import net.mcreator.boh.compat.mc.world.item.crafting.Ingredient;
+
+/** 1.20 Tier (tool material). */
+public interface Tier {
+
+    int getUses();
+
+    float getSpeed();
+
+    float getAttackDamageBonus();
+
+    int getLevel();
+
+    int getEnchantmentValue();
+
+    Ingredient getRepairIngredient();
+}
+//// FILE: mc/world/item/Type.java
+package net.mcreator.boh.compat.mc.world.item;
+
+import net.mcreator.boh.compat.mc.world.entity.EquipmentSlot;
+
+/** 1.20 ArmorItem.Type. */
+public enum Type {
+
+    HELMET(EquipmentSlot.HEAD, "helmet"),
+    CHESTPLATE(EquipmentSlot.CHEST, "chestplate"),
+    LEGGINGS(EquipmentSlot.LEGS, "leggings"),
+    BOOTS(EquipmentSlot.FEET, "boots");
+
+    private final EquipmentSlot slot;
+    private final String name;
+
+    Type(EquipmentSlot slot, String name) {
+        this.slot = slot;
+        this.name = name;
+    }
+
+    public EquipmentSlot getSlot() {
+        return slot;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    /** 1.7.10 armorType index (0 helmet .. 3 boots). */
+    public int legacyArmorType() {
+        return ordinal();
+    }
+}
+//// FILE: mc/world/item/ArmorMaterial.java
+package net.mcreator.boh.compat.mc.world.item;
+
+import net.mcreator.boh.compat.mc.sounds.SoundEvent;
+import net.mcreator.boh.compat.mc.world.item.crafting.Ingredient;
+
+/** 1.20 ArmorMaterial. */
+public interface ArmorMaterial {
+
+    int getDurabilityForType(Type type);
+
+    int getDefenseForType(Type type);
+
+    int getEnchantmentValue();
+
+    SoundEvent getEquipSound();
+
+    Ingredient getRepairIngredient();
+
+    String getName();
+
+    float getToughness();
+
+    float getKnockbackResistance();
+}
+//// FILE: item/BohItem.java
+package net.mcreator.boh.compat.item;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import net.mcreator.boh.compat.M;
+import net.mcreator.boh.compat.client.ItemModels;
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.core.Direction;
+import net.mcreator.boh.compat.mc.network.chat.Component;
+import net.mcreator.boh.compat.mc.world.InteractionHand;
+import net.mcreator.boh.compat.mc.world.InteractionResult;
+import net.mcreator.boh.compat.mc.world.InteractionResultHolder;
+import net.mcreator.boh.compat.mc.world.entity.EquipmentSlot;
+import net.mcreator.boh.compat.mc.world.food.FoodProperties;
+import net.mcreator.boh.compat.mc.world.item.Properties;
+import net.mcreator.boh.compat.mc.world.item.TooltipFlag;
+import net.mcreator.boh.compat.mc.world.item.UseAnim;
+import net.mcreator.boh.compat.mc.world.item.context.UseOnContext;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.mcreator.boh.compat.mc.world.phys.Vec3;
+import net.minecraft.block.Block;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.IAttribute;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumAction;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+
+/** Compat base for mod items: 1.20 Item hooks bridged onto the 1.7.10 Item callbacks. */
+public class BohItem extends Item {
+
+    protected final Properties properties;
+    protected ResourceLocation registryName;
+
+    public BohItem(Properties properties) {
+        this.properties = properties == null ? new Properties() : properties;
+        setMaxStackSize(this.properties.maxStackSize);
+        if (this.properties.maxDamage > 0) setMaxDamage(this.properties.maxDamage);
+        if (!this.properties.canRepair) setNoRepair();
+        if (this.properties.craftingRemainder != null) setContainerItem(this.properties.craftingRemainder);
+    }
+
+    public void onRegistered(ResourceLocation id) {
+        registryName = id;
+        setTextureName(ItemModels.iconFor(id));
+    }
+
+    public ResourceLocation registryName() {
+        return registryName;
+    }
+
+    public FoodProperties food() {
+        return properties.food;
+    }
+
+    // ------------------------------------------------------------------ 1.20 hooks
+
+    public InteractionResultHolder<ItemStack> use(World world, EntityPlayer player, InteractionHand hand) {
+        ItemStack stack = M.getItemInHand(player, hand);
+        if (properties.food != null) {
+            if (player.canEat(properties.food.canAlwaysEat())) {
+                M.startUsingItem(player, hand);
+                return InteractionResultHolder.consume(stack);
+            }
+            return InteractionResultHolder.fail(stack);
+        }
+        return InteractionResultHolder.pass(stack);
+    }
+
+    public InteractionResult useOn(UseOnContext context) {
+        return InteractionResult.PASS;
+    }
+
+    public InteractionResult interactLivingEntity(ItemStack stack, EntityPlayer player, EntityLivingBase target, InteractionHand hand) {
+        return InteractionResult.PASS;
+    }
+
+    public boolean hurtEnemy(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
+        return false;
+    }
+
+    public boolean mineBlock(ItemStack stack, World world, BlockState state, BlockPos pos, EntityLivingBase miner) {
+        return false;
+    }
+
+    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {}
+
+    public Multimap<IAttribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot slot) {
+        return HashMultimap.create();
+    }
+
+    public float getDestroySpeed(ItemStack stack, BlockState state) {
+        return 1.0F;
+    }
+
+    public int getUseDuration(ItemStack stack) {
+        if (properties.food != null) return properties.food.isFastFood() ? 16 : 32;
+        return 0;
+    }
+
+    public UseAnim getUseAnimation(ItemStack stack) {
+        return properties.food != null ? UseAnim.EAT : UseAnim.NONE;
+    }
+
+    public void appendHoverText(ItemStack stack, World world, List<Component> list, TooltipFlag flag) {}
+
+    public int getEnchantmentValue() {
+        return 0;
+    }
+
+    public boolean onEntitySwing(ItemStack stack, EntityLivingBase entity) {
+        return false;
+    }
+
+    public void releaseUsing(ItemStack stack, World world, EntityLivingBase entity, int timeLeft) {}
+
+    public ItemStack finishUsingItem(ItemStack stack, World world, EntityLivingBase entity) {
+        if (properties.food != null && entity instanceof EntityPlayer) {
+            EntityPlayer p = (EntityPlayer) entity;
+            p.getFoodStats().addStats(properties.food.getNutrition(), properties.food.getSaturationModifier());
+            world.playSoundAtEntity(p, "random.burp", 0.5F, world.rand.nextFloat() * 0.1F + 0.9F);
+            if (!world.isRemote) for (Object[] e : properties.food.getEffects()) {
+                @SuppressWarnings("unchecked")
+                Supplier<PotionEffect> s = (Supplier<PotionEffect>) e[0];
+                if (world.rand.nextFloat() < (Float) e[1]) p.addPotionEffect(s.get());
+            }
+            if (!p.capabilities.isCreativeMode) stack.stackSize--;
+        }
+        return M.stack(stack);
+    }
+
+    public void onUseTick(World world, EntityLivingBase entity, ItemStack stack, int count) {}
+
+    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
+        return true;
+    }
+
+    public boolean isFoil(ItemStack stack) {
+        return stack.isItemEnchanted();
+    }
+
+    public void initializeClient(Consumer<?> consumer) {}
+
+    public boolean canAttackBlock(BlockState state, World world, BlockPos pos, EntityPlayer player) {
+        return true;
+    }
+
+    public boolean isCorrectToolForDrops(BlockState state) {
+        return false;
+    }
+
+    public boolean isEnchantable(ItemStack stack) {
+        return getEnchantmentValue() > 0 && getItemStackLimit(stack) == 1;
+    }
+
+    // ------------------------------------------------------------------ 1.7.10 bridge
+
+    @Override
+    public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
+        InteractionResultHolder<ItemStack> r = use(world, player, InteractionHand.MAIN_HAND);
+        ItemStack out = r == null ? stack : r.getObject();
+        return M.legacy(out) == null && out != stack ? null : out == M.EMPTY ? null : out;
+    }
+
+    @Override
+    public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hx, float hy,
+        float hz) {
+        UseOnContext ctx = new UseOnContext(world, player, InteractionHand.MAIN_HAND, stack, new BlockPos(x, y, z),
+            Direction.from3DDataValue(side), new Vec3(x + hx, y + hy, z + hz));
+        InteractionResult r = useOn(ctx);
+        return r != null && r.consumesAction();
+    }
+
+    @Override
+    public boolean itemInteractionForEntity(ItemStack stack, EntityPlayer player, EntityLivingBase target) {
+        InteractionResult r = interactLivingEntity(stack, player, target, InteractionHand.MAIN_HAND);
+        return r != null && r.consumesAction();
+    }
+
+    @Override
+    public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
+        return hurtEnemy(stack, target, attacker);
+    }
+
+    @Override
+    public boolean onBlockDestroyed(ItemStack stack, World world, Block block, int x, int y, int z, EntityLivingBase miner) {
+        return mineBlock(stack, world, BlockState.of(block, world.getBlockMetadata(x, y, z)), new BlockPos(x, y, z), miner);
+    }
+
+    @Override
+    public void onUpdate(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
+        inventoryTick(stack, world, entity, slot, selected);
+    }
+
+    @Override
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public Multimap getAttributeModifiers(ItemStack stack) {
+        Multimap out = super.getAttributeModifiers(stack);
+        Multimap<IAttribute, AttributeModifier> mods = getDefaultAttributeModifiers(EquipmentSlot.MAINHAND);
+        for (java.util.Map.Entry<IAttribute, AttributeModifier> e : mods.entries())
+            out.put(e.getKey().getAttributeUnlocalizedName(), e.getValue());
+        return out;
+    }
+
+    @Override
+    public float getDigSpeed(ItemStack stack, Block block, int meta) {
+        return getDestroySpeed(stack, BlockState.of(block, meta));
+    }
+
+    @Override
+    public int getMaxItemUseDuration(ItemStack stack) {
+        return getUseDuration(stack);
+    }
+
+    @Override
+    public EnumAction getItemUseAction(ItemStack stack) {
+        UseAnim a = getUseAnimation(stack);
+        return a == null ? EnumAction.none : a.toVanilla();
+    }
+
+    @Override
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean advanced) {
+        List<Component> comps = new ArrayList<>();
+        appendHoverText(stack, player == null ? null : player.worldObj, comps, advanced ? TooltipFlag.ADVANCED : TooltipFlag.NORMAL);
+        for (Component c : comps) list.add(c.getFormattedText());
+    }
+
+    @Override
+    public int getItemEnchantability() {
+        return getEnchantmentValue();
+    }
+
+    @Override
+    public boolean onEntitySwing(EntityLivingBase entity, ItemStack stack) {
+        return onEntitySwing(stack, entity);
+    }
+
+    @Override
+    public void onPlayerStoppedUsing(ItemStack stack, World world, EntityPlayer player, int timeLeft) {
+        releaseUsing(stack, world, player, timeLeft);
+    }
+
+    @Override
+    public ItemStack onEaten(ItemStack stack, World world, EntityPlayer player) {
+        return M.legacy(finishUsingItem(stack, world, player));
+    }
+
+    @Override
+    public void onUsingTick(ItemStack stack, EntityPlayer player, int count) {
+        onUseTick(player.worldObj, player, stack, count);
+    }
+
+    @Override
+    public EnumRarity getRarity(ItemStack stack) {
+        return properties.rarity.toVanilla();
+    }
+
+    @Override
+    public boolean hasEffect(ItemStack stack, int pass) {
+        return isFoil(stack);
+    }
+
+    @Override
+    public boolean canHarvestBlock(Block block, ItemStack stack) {
+        return isCorrectToolForDrops(BlockState.of(block, 0));
+    }
+
+    @Override
+    public boolean isItemTool(ItemStack stack) {
+        return isEnchantable(stack);
+    }
+
+    @Override
+    public void registerIcons(IIconRegister reg) {
+        itemIcon = reg.registerIcon(getIconString());
+    }
+}
+//// FILE: item/BohBlockItem.java
+package net.mcreator.boh.compat.item;
+
+import net.minecraft.block.Block;
+import net.minecraft.item.ItemBlock;
+
+/** ItemBlock used for every mod block (1.7.10 registers the block and its item together). */
+public class BohBlockItem extends ItemBlock {
+
+    public BohBlockItem(Block block) {
+        super(block);
+    }
+
+    public BohBlockItem(Block block, net.mcreator.boh.compat.mc.world.item.Properties properties) {
+        super(block);
+        if (properties != null) setMaxStackSize(properties.maxStackSize);
+    }
+}
+//// FILE: mc/world/item/SwordItem.java
+package net.mcreator.boh.compat.mc.world.item;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+
+import net.mcreator.boh.compat.item.BohItem;
+import net.mcreator.boh.compat.mc.world.entity.EquipmentSlot;
+import net.mcreator.boh.compat.mc.world.entity.ai.attributes.Attributes;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.IAttribute;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
+
+/** 1.20 SwordItem. */
+public class SwordItem extends BohItem {
+
+    protected final Tier tier;
+    private final float attackDamage;
+
+    public SwordItem(Tier tier, int damage, float speed, Properties props) {
+        super(props.durability(tier.getUses()));
+        this.tier = tier;
+        this.attackDamage = damage + tier.getAttackDamageBonus();
+    }
+
+    public Tier getTier() {
+        return tier;
+    }
+
+    public float getDamage() {
+        return attackDamage;
+    }
+
+    @Override
+    public float getDestroySpeed(ItemStack stack, BlockState state) {
+        return state.getBlock() == Blocks.web ? 15.0F : 1.0F;
+    }
+
+    @Override
+    public boolean hurtEnemy(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
+        stack.damageItem(1, attacker);
+        return true;
+    }
+
+    @Override
+    public boolean isCorrectToolForDrops(BlockState state) {
+        return state.getBlock() == Blocks.web;
+    }
+
+    @Override
+    public int getEnchantmentValue() {
+        return tier.getEnchantmentValue();
+    }
+
+    @Override
+    public Multimap<IAttribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot slot) {
+        Multimap<IAttribute, AttributeModifier> m = HashMultimap.create();
+        if (slot == EquipmentSlot.MAINHAND)
+            m.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(field_111210_e, "Weapon modifier", attackDamage, 0));
+        return m;
+    }
+
+    @Override
+    public boolean isFull3D() {
+        return true;
+    }
+}
+//// FILE: mc/world/item/PickaxeItem.java
+package net.mcreator.boh.compat.mc.world.item;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+
+import net.mcreator.boh.compat.item.BohItem;
+import net.mcreator.boh.compat.mc.world.entity.EquipmentSlot;
+import net.mcreator.boh.compat.mc.world.entity.ai.attributes.Attributes;
+import net.mcreator.boh.compat.mc.world.level.block.state.BlockState;
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.IAttribute;
+import net.minecraft.item.ItemStack;
+
+/** 1.20 PickaxeItem. */
+public class PickaxeItem extends BohItem {
+
+    protected final Tier tier;
+    private final float attackDamage;
+
+    public PickaxeItem(Tier tier, int damage, float speed, Properties props) {
+        super(props.durability(tier.getUses()));
+        this.tier = tier;
+        this.attackDamage = damage + tier.getAttackDamageBonus();
+        setHarvestLevel("pickaxe", tier.getLevel());
+    }
+
+    @Override
+    public float getDestroySpeed(ItemStack stack, BlockState state) {
+        Material m = state.getBlock().getMaterial();
+        return m == Material.rock || m == Material.iron || m == Material.anvil ? tier.getSpeed() : 1.0F;
+    }
+
+    @Override
+    public boolean isCorrectToolForDrops(BlockState state) {
+        return state.getBlock().getHarvestLevel(state.meta()) <= tier.getLevel();
+    }
+
+    @Override
+    public boolean hurtEnemy(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
+        stack.damageItem(2, attacker);
+        return true;
+    }
+
+    @Override
+    public int getEnchantmentValue() {
+        return tier.getEnchantmentValue();
+    }
+
+    @Override
+    public Multimap<IAttribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot slot) {
+        Multimap<IAttribute, AttributeModifier> m = HashMultimap.create();
+        if (slot == EquipmentSlot.MAINHAND)
+            m.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(field_111210_e, "Tool modifier", attackDamage, 0));
+        return m;
+    }
+
+    @Override
+    public boolean isFull3D() {
+        return true;
+    }
+}
+//// FILE: mc/world/item/ArmorItem.java
+package net.mcreator.boh.compat.mc.world.item;
+
+import net.mcreator.boh.compat.item.BohItem;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.DamageSource;
+import net.minecraftforge.common.ISpecialArmor;
+
+/** 1.20 ArmorItem as a 1.7.10 ISpecialArmor (armor points from the material, any slot type). */
+public class ArmorItem extends BohItem implements ISpecialArmor {
+
+    protected final ArmorMaterial material;
+    protected final Type type;
+
+    public ArmorItem(ArmorMaterial material, Type type, Properties props) {
+        super(props.durability(material.getDurabilityForType(type)));
+        this.material = material;
+        this.type = type;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public ArmorMaterial getMaterial() {
+        return material;
+    }
+
+    public int getDefense() {
+        return material.getDefenseForType(type);
+    }
+
+    @Override
+    public boolean isValidArmor(ItemStack stack, int armorType, Entity entity) {
+        return armorType == type.legacyArmorType();
+    }
+
+    @Override
+    public ArmorProperties getProperties(EntityLivingBase player, ItemStack armor, DamageSource source, double damage, int slot) {
+        if (source.isUnblockable()) return new ArmorProperties(0, 0, 0);
+        return new ArmorProperties(0, getDefense() / 25.0, Integer.MAX_VALUE);
+    }
+
+    @Override
+    public int getArmorDisplay(EntityPlayer player, ItemStack armor, int slot) {
+        return getDefense();
+    }
+
+    @Override
+    public void damageArmor(EntityLivingBase entity, ItemStack stack, DamageSource source, int damage, int slot) {
+        stack.damageItem(damage, entity);
+    }
+
+    @Override
+    public int getEnchantmentValue() {
+        return material.getEnchantmentValue();
+    }
+
+    @Override
+    public String getArmorTexture(ItemStack stack, Entity entity, int slot, String type) {
+        return net.mcreator.boh.compat.client.ItemModels.armorTexture(this, stack, slot, type);
+    }
+}
+//// FILE: mc/world/item/RecordItem.java
+package net.mcreator.boh.compat.mc.world.item;
+
+import java.util.function.Supplier;
+
+import net.mcreator.boh.compat.mc.sounds.SoundEvent;
+import net.minecraft.item.ItemRecord;
+import net.minecraft.util.ResourceLocation;
+
+/** 1.20 RecordItem on top of 1.7.10 {@link ItemRecord}, playing the mod's own disc sound. */
+public class RecordItem extends ItemRecord {
+
+    private final Supplier<SoundEvent> sound;
+
+    public RecordItem(int comparatorValue, Supplier<SoundEvent> sound, Properties props, int lengthInTicks) {
+        super("boh_" + Integer.toHexString(System.identityHashCode(sound)));
+        this.sound = sound;
+        setMaxStackSize(1);
+    }
+
+    @Override
+    public ResourceLocation getRecordResource(String name) {
+        SoundEvent s = sound.get();
+        return s == null ? super.getRecordResource(name) : new ResourceLocation(s.legacyName());
+    }
+
+    @Override
+    public String getRecordNameLocal() {
+        return net.minecraft.util.StatCollector.translateToLocal(getUnlocalizedName() + ".desc");
+    }
+}
+//// FILE: forge/common/ForgeSpawnEggItem.java
+package net.mcreator.boh.compat.forge.common;
+
+import java.util.function.Supplier;
+
+import net.mcreator.boh.compat.item.BohItem;
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.world.InteractionResult;
+import net.mcreator.boh.compat.mc.world.entity.EntityType;
+import net.mcreator.boh.compat.mc.world.entity.MobSpawnType;
+import net.mcreator.boh.compat.mc.world.item.Properties;
+import net.mcreator.boh.compat.mc.world.item.context.UseOnContext;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.StatCollector;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+/** 1.20 ForgeSpawnEggItem with the vanilla two-layer egg icon tinted by the given colors. */
+public class ForgeSpawnEggItem extends BohItem {
+
+    private final Supplier<? extends EntityType<?>> type;
+    private final int primary, secondary;
+    private IIcon overlay;
+
+    public ForgeSpawnEggItem(Supplier<? extends EntityType<?>> type, int primary, int secondary, Properties props) {
+        super(props);
+        this.type = type;
+        this.primary = primary;
+        this.secondary = secondary;
+    }
+
+    public EntityType<?> getType(Object nbt) {
+        return type.get();
+    }
+
+    @Override
+    public void onRegistered(net.minecraft.util.ResourceLocation id) {
+        registryName = id;
+        setTextureName("spawn_egg");
+    }
+
+    @Override
+    public InteractionResult useOn(UseOnContext ctx) {
+        if (ctx.getLevel().isRemote) return InteractionResult.SUCCESS;
+        BlockPos pos = ctx.getClickedPos().relative(ctx.getClickedFace());
+        Entity e = type.get().spawn(ctx.getLevel(), pos, MobSpawnType.SPAWN_EGG);
+        if (e instanceof EntityLiving && ctx.getItemInHand().hasDisplayName())
+            ((EntityLiving) e).setCustomNameTag(ctx.getItemInHand().getDisplayName());
+        if (e != null && ctx.getPlayer() != null && !ctx.getPlayer().capabilities.isCreativeMode) ctx.getItemInHand().stackSize--;
+        return InteractionResult.CONSUME;
+    }
+
+    @Override
+    public String getItemStackDisplayName(ItemStack stack) {
+        String key = getUnlocalizedName() + ".name";
+        return StatCollector.canTranslate(key) ? StatCollector.translateToLocal(key) : super.getItemStackDisplayName(stack);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean requiresMultipleRenderPasses() {
+        return true;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public int getColorFromItemStack(ItemStack stack, int pass) {
+        return pass == 0 ? primary : secondary;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public IIcon getIconFromDamageForRenderPass(int damage, int pass) {
+        return pass > 0 ? overlay : super.getIconFromDamageForRenderPass(damage, pass);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(IIconRegister reg) {
+        itemIcon = reg.registerIcon("spawn_egg");
+        overlay = reg.registerIcon("spawn_egg_overlay");
+    }
+}
+//// FILE: mc/world/item/context/UseOnContext.java
+package net.mcreator.boh.compat.mc.world.item.context;
+
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.core.Direction;
+import net.mcreator.boh.compat.mc.world.InteractionHand;
+import net.mcreator.boh.compat.mc.world.phys.BlockHitResult;
+import net.mcreator.boh.compat.mc.world.phys.Vec3;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+
+/** 1.20 UseOnContext. */
+public class UseOnContext {
+
+    protected final World level;
+    protected final EntityPlayer player;
+    protected final InteractionHand hand;
+    protected final ItemStack stack;
+    protected final BlockPos pos;
+    protected final Direction face;
+    protected final Vec3 location;
+
+    public UseOnContext(World level, EntityPlayer player, InteractionHand hand, ItemStack stack, BlockPos pos, Direction face,
+        Vec3 location) {
+        this.level = level;
+        this.player = player;
+        this.hand = hand;
+        this.stack = stack;
+        this.pos = pos;
+        this.face = face;
+        this.location = location;
+    }
+
+    public World getLevel() {
+        return level;
+    }
+
+    public EntityPlayer getPlayer() {
+        return player;
+    }
+
+    public InteractionHand getHand() {
+        return hand;
+    }
+
+    public ItemStack getItemInHand() {
+        return net.mcreator.boh.compat.M.stack(stack);
+    }
+
+    public BlockPos getClickedPos() {
+        return pos;
+    }
+
+    public Direction getClickedFace() {
+        return face;
+    }
+
+    public Vec3 getClickLocation() {
+        return location;
+    }
+
+    public BlockHitResult getHitResult() {
+        return new BlockHitResult(location, face, pos, false);
+    }
+
+    public Direction getHorizontalDirection() {
+        return player == null ? Direction.NORTH : Direction.fromYRot(player.rotationYaw);
+    }
+
+    public float getRotation() {
+        return player == null ? 0 : player.rotationYaw;
+    }
+
+    public boolean isSecondaryUseActive() {
+        return player != null && player.isSneaking();
+    }
+
+    public boolean isInside() {
+        return false;
+    }
+}
+//// FILE: mc/world/item/context/BlockPlaceContext.java
+package net.mcreator.boh.compat.mc.world.item.context;
+
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.mcreator.boh.compat.mc.core.Direction;
+import net.mcreator.boh.compat.mc.world.InteractionHand;
+import net.mcreator.boh.compat.mc.world.phys.Vec3;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+
+/** 1.20 BlockPlaceContext: clicked position is the placement position. */
+public class BlockPlaceContext extends UseOnContext {
+
+    public BlockPlaceContext(World level, EntityPlayer player, InteractionHand hand, ItemStack stack, BlockPos placePos, Direction face,
+        Vec3 location) {
+        super(level, player, hand, stack, placePos, face, location);
+    }
+
+    public Direction getNearestLookingDirection() {
+        if (player == null) return Direction.NORTH;
+        if (player.rotationPitch < -60) return Direction.UP;
+        if (player.rotationPitch > 60) return Direction.DOWN;
+        return getHorizontalDirection();
+    }
+
+    public Direction[] getNearestLookingDirections() {
+        return new Direction[] { getNearestLookingDirection() };
+    }
+
+    public boolean canPlace() {
+        return level.isAirBlock(pos.getX(), pos.getY(), pos.getZ()) || level.getBlock(pos.getX(), pos.getY(), pos.getZ())
+            .isReplaceable(level, pos.getX(), pos.getY(), pos.getZ());
+    }
+
+    public boolean replacingClickedOnBlock() {
+        return false;
+    }
+}

@@ -1,0 +1,371 @@
+//// FILE: mc/world/entity/ai/goal/RandomLookAroundGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal;
+
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.ai.EntityAILookIdle;
+
+public class RandomLookAroundGoal extends WrappedGoal {
+
+    protected final EntityLiving mob;
+
+    public RandomLookAroundGoal(EntityLiving mob) {
+        super(new EntityAILookIdle(mob));
+        this.mob = mob;
+    }
+}
+//// FILE: mc/world/entity/ai/goal/FloatGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal;
+
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.ai.EntityAISwimming;
+
+public class FloatGoal extends WrappedGoal {
+
+    protected final EntityLiving mob;
+
+    public FloatGoal(EntityLiving mob) {
+        super(new EntityAISwimming(mob));
+        this.mob = mob;
+    }
+}
+//// FILE: mc/world/entity/ai/goal/PanicGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal;
+
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.ai.EntityAIPanic;
+
+public class PanicGoal extends WrappedGoal {
+
+    protected final EntityCreature mob;
+    protected final double speedModifier;
+
+    public PanicGoal(EntityCreature mob, double speed) {
+        super(new EntityAIPanic(mob, speed));
+        this.mob = mob;
+        this.speedModifier = speed;
+    }
+}
+//// FILE: mc/world/entity/ai/goal/WaterAvoidingRandomStrollGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal;
+
+import net.mcreator.boh.compat.mc.world.phys.Vec3;
+import net.minecraft.entity.EntityCreature;
+
+public class WaterAvoidingRandomStrollGoal extends RandomStrollGoal {
+
+    public WaterAvoidingRandomStrollGoal(EntityCreature mob, double speed) {
+        super(mob, speed);
+    }
+
+    public WaterAvoidingRandomStrollGoal(EntityCreature mob, double speed, float probability) {
+        super(mob, speed);
+    }
+
+    @Override
+    protected Vec3 getPosition() {
+        if (mob.isInWater()) return super.getPosition();
+        for (int i = 0; i < 10; i++) {
+            Vec3 v = super.getPosition();
+            if (v == null) return null;
+            int x = (int) Math.floor(v.x), y = (int) Math.floor(v.y), z = (int) Math.floor(v.z);
+            if (!mob.worldObj.getBlock(x, y - 1, z).getMaterial().isLiquid()
+                && !mob.worldObj.getBlock(x, y, z).getMaterial().isLiquid()) return v;
+        }
+        return null;
+    }
+}
+//// FILE: mc/world/entity/ai/goal/RandomSwimmingGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal;
+
+import net.minecraft.entity.EntityCreature;
+
+public class RandomSwimmingGoal extends RandomStrollGoal {
+
+    public RandomSwimmingGoal(EntityCreature mob, double speed, int interval) {
+        super(mob, speed, interval);
+    }
+}
+//// FILE: mc/world/entity/ai/goal/BreakDoorGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal;
+
+import java.util.function.Predicate;
+
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.ai.EntityAIBreakDoor;
+
+public class BreakDoorGoal extends WrappedGoal {
+
+    protected final EntityLiving mob;
+
+    public BreakDoorGoal(EntityLiving mob, Predicate<?> validDifficulties) {
+        super(new EntityAIBreakDoor(mob));
+        this.mob = mob;
+        mob.getNavigator().setBreakDoors(true);
+    }
+
+    public BreakDoorGoal(EntityLiving mob, int doorBreakTime, Predicate<?> validDifficulties) {
+        this(mob, validDifficulties);
+    }
+}
+//// FILE: mc/world/entity/ai/goal/OpenDoorGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal;
+
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.ai.EntityAIOpenDoor;
+
+public class OpenDoorGoal extends WrappedGoal {
+
+    public OpenDoorGoal(EntityLiving mob, boolean closeDoor) {
+        super(new EntityAIOpenDoor(mob, closeDoor));
+        mob.getNavigator().setEnterDoors(true);
+    }
+}
+//// FILE: mc/world/entity/ai/goal/MoveBackToVillageGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal;
+
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.ai.EntityAIMoveThroughVillage;
+
+public class MoveBackToVillageGoal extends WrappedGoal {
+
+    public MoveBackToVillageGoal(EntityCreature mob, double speed, boolean checkNoActionTime) {
+        super(new EntityAIMoveThroughVillage(mob, speed, false));
+    }
+}
+//// FILE: mc/world/entity/ai/goal/LookAtPlayerGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal;
+
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.ai.EntityAIWatchClosest;
+
+public class LookAtPlayerGoal extends WrappedGoal {
+
+    protected final EntityLiving mob;
+
+    public LookAtPlayerGoal(EntityLiving mob, Class<?> lookAtType, float lookDistance) {
+        super(new EntityAIWatchClosest(mob, lookAtType, lookDistance));
+        this.mob = mob;
+    }
+
+    public LookAtPlayerGoal(EntityLiving mob, Class<?> lookAtType, float lookDistance, float probability) {
+        super(new EntityAIWatchClosest(mob, lookAtType, lookDistance, probability));
+        this.mob = mob;
+    }
+
+    public LookAtPlayerGoal(EntityLiving mob, Class<?> lookAtType, float lookDistance, float probability,
+        boolean onlyHorizontal) {
+        this(mob, lookAtType, lookDistance, probability);
+    }
+}
+//// FILE: mc/world/entity/ai/goal/AvoidEntityGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal;
+
+import java.util.function.Predicate;
+
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.ai.EntityAIAvoidEntity;
+
+public class AvoidEntityGoal<T> extends WrappedGoal {
+
+    protected final EntityCreature mob;
+
+    public AvoidEntityGoal(EntityCreature mob, Class<T> avoidClass, float maxDist, double walkSpeed, double sprintSpeed) {
+        super(new EntityAIAvoidEntity(mob, avoidClass, maxDist, walkSpeed, sprintSpeed));
+        this.mob = mob;
+    }
+
+    public AvoidEntityGoal(EntityCreature mob, Class<T> avoidClass, float maxDist, double walkSpeed, double sprintSpeed,
+        Predicate<?> predicate) {
+        this(mob, avoidClass, maxDist, walkSpeed, sprintSpeed);
+    }
+}
+//// FILE: mc/world/entity/ai/goal/RestrictSunGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal;
+
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.ai.EntityAIRestrictSun;
+
+public class RestrictSunGoal extends WrappedGoal {
+
+    public RestrictSunGoal(EntityCreature mob) {
+        super(new EntityAIRestrictSun(mob));
+    }
+}
+//// FILE: mc/world/entity/ai/goal/LeapAtTargetGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal;
+
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.ai.EntityAILeapAtTarget;
+
+public class LeapAtTargetGoal extends WrappedGoal {
+
+    public LeapAtTargetGoal(EntityLiving mob, float yd) {
+        super(new EntityAILeapAtTarget(mob, yd));
+    }
+}
+//// FILE: mc/world/entity/ai/goal/FollowParentGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal;
+
+import net.minecraft.entity.ai.EntityAIFollowParent;
+import net.minecraft.entity.passive.EntityAnimal;
+
+public class FollowParentGoal extends WrappedGoal {
+
+    public FollowParentGoal(EntityAnimal animal, double speed) {
+        super(new EntityAIFollowParent(animal, speed));
+    }
+}
+//// FILE: mc/world/entity/ai/goal/EatBlockGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal;
+
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.ai.EntityAIEatGrass;
+
+public class EatBlockGoal extends WrappedGoal {
+
+    public EatBlockGoal(EntityLiving mob) {
+        super(new EntityAIEatGrass(mob));
+    }
+}
+//// FILE: mc/world/entity/ai/goal/BreedGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal;
+
+import net.minecraft.entity.ai.EntityAIMate;
+import net.minecraft.entity.passive.EntityAnimal;
+
+public class BreedGoal extends WrappedGoal {
+
+    public BreedGoal(EntityAnimal animal, double speed) {
+        super(new EntityAIMate(animal, speed));
+    }
+}
+//// FILE: mc/world/entity/ai/goal/FollowOwnerGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal;
+
+import net.minecraft.entity.ai.EntityAIFollowOwner;
+import net.minecraft.entity.passive.EntityTameable;
+
+public class FollowOwnerGoal extends WrappedGoal {
+
+    protected final EntityTameable tamable;
+
+    public FollowOwnerGoal(EntityTameable tamable, double speed, float startDistance, float stopDistance, boolean canFly) {
+        super(new EntityAIFollowOwner(tamable, speed, startDistance, stopDistance));
+        this.tamable = tamable;
+    }
+}
+//// FILE: mc/world/entity/ai/goal/TemptGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal;
+
+import net.mcreator.boh.compat.mc.world.item.crafting.Ingredient;
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.ai.EntityAITempt;
+
+public class TemptGoal extends WrappedGoal {
+
+    public TemptGoal(EntityCreature mob, double speed, Ingredient items, boolean canScare) {
+        super(new EntityAITempt(mob, speed, items.firstItem(), canScare));
+    }
+}
+//// FILE: mc/world/entity/ai/goal/RangedAttackGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal;
+
+import net.minecraft.entity.IRangedAttackMob;
+import net.minecraft.entity.ai.EntityAIArrowAttack;
+
+public class RangedAttackGoal extends WrappedGoal {
+
+    public RangedAttackGoal(IRangedAttackMob mob, double speed, int interval, float radius) {
+        super(new EntityAIArrowAttack(mob, speed, interval, interval, radius));
+    }
+
+    public RangedAttackGoal(IRangedAttackMob mob, double speed, int minInterval, int maxInterval, float radius) {
+        super(new EntityAIArrowAttack(mob, speed, minInterval, maxInterval, radius));
+    }
+}
+//// FILE: mc/world/entity/ai/goal/target/OwnerHurtTargetGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal.target;
+
+import net.mcreator.boh.compat.mc.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.entity.ai.EntityAIOwnerHurtTarget;
+import net.minecraft.entity.passive.EntityTameable;
+
+public class OwnerHurtTargetGoal extends WrappedGoal {
+
+    public OwnerHurtTargetGoal(EntityTameable tamable) {
+        super(new EntityAIOwnerHurtTarget(tamable));
+    }
+}
+//// FILE: mc/world/entity/ai/goal/target/OwnerHurtByTargetGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal.target;
+
+import net.mcreator.boh.compat.mc.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.entity.ai.EntityAIOwnerHurtByTarget;
+import net.minecraft.entity.passive.EntityTameable;
+
+public class OwnerHurtByTargetGoal extends WrappedGoal {
+
+    public OwnerHurtByTargetGoal(EntityTameable tamable) {
+        super(new EntityAIOwnerHurtByTarget(tamable));
+    }
+}
+//// FILE: mc/world/entity/ai/goal/target/HurtByTargetGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal.target;
+
+import net.mcreator.boh.compat.mc.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.ai.EntityAIHurtByTarget;
+
+/** 1.20 HurtByTargetGoal; setAlertOthers() switches the vanilla task to call for help. */
+public class HurtByTargetGoal extends WrappedGoal {
+
+    protected final EntityCreature mob;
+
+    public HurtByTargetGoal(EntityCreature mob, Class<?>... toIgnoreDamage) {
+        super(new EntityAIHurtByTarget(mob, false));
+        this.mob = mob;
+    }
+
+    public HurtByTargetGoal setAlertOthers(Class<?>... reinforcementTypes) {
+        delegate = new EntityAIHurtByTarget(mob, true);
+        setMutexBits(delegate.getMutexBits());
+        return this;
+    }
+}
+//// FILE: mc/world/entity/ai/goal/target/NearestAttackableTargetGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal.target;
+
+import java.util.function.Predicate;
+
+import net.mcreator.boh.compat.mc.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
+
+public class NearestAttackableTargetGoal<T> extends WrappedGoal {
+
+    protected final EntityCreature mob;
+    protected final Class<T> targetType;
+
+    public NearestAttackableTargetGoal(EntityCreature mob, Class<T> targetType, boolean mustSee) {
+        this(mob, targetType, 10, mustSee, false, null);
+    }
+
+    public NearestAttackableTargetGoal(EntityCreature mob, Class<T> targetType, boolean mustSee, boolean mustReach) {
+        this(mob, targetType, 10, mustSee, mustReach, null);
+    }
+
+    public NearestAttackableTargetGoal(EntityCreature mob, Class<T> targetType, boolean mustSee,
+        Predicate<EntityLivingBase> predicate) {
+        this(mob, targetType, 10, mustSee, false, predicate);
+    }
+
+    public NearestAttackableTargetGoal(EntityCreature mob, Class<T> targetType, int randomInterval, boolean mustSee,
+        boolean mustReach, Predicate<EntityLivingBase> predicate) {
+        super(new EntityAINearestAttackableTarget(mob, targetType, randomInterval, mustSee, mustReach,
+            predicate == null ? null : (Entity e) -> e instanceof EntityLivingBase && predicate.test((EntityLivingBase) e)));
+        this.mob = mob;
+        this.targetType = targetType;
+    }
+}

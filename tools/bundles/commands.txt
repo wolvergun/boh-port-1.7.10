@@ -1,0 +1,309 @@
+//// FILE: command/ParticleNames.java
+package net.mcreator.boh.compat.command;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/** 1.20 particle ids -> nearest 1.7.10 particle names. */
+public final class ParticleNames {
+
+    private static final Map<String, String> MAP = new HashMap<>();
+
+    static {
+        String[][] m = { { "sweep_attack", "magicCrit" }, { "squid_ink", "largesmoke" }, { "poof", "explode" }, { "heart", "heart" },
+            { "happy_villager", "happyVillager" }, { "angry_villager", "angryVillager" }, { "smoke", "smoke" },
+            { "large_smoke", "largesmoke" }, { "flame", "flame" }, { "soul_fire_flame", "flame" }, { "soul", "depthsuspend" },
+            { "explosion", "largeexplode" }, { "explosion_emitter", "hugeexplosion" }, { "crit", "crit" },
+            { "enchanted_hit", "magicCrit" }, { "portal", "portal" }, { "witch", "witchMagic" }, { "note", "note" },
+            { "cloud", "cloud" }, { "lava", "lava" }, { "splash", "splash" }, { "bubble", "bubble" },
+            { "dripping_water", "dripWater" }, { "dripping_lava", "dripLava" }, { "enchant", "enchantmenttable" },
+            { "ash", "townaura" }, { "white_ash", "townaura" }, { "end_rod", "fireworksSpark" }, { "firework", "fireworksSpark" },
+            { "effect", "spell" }, { "entity_effect", "mobSpell" }, { "instant_effect", "instantSpell" },
+            { "damage_indicator", "crit" }, { "item_snowball", "snowballpoof" }, { "snowflake", "snowshovel" },
+            { "campfire_cosy_smoke", "largesmoke" }, { "electric_spark", "fireworksSpark" }, { "glow", "happyVillager" },
+            { "sonic_boom", "largeexplode" }, { "sculk_soul", "depthsuspend" }, { "falling_water", "dripWater" },
+            { "landing_lava", "lava" }, { "mycelium", "townaura" } };
+        for (String[] p : m) MAP.put(p[0], p[1]);
+    }
+
+    private ParticleNames() {}
+
+    public static String legacy(String modern) {
+        String n = modern.startsWith("minecraft:") ? modern.substring(10) : modern;
+        String l = MAP.get(n);
+        return l != null ? l : n;
+    }
+}
+//// FILE: command/Summons.java
+package net.mcreator.boh.compat.command;
+
+import net.mcreator.boh.compat.entity.BohAreaEffectCloud;
+import net.mcreator.boh.compat.entity.BohLightningBolt;
+import net.mcreator.boh.compat.forge.registries.ForgeRegistries;
+import net.mcreator.boh.compat.mc.world.entity.EntityType;
+import net.mcreator.boh.compat.mc.world.phys.Vec3;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.item.EntityFireworkRocket;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
+
+/** Entity creation for the summon command, including the 1.20 NBT forms the mod uses. */
+public final class Summons {
+
+    private Summons() {}
+
+    public static Entity create(String id, World w, Vec3 p, String nbt) {
+        NBTTagCompound tag = null;
+        if (nbt != null && nbt.startsWith("{")) {
+            try {
+                NBTBase b = JsonToNBT.func_150315_a(nbt.replace("[I;", "["));
+                if (b instanceof NBTTagCompound) tag = (NBTTagCompound) b;
+            } catch (Exception ignored) {}
+        }
+        switch (id) {
+            case "minecraft:lightning_bolt":
+                return new BohLightningBolt(w, p.x, p.y, p.z);
+            case "minecraft:firework_rocket": {
+                ItemStack rocket = new ItemStack(Items.fireworks);
+                if (tag != null && tag.hasKey("FireworksItem")) {
+                    NBTTagCompound item = tag.getCompoundTag("FireworksItem");
+                    if (item.hasKey("tag")) rocket.setTagCompound(item.getCompoundTag("tag"));
+                }
+                EntityFireworkRocket r = new EntityFireworkRocket(w, p.x, p.y, p.z, rocket);
+                return r;
+            }
+            case "minecraft:area_effect_cloud":
+                return BohAreaEffectCloud.fromNbt(w, p, tag);
+            default: {
+                EntityType<?> type = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(id));
+                if (type == null) return null;
+                Entity e = type.create(w);
+                if (e == null) return null;
+                e.setLocationAndAngles(p.x, p.y, p.z, w.rand.nextFloat() * 360F, 0);
+                if (e instanceof EntityLiving) ((EntityLiving) e).onSpawnWithEgg(null);
+                return e;
+            }
+        }
+    }
+
+    /** 1.20 attribute ids -> 1.7.10 attribute names. */
+    public static String attributeName(String id) {
+        switch (id.replace("minecraft:", "")) {
+            case "generic.max_health":
+                return "generic.maxHealth";
+            case "generic.movement_speed":
+                return "generic.movementSpeed";
+            case "generic.attack_damage":
+                return "generic.attackDamage";
+            case "generic.follow_range":
+                return "generic.followRange";
+            case "generic.knockback_resistance":
+                return "generic.knockbackResistance";
+            case "generic.armor":
+                return "boh.armor";
+            case "generic.flying_speed":
+                return "boh.flyingSpeed";
+            case "generic.attack_knockback":
+                return "boh.attackKnockback";
+            default:
+                return id;
+        }
+    }
+}
+//// FILE: mc/commands/CommandSource.java
+package net.mcreator.boh.compat.mc.commands;
+
+/** 1.20 CommandSource; only NULL is used. */
+public interface CommandSource {
+
+    CommandSource NULL = new CommandSource() {};
+}
+//// FILE: mc/commands/CommandSourceStack.java
+package net.mcreator.boh.compat.mc.commands;
+
+import net.mcreator.boh.compat.command.CommandContext;
+import net.mcreator.boh.compat.mc.network.chat.Component;
+import net.mcreator.boh.compat.mc.world.phys.Vec2;
+import net.mcreator.boh.compat.mc.world.phys.Vec3;
+import net.minecraft.entity.Entity;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.World;
+
+/** 1.20 CommandSourceStack: everything the interpreter needs to run a command for a source. */
+public class CommandSourceStack {
+
+    private final Vec3 position;
+    private final Vec2 rotation;
+    private final World level;
+    private final int permission;
+    private final String name;
+    private final Component displayName;
+    private final MinecraftServer server;
+    private final Entity entity;
+    private boolean silent;
+
+    public CommandSourceStack(CommandSource source, Vec3 position, Vec2 rotation, World level, int permission, String name,
+        Component displayName, MinecraftServer server, Entity entity) {
+        this.position = position;
+        this.rotation = rotation;
+        this.level = level;
+        this.permission = permission;
+        this.name = name;
+        this.displayName = displayName;
+        this.server = server;
+        this.entity = entity;
+    }
+
+    public CommandSourceStack withSuppressedOutput() {
+        silent = true;
+        return this;
+    }
+
+    public CommandContext toContext() {
+        World w = level != null ? level : entity != null ? entity.worldObj : null;
+        return new CommandContext(w, entity, position, rotation == null ? 0 : rotation.y, rotation == null ? 0 : rotation.x, false);
+    }
+
+    public Entity getEntity() {
+        return entity;
+    }
+
+    public Vec3 getPosition() {
+        return position;
+    }
+
+    public Vec2 getRotation() {
+        return rotation;
+    }
+
+    public World getLevel() {
+        return level;
+    }
+
+    public World getUnsidedLevel() {
+        return level;
+    }
+
+    public MinecraftServer getServer() {
+        return server;
+    }
+
+    public String getTextName() {
+        return name;
+    }
+
+    public Component getDisplayName() {
+        return displayName;
+    }
+
+    public boolean hasPermission(int level) {
+        return permission >= level;
+    }
+
+    public void sendSuccess(java.util.function.Supplier<Component> msg, boolean broadcast) {
+        if (!silent && entity instanceof net.minecraft.entity.player.EntityPlayer)
+            ((net.minecraft.entity.player.EntityPlayer) entity).addChatComponentMessage(msg.get().toVanilla());
+    }
+
+    public void sendFailure(Component msg) {
+        if (entity instanceof net.minecraft.entity.player.EntityPlayer)
+            ((net.minecraft.entity.player.EntityPlayer) entity).addChatComponentMessage(msg.toVanilla());
+    }
+}
+//// FILE: mc/commands/Commands.java
+package net.mcreator.boh.compat.mc.commands;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import net.mcreator.boh.compat.command.Interpreter;
+import net.mcreator.boh.compat.mojang.brigadier.builder.LiteralArgumentBuilder;
+
+/** 1.20 Commands: runs 1.20-syntax command strings and builds literal commands. */
+public class Commands {
+
+    public static final Commands INSTANCE = new Commands();
+    public static final List<LiteralArgumentBuilder> REGISTERED = new ArrayList<>();
+
+    public int performPrefixedCommand(CommandSourceStack source, String command) {
+        return Interpreter.run(command, source.toContext());
+    }
+
+    public int performCommand(Object parsed, String command) {
+        return 0;
+    }
+
+    public static LiteralArgumentBuilder literal(String name) {
+        return LiteralArgumentBuilder.literal(name);
+    }
+
+    public Object getDispatcher() {
+        return this;
+    }
+
+    public void register(LiteralArgumentBuilder builder) {
+        REGISTERED.add(builder);
+    }
+}
+//// FILE: mojang/brigadier/builder/LiteralArgumentBuilder.java
+package net.mcreator.boh.compat.mojang.brigadier.builder;
+
+import java.util.function.Predicate;
+
+import net.mcreator.boh.compat.mc.commands.CommandSourceStack;
+
+/** Minimal brigadier literal: name + permission predicate + executor (registered as a 1.7.10 command). */
+public class LiteralArgumentBuilder {
+
+    @FunctionalInterface
+    public interface Executor {
+
+        int run(CommandArguments args) throws Exception;
+    }
+
+    /** What 1.20 command lambdas call getSource() on. */
+    public static final class CommandArguments {
+
+        private final CommandSourceStack source;
+
+        public CommandArguments(CommandSourceStack source) {
+            this.source = source;
+        }
+
+        public CommandSourceStack getSource() {
+            return source;
+        }
+    }
+
+    public final String name;
+    public Predicate<CommandSourceStack> requirement = s -> true;
+    public Executor executor;
+
+    private LiteralArgumentBuilder(String name) {
+        this.name = name;
+    }
+
+    public static LiteralArgumentBuilder literal(String name) {
+        return new LiteralArgumentBuilder(name);
+    }
+
+    public LiteralArgumentBuilder requires(Predicate<CommandSourceStack> r) {
+        requirement = r;
+        return this;
+    }
+
+    public LiteralArgumentBuilder executes(Executor e) {
+        executor = e;
+        return this;
+    }
+
+    public LiteralArgumentBuilder then(Object child) {
+        return this;
+    }
+}

@@ -1,0 +1,15 @@
+ItemStack
+MobEffectInstance
+PotionEffect
+ItemEntity
+EntityItem
+DamageSource
+AttributeModifier
+SmallFireball
+LargeFireball
+Arrow
+EntityArrow
+EntitySmallFireball
+EntityLargeFireball
+CompoundTag
+NBTTagCompound

@@ -1,0 +1,395 @@
+//// FILE: advancement/Advancements.java
+package net.mcreator.boh.compat.advancement;
+
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import net.mcreator.boh.BohMod;
+import net.mcreator.boh.compat.mc.advancements.Advancement;
+import net.mcreator.boh.compat.registry.LegacyIds;
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.stats.Achievement;
+import net.minecraftforge.common.AchievementPage;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.world.BlockEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+
+/**
+ * 1.20 advancements of the mod (data/boh/advancements) as 1.7.10 achievements on a "Box of Horrors" page.
+ * Title/description keys: achievement.boh.&lt;name&gt; / achievement.boh.&lt;name&gt;.desc.
+ */
+public final class Advancements {
+
+    private static final String[] FILES = { "start_boh", "craft_computer_achievement", "grimm_start", "pasta_night",
+        "big_top_burger_achievement", "obtain_first_document_achievement", "requiemfor_two_killers", "slender_gift" };
+
+    private static final Map<String, Advancement> BY_ID = new LinkedHashMap<>();
+    /** advancement id -> block ids whose placement grants it (placed_block trigger) */
+    private static final Map<String, List<String>> PLACED_BLOCK = new HashMap<>();
+
+    private Advancements() {}
+
+    public static void init() {
+        Map<String, JsonObject> defs = new LinkedHashMap<>();
+        for (String f : FILES) {
+            try (InputStream in = Advancements.class.getResourceAsStream("/data/boh/advancements/" + f + ".json")) {
+                if (in == null) continue;
+                defs.put("boh:" + f, new JsonParser().parse(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonObject());
+            } catch (Exception e) {
+                BohMod.LOGGER.error("Could not read advancement " + f, e);
+            }
+        }
+        Map<String, Integer> depth = new HashMap<>();
+        Map<Integer, Integer> rowsAtDepth = new HashMap<>();
+        List<Achievement> page = new ArrayList<>();
+        // parents are listed before children in FILES
+        for (Map.Entry<String, JsonObject> e : defs.entrySet()) {
+            String id = e.getKey();
+            JsonObject o = e.getValue();
+            String parentId = o.has("parent") ? o.get("parent").getAsString() : null;
+            Advancement parent = parentId == null ? null : BY_ID.get(parentId);
+            int d = parent == null ? 0 : depth.get(parentId) + 1;
+            depth.put(id, d);
+            int row = rowsAtDepth.merge(d, 1, Integer::sum) - 1;
+            JsonObject display = o.getAsJsonObject("display");
+            ItemStack icon = icon(display.getAsJsonObject("icon").get("item").getAsString());
+            String name = "boh." + id.substring(4);
+            Achievement a = new Achievement("achievement." + name, name, d * 2 - 1, row * 2 - 1, icon,
+                parent == null ? null : parent.achievement);
+            if (parent == null) a.initIndependentStat();
+            if ("challenge".equals(display.has("frame") ? display.get("frame").getAsString() : "")) a.setSpecial();
+            a.registerStat();
+            page.add(a);
+            Advancement adv = new Advancement(id, a, parent);
+            BY_ID.put(id, adv);
+            for (Map.Entry<String, JsonElement> c : o.getAsJsonObject("criteria").entrySet()) {
+                JsonObject crit = c.getValue().getAsJsonObject();
+                if (!"minecraft:placed_block".equals(crit.get("trigger").getAsString()) || !crit.has("conditions")) continue;
+                JsonArray loc = crit.getAsJsonObject("conditions").getAsJsonArray("location");
+                for (JsonElement l : loc) {
+                    JsonObject lo = l.getAsJsonObject();
+                    if (lo.has("block")) PLACED_BLOCK.computeIfAbsent(id, k -> new ArrayList<>()).add(lo.get("block").getAsString());
+                }
+            }
+        }
+        AchievementPage.registerAchievementPage(new AchievementPage("Box of Horrors", page.toArray(new Achievement[0])));
+        MinecraftForge.EVENT_BUS.register(new Advancements.Hooks());
+    }
+
+    private static ItemStack icon(String id) {
+        Object o = Item.itemRegistry.getObject(id);
+        if (o instanceof Item) return new ItemStack((Item) o);
+        LegacyIds.Target t = LegacyIds.target(id);
+        if (t != null && t.item() != null) return new ItemStack(t.item(), 1, t.meta);
+        return new ItemStack(Items.paper);
+    }
+
+    public static Advancement get(String id) {
+        return BY_ID.get(id.contains(":") ? id : "boh:" + id);
+    }
+
+    public static boolean isDone(EntityPlayer p, Advancement a) {
+        if (a == null) return false;
+        if (p instanceof EntityPlayerMP) return ((EntityPlayerMP) p).func_147099_x().hasAchievementUnlocked(a.achievement);
+        return false;
+    }
+
+    /** Grants an advancement (and its locked ancestors, which 1.7.10 requires). */
+    public static void grant(EntityPlayerMP p, Advancement a) {
+        if (a == null || isDone(p, a)) return;
+        if (a.parent != null) grant(p, a.parent);
+        p.triggerAchievement(a.achievement);
+    }
+
+    public static void grant(EntityPlayerMP p, String id) {
+        grant(p, get(id));
+    }
+
+    public static void revoke(EntityPlayerMP p, Advancement a) {
+        if (a != null) p.func_147099_x().func_150873_a(p, a.achievement, 0);
+    }
+
+    public static final class Hooks {
+
+        @SubscribeEvent
+        public void onPlace(BlockEvent.PlaceEvent e) {
+            if (!(e.player instanceof EntityPlayerMP)) return;
+            String placed = Block.blockRegistry.getNameForObject(e.placedBlock);
+            for (Map.Entry<String, List<String>> en : PLACED_BLOCK.entrySet())
+                if (en.getValue().contains(placed)) grant((EntityPlayerMP) e.player, BY_ID.get(en.getKey()));
+        }
+    }
+}
+//// FILE: mc/advancements/Advancement.java
+package net.mcreator.boh.compat.mc.advancements;
+
+import net.minecraft.stats.Achievement;
+import net.minecraft.util.ResourceLocation;
+
+/** A 1.20 advancement backed by a 1.7.10 achievement. */
+public final class Advancement {
+
+    public final String id;
+    public final Achievement achievement;
+    public final Advancement parent;
+
+    public Advancement(String id, Achievement achievement, Advancement parent) {
+        this.id = id;
+        this.achievement = achievement;
+        this.parent = parent;
+    }
+
+    public ResourceLocation getId() {
+        return new ResourceLocation(id);
+    }
+
+    public Advancement getParent() {
+        return parent;
+    }
+}
+//// FILE: mc/advancements/AdvancementProgress.java
+package net.mcreator.boh.compat.mc.advancements;
+
+import java.util.Collections;
+
+import net.mcreator.boh.compat.advancement.Advancements;
+import net.minecraft.entity.player.EntityPlayerMP;
+
+/** Progress of one advancement: a single implicit criterion ("grant"). */
+public final class AdvancementProgress {
+
+    private final EntityPlayerMP player;
+    private final Advancement advancement;
+
+    public AdvancementProgress(EntityPlayerMP player, Advancement advancement) {
+        this.player = player;
+        this.advancement = advancement;
+    }
+
+    public boolean isDone() {
+        return Advancements.isDone(player, advancement);
+    }
+
+    public boolean hasProgress() {
+        return isDone();
+    }
+
+    public Iterable<String> getRemainingCriteria() {
+        return isDone() ? Collections.<String>emptyList() : Collections.singletonList("grant");
+    }
+
+    public Iterable<String> getCompletedCriteria() {
+        return isDone() ? Collections.singletonList("grant") : Collections.<String>emptyList();
+    }
+}
+//// FILE: mc/advancements/PlayerAdvancements.java
+package net.mcreator.boh.compat.mc.advancements;
+
+import net.mcreator.boh.compat.advancement.Advancements;
+import net.minecraft.entity.player.EntityPlayerMP;
+
+/** 1.20 PlayerAdvancements over 1.7.10 achievement stats. */
+public final class PlayerAdvancements {
+
+    private final EntityPlayerMP player;
+
+    public PlayerAdvancements(EntityPlayerMP player) {
+        this.player = player;
+    }
+
+    public AdvancementProgress getOrStartProgress(Advancement a) {
+        return new AdvancementProgress(player, a);
+    }
+
+    public boolean award(Advancement a, String criterion) {
+        if (a == null || Advancements.isDone(player, a)) return false;
+        Advancements.grant(player, a);
+        return true;
+    }
+
+    public boolean revoke(Advancement a, String criterion) {
+        Advancements.revoke(player, a);
+        return true;
+    }
+}
+//// FILE: mc/server/ServerAdvancementManager.java
+package net.mcreator.boh.compat.mc.server;
+
+import net.mcreator.boh.compat.advancement.Advancements;
+import net.mcreator.boh.compat.mc.advancements.Advancement;
+import net.minecraft.util.ResourceLocation;
+
+/** 1.20 ServerAdvancementManager. */
+public final class ServerAdvancementManager {
+
+    public static final ServerAdvancementManager INSTANCE = new ServerAdvancementManager();
+
+    public Advancement getAdvancement(ResourceLocation id) {
+        return Advancements.get(id.toString());
+    }
+}
+//// FILE: entity/BohAreaEffectCloud.java
+package net.mcreator.boh.compat.entity;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import io.netty.buffer.ByteBuf;
+import net.mcreator.boh.compat.command.ParticleNames;
+import net.mcreator.boh.compat.mc.world.phys.Vec3;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.world.World;
+import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
+
+/** 1.20 area_effect_cloud: a lingering disc of particles that applies its effects to entities inside it. */
+public class BohAreaEffectCloud extends Entity implements IEntityAdditionalSpawnData {
+
+    private float radius = 3;
+    private int duration = 600;
+    private int waitTime = 10;
+    private float radiusPerTick;
+    private String particle = "spell";
+    private final List<PotionEffect> effects = new ArrayList<>();
+    private final Map<Entity, Integer> victims = new HashMap<>();
+
+    public BohAreaEffectCloud(World w) {
+        super(w);
+        noClip = true;
+        isImmuneToFire = true;
+        setSize(radius * 2, 0.5F);
+    }
+
+    public static BohAreaEffectCloud fromNbt(World w, Vec3 p, NBTTagCompound tag) {
+        BohAreaEffectCloud c = new BohAreaEffectCloud(w);
+        c.setPosition(p.x, p.y, p.z);
+        if (tag != null) c.readFrom(tag);
+        return c;
+    }
+
+    @Override
+    protected void entityInit() {}
+
+    @Override
+    public void onUpdate() {
+        super.onUpdate();
+        if (worldObj.isRemote) {
+            int n = (int) (Math.PI * radius * radius * 0.5F);
+            for (int i = 0; i < n; i++) {
+                double a = rand.nextFloat() * Math.PI * 2, r = Math.sqrt(rand.nextFloat()) * radius;
+                worldObj.spawnParticle(particle, posX + Math.cos(a) * r, posY, posZ + Math.sin(a) * r, 0, 0, 0);
+            }
+            return;
+        }
+        if (ticksExisted >= waitTime + duration) {
+            setDead();
+            return;
+        }
+        radius += radiusPerTick;
+        if (radius < 0.5F) {
+            setDead();
+            return;
+        }
+        if (ticksExisted < waitTime || ticksExisted % 5 != 0) return;
+        victims.entrySet().removeIf(en -> ticksExisted >= en.getValue());
+        AxisAlignedBB box = AxisAlignedBB.getBoundingBox(posX - radius, posY - 0.5, posZ - radius, posX + radius, posY + 3, posZ + radius);
+        for (Object o : worldObj.getEntitiesWithinAABB(EntityLivingBase.class, box)) {
+            EntityLivingBase l = (EntityLivingBase) o;
+            if (victims.containsKey(l)) continue;
+            double dx = l.posX - posX, dz = l.posZ - posZ;
+            if (dx * dx + dz * dz > radius * radius) continue;
+            victims.put(l, ticksExisted + 20);
+            for (PotionEffect e : effects) {
+                Potion p = Potion.potionTypes[e.getPotionID()];
+                if (p != null && p.isInstant()) p.affectEntity(null, l, e.getAmplifier(), 0.5);
+                else l.addPotionEffect(new PotionEffect(e));
+            }
+        }
+    }
+
+    private void readFrom(NBTTagCompound t) {
+        if (t.hasKey("Radius")) radius = t.getFloat("Radius");
+        if (t.hasKey("Duration")) duration = t.getInteger("Duration");
+        if (t.hasKey("WaitTime")) waitTime = t.getInteger("WaitTime");
+        if (t.hasKey("RadiusPerTick")) radiusPerTick = t.getFloat("RadiusPerTick");
+        if (t.hasKey("Particle")) particle = ParticleNames.legacy(t.getString("Particle"));
+        effects.clear();
+        NBTTagList l = t.getTagList("Effects", 10);
+        for (int i = 0; i < l.tagCount(); i++) {
+            NBTTagCompound e = l.getCompoundTagAt(i);
+            effects.add(new PotionEffect(e.getInteger("Id"), e.getInteger("Duration"), e.getInteger("Amplifier"), e.getBoolean("Ambient")));
+        }
+        setSize(radius * 2, 0.5F);
+    }
+
+    @Override
+    protected void readEntityFromNBT(NBTTagCompound t) {
+        readFrom(t);
+        ticksExisted = t.getInteger("Age");
+    }
+
+    @Override
+    protected void writeEntityToNBT(NBTTagCompound t) {
+        t.setFloat("Radius", radius);
+        t.setInteger("Duration", duration);
+        t.setInteger("WaitTime", waitTime);
+        t.setFloat("RadiusPerTick", radiusPerTick);
+        t.setString("Particle", particle);
+        t.setInteger("Age", ticksExisted);
+        NBTTagList l = new NBTTagList();
+        for (PotionEffect e : effects) {
+            NBTTagCompound c = new NBTTagCompound();
+            c.setInteger("Id", e.getPotionID());
+            c.setInteger("Duration", e.getDuration());
+            c.setInteger("Amplifier", e.getAmplifier());
+            c.setBoolean("Ambient", e.getIsAmbient());
+            l.appendTag(c);
+        }
+        t.setTag("Effects", l);
+    }
+
+    @Override
+    public void writeSpawnData(ByteBuf b) {
+        b.writeFloat(radius);
+        b.writeInt(duration);
+        b.writeInt(waitTime);
+        b.writeFloat(radiusPerTick);
+        byte[] s = particle.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        b.writeShort(s.length);
+        b.writeBytes(s);
+    }
+
+    @Override
+    public void readSpawnData(ByteBuf b) {
+        radius = b.readFloat();
+        duration = b.readInt();
+        waitTime = b.readInt();
+        radiusPerTick = b.readFloat();
+        byte[] s = new byte[b.readShort()];
+        b.readBytes(s);
+        particle = new String(s, java.nio.charset.StandardCharsets.UTF_8);
+    }
+}

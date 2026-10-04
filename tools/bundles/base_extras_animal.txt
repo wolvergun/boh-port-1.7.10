@@ -1,0 +1,25 @@
+
+    // ------------------------------------------------------------------ breeding (1.20 AgeableMob / Animal)
+
+    public net.minecraft.entity.EntityAgeable getBreedOffspring(World world, net.minecraft.entity.EntityAgeable mate) {
+        return null;
+    }
+
+    public boolean isFood(net.minecraft.item.ItemStack stack) {
+        return false;
+    }
+
+    @Override
+    public net.minecraft.entity.EntityAgeable createChild(net.minecraft.entity.EntityAgeable mate) {
+        return getBreedOffspring(worldObj, mate);
+    }
+
+    @Override
+    public boolean isBreedingItem(net.minecraft.item.ItemStack stack) {
+        return stack != null && isFood(stack);
+    }
+
+    public boolean isBaby() {
+        return isChild();
+    }
+}

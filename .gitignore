@@ -1,41 +1,40 @@
-.gradle
-.settings
-/.idea/
-/.vscode/
-/run/
-/build/
-/eclipse/
-.classpath
-.project
-/bin/
-/config/
-/crash-reports/
+# Local-only inputs (never commit: gus's original jar, Mojang's decompiled Minecraft source)
+/original/
+/ref/
+
+# Build outputs and scratch
+/build-fast/
 /logs/
-options.txt
-/saves/
-usernamecache.json
-banned-ips.json
-banned-players.json
-eula.txt
-ops.json
-server.properties
-servers.dat
-usercache.json
-whitelist.json
-/out/
+*.log
+/stage/BohMod.java.orig
+/tools/errors*.txt
+/tools/stubs.txt
+/tools/mcpconfig/
+/tools/mcpconfig.zip
+/tools/client_mappings.txt
+/tools/level_copy.dat
+# machine-specific classpaths, regenerate with tools/printcp.gradle
+/tools/classpath.txt
+/tools/cp-fast.txt
+
+# Gradle / IDE / dev runs (port/ is the Gradle project)
+.gradle/
+build/
+port/run/
+port/eclipse/
+port/out/
+.idea/
+.vscode/
 *.iml
 *.ipr
 *.iws
-*.bat
-*.DS_Store
-!gradlew.bat
-.factorypath
-addon.local.gradle
-addon.local.gradle.kts
-addon.late.local.gradle
-addon.late.local.gradle.kts
-layout.json
+.classpath
+.project
+.settings/
+.DS_Store
+addon.local.gradle*
+addon.late.local.gradle*
 
-# Never commit built or downloaded mod jars (the gradle wrapper jar is the only exception)
+# Jars (tool jars are downloaded, mod jars are built); only the gradle wrapper is committed
 *.jar
-!gradle/wrapper/gradle-wrapper.jar
+!port/gradle/wrapper/gradle-wrapper.jar

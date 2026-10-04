@@ -1,0 +1,10 @@
+isEmpty
+contains
+remove
+getEntityData
+getName
+getType
+getId
+set
+getCapability
+split

@@ -1,0 +1,51 @@
+
+    // ------------------------------------------------------------------ breeding + taming (1.20 TamableAnimal)
+
+    public net.minecraft.entity.EntityAgeable getBreedOffspring(World world, net.minecraft.entity.EntityAgeable mate) {
+        return null;
+    }
+
+    public boolean isFood(net.minecraft.item.ItemStack stack) {
+        return false;
+    }
+
+    @Override
+    public net.minecraft.entity.EntityAgeable createChild(net.minecraft.entity.EntityAgeable mate) {
+        return getBreedOffspring(worldObj, mate);
+    }
+
+    @Override
+    public boolean isBreedingItem(net.minecraft.item.ItemStack stack) {
+        return stack != null && isFood(stack);
+    }
+
+    public boolean isBaby() {
+        return isChild();
+    }
+
+    public boolean isTame() {
+        return isTamed();
+    }
+
+    public void tame(EntityPlayer player) {
+        setTamed(true);
+        func_152115_b(player.getUniqueID().toString());
+    }
+
+    public boolean isOwnedBy(EntityLivingBase entity) {
+        return entity != null && func_152114_e(entity);
+    }
+
+    public boolean isOrderedToSit() {
+        return isSitting();
+    }
+
+    public void setOrderedToSit(boolean sit) {
+        func_70907_r().setSitting(sit);
+        setSitting(sit);
+    }
+
+    public void setInSittingPose(boolean sit) {
+        setSitting(sit);
+    }
+}

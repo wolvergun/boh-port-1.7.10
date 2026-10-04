@@ -1,0 +1,276 @@
+//// FILE: mc/world/entity/ai/goal/MeleeAttackGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal;
+
+import java.util.EnumSet;
+
+import net.mcreator.boh.compat.entity.BohMob;
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.pathfinding.PathEntity;
+
+/** Port of the 1.20.1 MeleeAttackGoal on the 1.7.10 navigator. */
+public class MeleeAttackGoal extends Goal {
+
+    protected final EntityCreature mob;
+    private final double speedModifier;
+    private final boolean followingTargetEvenIfNotSeen;
+    private PathEntity path;
+    private double pathedTargetX, pathedTargetY, pathedTargetZ;
+    private int ticksUntilNextPathRecalculation;
+    private int ticksUntilNextAttack;
+    private long lastCanUseCheck;
+    private int failedPathFindingPenalty;
+
+    public MeleeAttackGoal(EntityCreature mob, double speed, boolean followingTargetEvenIfNotSeen) {
+        this.mob = mob;
+        this.speedModifier = speed;
+        this.followingTargetEvenIfNotSeen = followingTargetEvenIfNotSeen;
+        setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+    }
+
+    @Override
+    public boolean canUse() {
+        long time = mob.worldObj.getTotalWorldTime();
+        if (time - lastCanUseCheck < 20L) return false;
+        lastCanUseCheck = time;
+        EntityLivingBase target = mob.getAttackTarget();
+        if (target == null || !target.isEntityAlive()) return false;
+        path = mob.getNavigator().getPathToEntityLiving(target);
+        if (path != null) return true;
+        return getAttackReachSqr(target) >= mob.getDistanceSq(target.posX, target.boundingBox.minY, target.posZ);
+    }
+
+    @Override
+    public boolean canContinueToUse() {
+        EntityLivingBase target = mob.getAttackTarget();
+        if (target == null || !target.isEntityAlive()) return false;
+        if (!followingTargetEvenIfNotSeen) return !mob.getNavigator().noPath();
+        if (!mob.isWithinHomeDistance((int) Math.floor(target.posX), (int) Math.floor(target.posY), (int) Math.floor(target.posZ)))
+            return false;
+        return !(target instanceof EntityPlayer) || !((EntityPlayer) target).capabilities.isCreativeMode;
+    }
+
+    @Override
+    public void start() {
+        mob.getNavigator().setPath(path, speedModifier);
+        BohMob.setAggressive(mob, true);
+        ticksUntilNextPathRecalculation = 0;
+        ticksUntilNextAttack = 0;
+    }
+
+    @Override
+    public void stop() {
+        EntityLivingBase target = mob.getAttackTarget();
+        if (target instanceof EntityPlayer && ((EntityPlayer) target).capabilities.isCreativeMode) mob.setAttackTarget(null);
+        BohMob.setAggressive(mob, false);
+        mob.getNavigator().clearPathEntity();
+    }
+
+    @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
+    }
+
+    @Override
+    public void tick() {
+        EntityLivingBase target = mob.getAttackTarget();
+        if (target == null) return;
+        mob.getLookHelper().setLookPositionWithEntity(target, 30.0F, 30.0F);
+        double distSqr = mob.getDistanceSq(target.posX, target.boundingBox.minY, target.posZ);
+        ticksUntilNextPathRecalculation = Math.max(ticksUntilNextPathRecalculation - 1, 0);
+        if ((followingTargetEvenIfNotSeen || mob.getEntitySenses().canSee(target)) && ticksUntilNextPathRecalculation <= 0
+            && (pathedTargetX == 0 && pathedTargetY == 0 && pathedTargetZ == 0
+                || target.getDistanceSq(pathedTargetX, pathedTargetY, pathedTargetZ) >= 1.0
+                || mob.getRNG().nextFloat() < 0.05F)) {
+            pathedTargetX = target.posX;
+            pathedTargetY = target.boundingBox.minY;
+            pathedTargetZ = target.posZ;
+            ticksUntilNextPathRecalculation = 4 + mob.getRNG().nextInt(7);
+            if (distSqr > 1024.0) ticksUntilNextPathRecalculation += 10;
+            else if (distSqr > 256.0) ticksUntilNextPathRecalculation += 5;
+            if (!mob.getNavigator().tryMoveToEntityLiving(target, speedModifier)) ticksUntilNextPathRecalculation += 15;
+            ticksUntilNextPathRecalculation = adjustedTickDelay(ticksUntilNextPathRecalculation);
+        }
+        ticksUntilNextAttack = Math.max(ticksUntilNextAttack - 1, 0);
+        checkAndPerformAttack(target, distSqr);
+    }
+
+    protected void checkAndPerformAttack(EntityLivingBase target, double distSqr) {
+        if (distSqr <= getAttackReachSqr(target) && ticksUntilNextAttack <= 0) {
+            resetAttackCooldown();
+            mob.swingItem();
+            mob.attackEntityAsMob(target);
+        }
+    }
+
+    protected void resetAttackCooldown() {
+        ticksUntilNextAttack = adjustedTickDelay(20);
+    }
+
+    protected boolean isTimeToAttack() {
+        return ticksUntilNextAttack <= 0;
+    }
+
+    protected int getTicksUntilNextAttack() {
+        return ticksUntilNextAttack;
+    }
+
+    protected int getAttackInterval() {
+        return adjustedTickDelay(20);
+    }
+
+    protected double getAttackReachSqr(EntityLivingBase target) {
+        return mob.width * 2.0F * mob.width * 2.0F + target.width;
+    }
+}
+//// FILE: mc/world/entity/ai/goal/RandomStrollGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal;
+
+import java.util.EnumSet;
+
+import net.mcreator.boh.compat.mc.world.phys.Vec3;
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.ai.RandomPositionGenerator;
+
+/** Port of the 1.20.1 RandomStrollGoal; subclasses may override {@link #getPosition()}. */
+public class RandomStrollGoal extends Goal {
+
+    protected final EntityCreature mob;
+    protected double wantedX, wantedY, wantedZ;
+    protected final double speedModifier;
+    protected int interval;
+    protected boolean forceTrigger;
+    private final boolean checkNoActionTime;
+
+    public RandomStrollGoal(EntityCreature mob, double speed) {
+        this(mob, speed, 120);
+    }
+
+    public RandomStrollGoal(EntityCreature mob, double speed, int interval) {
+        this(mob, speed, interval, true);
+    }
+
+    public RandomStrollGoal(EntityCreature mob, double speed, int interval, boolean checkNoActionTime) {
+        this.mob = mob;
+        this.speedModifier = speed;
+        this.interval = interval;
+        this.checkNoActionTime = checkNoActionTime;
+        setFlags(EnumSet.of(Flag.MOVE));
+    }
+
+    @Override
+    public boolean canUse() {
+        if (mob.riddenByEntity != null) return false;
+        if (!forceTrigger) {
+            if (checkNoActionTime && mob.getAge() >= 100) return false;
+            if (mob.getRNG().nextInt(reducedTickDelay(interval)) != 0) return false;
+        }
+        Vec3 pos = getPosition();
+        if (pos == null) return false;
+        wantedX = pos.x;
+        wantedY = pos.y;
+        wantedZ = pos.z;
+        forceTrigger = false;
+        return true;
+    }
+
+    protected Vec3 getPosition() {
+        return Vec3.of(RandomPositionGenerator.findRandomTarget(mob, 10, 7));
+    }
+
+    @Override
+    public boolean canContinueToUse() {
+        return !mob.getNavigator().noPath() && mob.riddenByEntity == null;
+    }
+
+    @Override
+    public void start() {
+        mob.getNavigator().tryMoveToXYZ(wantedX, wantedY, wantedZ, speedModifier);
+    }
+
+    @Override
+    public void stop() {
+        mob.getNavigator().clearPathEntity();
+    }
+
+    public void trigger() {
+        forceTrigger = true;
+    }
+
+    public void setInterval(int interval) {
+        this.interval = interval;
+    }
+}
+//// FILE: mc/world/entity/ai/goal/RemoveBlockGoal.java
+package net.mcreator.boh.compat.mc.world.entity.ai.goal;
+
+import java.util.EnumSet;
+
+import net.minecraft.block.Block;
+import net.minecraft.entity.EntityCreature;
+
+/** Simplified 1.20 RemoveBlockGoal: walk to a nearby block of the given type and break it. */
+public class RemoveBlockGoal extends Goal {
+
+    private final Block blockToRemove;
+    protected final EntityCreature mob;
+    private final double speed;
+    private final int verticalRange;
+    private int tx, ty, tz;
+    private boolean hasTarget;
+    private int ticksSinceReached;
+
+    public RemoveBlockGoal(Block block, EntityCreature mob, double speed, int verticalRange) {
+        this.blockToRemove = block;
+        this.mob = mob;
+        this.speed = speed;
+        this.verticalRange = verticalRange;
+        setFlags(EnumSet.of(Flag.MOVE, Flag.JUMP));
+    }
+
+    @Override
+    public boolean canUse() {
+        if (mob.getRNG().nextInt(reducedTickDelay(20)) != 0) return false;
+        int bx = (int) Math.floor(mob.posX), by = (int) Math.floor(mob.posY), bz = (int) Math.floor(mob.posZ);
+        for (int dy = -verticalRange; dy <= verticalRange; dy++) for (int dx = -8; dx <= 8; dx++) for (int dz = -8; dz <= 8; dz++) {
+            if (mob.worldObj.getBlock(bx + dx, by + dy, bz + dz) == blockToRemove) {
+                tx = bx + dx;
+                ty = by + dy;
+                tz = bz + dz;
+                hasTarget = true;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean canContinueToUse() {
+        return hasTarget && mob.worldObj.getBlock(tx, ty, tz) == blockToRemove && ticksSinceReached < 60;
+    }
+
+    @Override
+    public void start() {
+        ticksSinceReached = 0;
+        mob.getNavigator().tryMoveToXYZ(tx + 0.5, ty, tz + 0.5, speed);
+    }
+
+    @Override
+    public void stop() {
+        hasTarget = false;
+    }
+
+    @Override
+    public void tick() {
+        if (mob.getDistanceSq(tx + 0.5, ty, tz + 0.5) < 4.0) {
+            ticksSinceReached++;
+            if (ticksSinceReached > 20) {
+                mob.worldObj.func_147480_a(tx, ty, tz, false);
+                hasTarget = false;
+            }
+        } else if (mob.getNavigator().noPath()) {
+            mob.getNavigator().tryMoveToXYZ(tx + 0.5, ty, tz + 0.5, speed);
+        }
+    }
+}

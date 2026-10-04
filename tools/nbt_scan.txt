@@ -1,0 +1,262 @@
+tools\ScanNbt.java:19: warning: [unchecked] unchecked cast
+                Map<String, Object> root = (Map<String, Object>) read(in, 10);
+                                                                     ^
+  required: Map<String,Object>
+  found:    Object
+tools\ScanNbt.java:20: warning: [unchecked] unchecked cast
+                List<Object> palette = (List<Object>) root.get("palette");
+                                                              ^
+  required: List<Object>
+  found:    Object
+tools\ScanNbt.java:21: warning: [unchecked] unchecked cast
+                if (palette == null && root.get("palettes") != null) palette = (List<Object>) ((List<Object>) root.get("palettes")).get(0);
+                                                                                                                      ^
+  required: List<Object>
+  found:    Object
+tools\ScanNbt.java:21: warning: [unchecked] unchecked cast
+                if (palette == null && root.get("palettes") != null) palette = (List<Object>) ((List<Object>) root.get("palettes")).get(0);
+                                                                                                                                       ^
+  required: List<Object>
+  found:    Object
+tools\ScanNbt.java:23: warning: [unchecked] unchecked cast
+                    Map<String, Object> s = (Map<String, Object>) o;
+                                                                  ^
+  required: Map<String,Object>
+  found:    Object
+tools\ScanNbt.java:26: warning: [unchecked] unchecked cast
+                    if (s.get("Properties") != null) props.computeIfAbsent(n, k -> new TreeSet<>()).addAll(((Map<String, Object>) s.get("Properties")).keySet());
+                                                                                                                                       ^
+  required: Map<String,Object>
+  found:    Object
+tools\ScanNbt.java:28: warning: [unchecked] unchecked cast
+                List<Object> blocks = (List<Object>) root.get("blocks");
+                                                             ^
+  required: List<Object>
+  found:    Object
+tools\ScanNbt.java:30: warning: [unchecked] unchecked cast
+                    Map<String, Object> b = (Map<String, Object>) o;
+                                                                  ^
+  required: Map<String,Object>
+  found:    Object
+tools\ScanNbt.java:31: warning: [unchecked] unchecked cast
+                    if (b.get("nbt") != null) beIds.add(String.valueOf(((Map<String, Object>) b.get("nbt")).get("id")));
+                                                                                                   ^
+  required: Map<String,Object>
+  found:    Object
+tools\ScanNbt.java:33: warning: [unchecked] unchecked cast
+                List<Object> es = (List<Object>) root.get("entities");
+                                                         ^
+  required: List<Object>
+  found:    Object
+tools\ScanNbt.java:35: warning: [unchecked] unchecked cast
+                    Map<String, Object> e = (Map<String, Object>) o;
+                                                                  ^
+  required: Map<String,Object>
+  found:    Object
+tools\ScanNbt.java:36: warning: [unchecked] unchecked cast
+                    Map<String, Object> nbt = (Map<String, Object>) e.get("nbt");
+                                                                         ^
+  required: Map<String,Object>
+  found:    Object
+12 warnings
+boh:backrooms_ceiling_tile []
+boh:backrooms_floor []
+boh:backrooms_lamp []
+boh:backrooms_socket []
+boh:backrooms_walls []
+boh:backrooms_walls_bottom []
+boh:backrooms_walls_top []
+boh:drawing_slender [facing]
+boh:escape_nightmare_block []
+boh:gametable [facing]
+boh:gaster_block_exit [facing, half, hinge, open, powered]
+boh:gaster_block_floor []
+boh:gaster_block_wall []
+boh:lifeform_growth []
+boh:ovamorph [waterlogged]
+boh:pamela_voorhees [facing]
+boh:pipe_block [axis]
+boh:pipe_burst [facing]
+boh:stud_baseplate []
+boh:xenomorph_blood []
+minecraft:acacia_trapdoor [facing, half, open, powered, waterlogged]
+minecraft:air []
+minecraft:andesite []
+minecraft:andesite_slab [type, waterlogged]
+minecraft:bamboo_fence [east, north, south, waterlogged, west]
+minecraft:barrel [facing, open]
+minecraft:basalt [axis]
+minecraft:beehive [facing, honey_level]
+minecraft:big_dripleaf [facing, tilt, waterlogged]
+minecraft:birch_trapdoor [facing, half, open, powered, waterlogged]
+minecraft:black_carpet []
+minecraft:black_concrete []
+minecraft:black_stained_glass []
+minecraft:black_stained_glass_pane [east, north, south, waterlogged, west]
+minecraft:blackstone []
+minecraft:blackstone_slab [type, waterlogged]
+minecraft:blackstone_stairs [facing, half, shape, waterlogged]
+minecraft:blast_furnace [facing, lit]
+minecraft:blue_bed [facing, occupied, part]
+minecraft:blue_wool []
+minecraft:bone_block [axis]
+minecraft:bookshelf []
+minecraft:brick_stairs [facing, half, shape, waterlogged]
+minecraft:bricks []
+minecraft:brown_carpet []
+minecraft:brown_mushroom []
+minecraft:brown_wall_banner [facing]
+minecraft:calcite []
+minecraft:campfire [facing, lit, signal_fire, waterlogged]
+minecraft:candle [candles, lit, waterlogged]
+minecraft:chest [facing, type, waterlogged]
+minecraft:coal_block []
+minecraft:coarse_dirt []
+minecraft:cobblestone []
+minecraft:cobblestone_slab [type, waterlogged]
+minecraft:cobblestone_stairs [facing, half, shape, waterlogged]
+minecraft:cobweb []
+minecraft:composter [level]
+minecraft:copper_block []
+minecraft:cracked_stone_bricks []
+minecraft:cut_copper_slab [type, waterlogged]
+minecraft:cyan_terracotta []
+minecraft:dandelion []
+minecraft:dark_oak_trapdoor [facing, half, open, powered, waterlogged]
+minecraft:deepslate [axis]
+minecraft:diorite []
+minecraft:diorite_slab [type, waterlogged]
+minecraft:diorite_stairs [facing, half, shape, waterlogged]
+minecraft:diorite_wall [east, north, south, up, waterlogged, west]
+minecraft:dirt []
+minecraft:exposed_cut_copper []
+minecraft:fire [age, east, north, south, up, west]
+minecraft:glass []
+minecraft:glass_pane [east, north, south, waterlogged, west]
+minecraft:glow_lichen [down, east, north, south, up, waterlogged, west]
+minecraft:granite []
+minecraft:granite_stairs [facing, half, shape, waterlogged]
+minecraft:grass []
+minecraft:grass_block [snowy]
+minecraft:gravel []
+minecraft:gray_carpet []
+minecraft:gray_concrete []
+minecraft:gray_stained_glass_pane [east, north, south, waterlogged, west]
+minecraft:gray_wall_banner [facing]
+minecraft:hanging_roots [waterlogged]
+minecraft:hay_block [axis]
+minecraft:iron_bars [east, north, south, waterlogged, west]
+minecraft:iron_door [facing, half, hinge, open, powered]
+minecraft:iron_trapdoor [facing, half, open, powered, waterlogged]
+minecraft:jungle_fence [east, north, south, waterlogged, west]
+minecraft:jungle_pressure_plate [powered]
+minecraft:jungle_trapdoor [facing, half, open, powered, waterlogged]
+minecraft:ladder [facing, waterlogged]
+minecraft:light_blue_carpet []
+minecraft:light_gray_carpet []
+minecraft:light_gray_concrete []
+minecraft:light_gray_wall_banner [facing]
+minecraft:lime_carpet []
+minecraft:lime_concrete []
+minecraft:lime_wall_banner [facing]
+minecraft:lime_wool []
+minecraft:mangrove_door [facing, half, hinge, open, powered]
+minecraft:moss_block []
+minecraft:moss_carpet []
+minecraft:mossy_cobblestone []
+minecraft:mossy_stone_bricks []
+minecraft:mud []
+minecraft:mud_bricks []
+minecraft:netherrack []
+minecraft:oak_fence [east, north, south, waterlogged, west]
+minecraft:oak_fence_gate [facing, in_wall, open, powered]
+minecraft:oak_leaves [distance, persistent, waterlogged]
+minecraft:oak_log [axis]
+minecraft:oak_planks []
+minecraft:oak_pressure_plate [powered]
+minecraft:oak_slab [type, waterlogged]
+minecraft:oak_stairs [facing, half, shape, waterlogged]
+minecraft:oak_trapdoor [facing, half, open, powered, waterlogged]
+minecraft:oak_wall_sign [facing, waterlogged]
+minecraft:ochre_froglight [axis]
+minecraft:orange_stained_glass []
+minecraft:orange_terracotta []
+minecraft:pink_carpet []
+minecraft:polished_basalt [axis]
+minecraft:polished_diorite []
+minecraft:polished_diorite_slab [type, waterlogged]
+minecraft:polished_diorite_stairs [facing, half, shape, waterlogged]
+minecraft:polished_granite []
+minecraft:polished_granite_stairs [facing, half, shape, waterlogged]
+minecraft:purple_bed [facing, occupied, part]
+minecraft:purple_carpet []
+minecraft:purple_wall_banner [facing]
+minecraft:quartz_block []
+minecraft:quartz_pillar [axis]
+minecraft:quartz_stairs [facing, half, shape, waterlogged]
+minecraft:rail [shape, waterlogged]
+minecraft:red_carpet []
+minecraft:red_mushroom []
+minecraft:red_nether_brick_slab [type, waterlogged]
+minecraft:red_nether_brick_stairs [facing, half, shape, waterlogged]
+minecraft:red_terracotta []
+minecraft:red_wool []
+minecraft:redstone_lamp [lit]
+minecraft:redstone_torch [lit]
+minecraft:redstone_wall_torch [facing, lit]
+minecraft:redstone_wire [east, north, power, south, west]
+minecraft:rooted_dirt []
+minecraft:sea_lantern []
+minecraft:shroomlight []
+minecraft:skeleton_skull [rotation]
+minecraft:smooth_quartz []
+minecraft:smooth_quartz_stairs [facing, half, shape, waterlogged]
+minecraft:smooth_sandstone []
+minecraft:smooth_stone []
+minecraft:smooth_stone_slab [type, waterlogged]
+minecraft:soul_campfire [facing, lit, signal_fire, waterlogged]
+minecraft:spruce_fence [east, north, south, waterlogged, west]
+minecraft:spruce_leaves [distance, persistent, waterlogged]
+minecraft:spruce_log [axis]
+minecraft:spruce_planks []
+minecraft:spruce_slab [type, waterlogged]
+minecraft:spruce_stairs [facing, half, shape, waterlogged]
+minecraft:spruce_trapdoor [facing, half, open, powered, waterlogged]
+minecraft:spruce_wall_sign [facing, waterlogged]
+minecraft:spruce_wood [axis]
+minecraft:stone []
+minecraft:stone_brick_slab [type, waterlogged]
+minecraft:stone_brick_stairs [facing, half, shape, waterlogged]
+minecraft:stone_brick_wall [east, north, south, up, waterlogged, west]
+minecraft:stone_bricks []
+minecraft:stone_button [face, facing, powered]
+minecraft:stone_slab [type, waterlogged]
+minecraft:stripped_acacia_log [axis]
+minecraft:stripped_acacia_wood [axis]
+minecraft:stripped_birch_log [axis]
+minecraft:stripped_birch_wood [axis]
+minecraft:stripped_dark_oak_log [axis]
+minecraft:stripped_oak_log [axis]
+minecraft:stripped_oak_wood [axis]
+minecraft:stripped_spruce_log [axis]
+minecraft:structure_block [mode]
+minecraft:tall_grass [half]
+minecraft:tinted_glass []
+minecraft:tripwire_hook [attached, facing, powered]
+minecraft:vine [east, north, south, up, west]
+minecraft:water [level]
+minecraft:water_cauldron [level]
+minecraft:waxed_exposed_copper []
+minecraft:waxed_exposed_cut_copper_slab [type, waterlogged]
+minecraft:waxed_oxidized_copper []
+minecraft:waxed_oxidized_cut_copper []
+minecraft:waxed_oxidized_cut_copper_slab [type, waterlogged]
+minecraft:white_carpet []
+minecraft:white_concrete []
+minecraft:white_wall_banner [facing]
+minecraft:yellow_concrete []
+minecraft:yellow_stained_glass []
+minecraft:yellow_terracotta []
+minecraft:yellow_wall_banner [facing]
+BLOCK ENTITIES [boh:backrooms_floor, boh:pipe_burst, minecraft:banner, minecraft:barrel, minecraft:bed, minecraft:beehive, minecraft:blast_furnace, minecraft:campfire, minecraft:chest, minecraft:sign, minecraft:skull, minecraft:structure_block]
+ENTITIES {boh:big_daddy=1, boh:chucky=1, boh:demogorgon=1, boh:entity_well=1, boh:gaster=1, boh:ghostface=1, boh:goji=1, boh:ink_demon=1, boh:jason_voorhees=1, boh:little_sister=1, boh:michael_myers=1, boh:nemesis=1, boh:predator=1, boh:raatma=1, boh:rexy=1, boh:rolling_giant=1, boh:siren_head=1, boh:springtrap=1, minecraft:item=1, minecraft:villager=1}

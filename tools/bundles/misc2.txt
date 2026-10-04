@@ -1,0 +1,236 @@
+//// FILE: mc/world/item/SpawnEggItem.java
+package net.mcreator.boh.compat.mc.world.item;
+
+import net.mcreator.boh.compat.item.BohItem;
+
+/** 1.20 SpawnEggItem (base of the mod's spawn eggs). */
+public abstract class SpawnEggItem extends BohItem {
+
+    protected SpawnEggItem(Properties props) {
+        super(props);
+    }
+}
+//// FILE: mc/world/level/block/SimpleWaterloggedBlock.java
+package net.mcreator.boh.compat.mc.world.level.block;
+
+/** 1.20 SimpleWaterloggedBlock (waterlogging does not exist in 1.7.10). */
+public interface SimpleWaterloggedBlock {}
+//// FILE: forge/event/ForgeEventFactory.java
+package net.mcreator.boh.compat.forge.event;
+
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
+
+/** Forge ForgeEventFactory: hooks without a 1.7.10 event report "not canceled". */
+public final class ForgeEventFactory {
+
+    private ForgeEventFactory() {}
+
+    public static boolean onAnimalTame(EntityLivingBase animal, EntityPlayer tamer) {
+        return false;
+    }
+
+    public static boolean getMobGriefingEvent(World w, Entity e) {
+        return w.getGameRules().getGameRuleBooleanValue("mobGriefing");
+    }
+
+    public static boolean onEntityDestroyBlock(EntityLivingBase e, Object pos, Object state) {
+        return true;
+    }
+}
+//// FILE: forge/common/DungeonHooks.java
+package net.mcreator.boh.compat.forge.common;
+
+import net.mcreator.boh.compat.mc.world.entity.EntityType;
+import net.minecraft.entity.EntityList;
+
+/** Forge DungeonHooks over 1.7.10's name-based dungeon mob table. */
+public final class DungeonHooks {
+
+    private DungeonHooks() {}
+
+    public static float addDungeonMob(EntityType<?> type, int rarity) {
+        if (type == null || type.getEntityClass() == null) return 0;
+        Object name = EntityList.classToStringMapping.get(type.getEntityClass());
+        return name == null ? 0 : net.minecraftforge.common.DungeonHooks.addDungeonMob((String) name, rarity);
+    }
+}
+//// FILE: forge/common/brewing/IBrewingRecipe.java
+package net.mcreator.boh.compat.forge.common.brewing;
+
+import net.minecraft.item.ItemStack;
+
+/** Forge IBrewingRecipe. */
+public interface IBrewingRecipe {
+
+    boolean isInput(ItemStack input);
+
+    boolean isIngredient(ItemStack ingredient);
+
+    ItemStack getOutput(ItemStack input, ItemStack ingredient);
+}
+//// FILE: forge/common/brewing/BrewingRecipeRegistry.java
+package net.mcreator.boh.compat.forge.common.brewing;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/** Forge BrewingRecipeRegistry; the recipes are applied by compat BrewingHooks. */
+public final class BrewingRecipeRegistry {
+
+    public static final List<IBrewingRecipe> RECIPES = new ArrayList<>();
+
+    private BrewingRecipeRegistry() {}
+
+    public static boolean addRecipe(IBrewingRecipe r) {
+        return RECIPES.add(r);
+    }
+}
+//// FILE: mc/world/item/ProjectileWeaponItem.java
+package net.mcreator.boh.compat.mc.world.item;
+
+import java.util.function.Predicate;
+
+import net.mcreator.boh.compat.M;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+
+/** 1.20 ProjectileWeaponItem.getHeldProjectile. */
+public final class ProjectileWeaponItem {
+
+    private ProjectileWeaponItem() {}
+
+    public static ItemStack getHeldProjectile(EntityLivingBase e, Predicate<ItemStack> p) {
+        ItemStack held = e.getHeldItem();
+        if (held != null && p.test(held)) return held;
+        if (e instanceof EntityPlayer) {
+            for (ItemStack s : ((EntityPlayer) e).inventory.mainInventory) if (s != null && p.test(s)) return s;
+        }
+        return M.EMPTY;
+    }
+}
+//// FILE: mc/world/item/BoneMealItem.java
+package net.mcreator.boh.compat.mc.world.item;
+
+import net.mcreator.boh.compat.mc.core.BlockPos;
+import net.minecraft.item.ItemDye;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.util.FakePlayerFactory;
+
+/** 1.20 BoneMealItem static helpers. */
+public final class BoneMealItem {
+
+    private BoneMealItem() {}
+
+    public static boolean growCrop(ItemStack stack, World w, BlockPos pos) {
+        if (stack == null || stack.getItem() == null) return false;
+        ItemStack s = stack.copy();
+        if (w instanceof WorldServer)
+            return ItemDye.applyBonemeal(s, w, pos.getX(), pos.getY(), pos.getZ(), FakePlayerFactory.getMinecraft((WorldServer) w));
+        return ItemDye.func_150919_a(s, w, pos.getX(), pos.getY(), pos.getZ());
+    }
+
+    public static boolean growWaterPlant(ItemStack stack, World w, BlockPos pos, Object face) {
+        return false;
+    }
+
+    public static void addGrowthParticles(Object world, BlockPos pos, int count) {}
+}
+//// FILE: forge/common/BasicItemListing.java
+package net.mcreator.boh.compat.forge.common;
+
+import net.mcreator.boh.compat.M;
+import net.minecraft.item.ItemStack;
+import net.minecraft.village.MerchantRecipe;
+
+/** Forge BasicItemListing: a fixed villager trade. */
+public class BasicItemListing {
+
+    public final ItemStack price, price2, forSale;
+    public final int maxTrades, xp;
+    public final float priceMult;
+
+    public BasicItemListing(ItemStack price, ItemStack forSale, int maxTrades, int xp, float priceMult) {
+        this(price, M.EMPTY, forSale, maxTrades, xp, priceMult);
+    }
+
+    public BasicItemListing(ItemStack price, ItemStack price2, ItemStack forSale, int maxTrades, int xp, float priceMult) {
+        this.price = price;
+        this.price2 = price2;
+        this.forSale = forSale;
+        this.maxTrades = maxTrades;
+        this.xp = xp;
+        this.priceMult = priceMult;
+    }
+
+    public MerchantRecipe toRecipe() {
+        ItemStack b = M.legacy(price2);
+        MerchantRecipe r = b == null ? new MerchantRecipe(M.legacy(price).copy(), M.legacy(forSale).copy())
+            : new MerchantRecipe(M.legacy(price).copy(), b.copy(), M.legacy(forSale).copy());
+        r.func_82783_a(maxTrades - 7);
+        return r;
+    }
+}
+//// FILE: forge/event/village/VillagerTradesEvent.java
+package net.mcreator.boh.compat.forge.event.village;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.mcreator.boh.compat.mc.world.entity.npc.VillagerProfession;
+import cpw.mods.fml.common.eventhandler.Event;
+
+/** Forge VillagerTradesEvent: trades per level (1-5) for one profession. */
+public class VillagerTradesEvent extends Event {
+
+    private final VillagerProfession type;
+    private final Map<Integer, List<Object>> trades = new HashMap<>();
+
+    public VillagerTradesEvent() {
+        this(null);
+    }
+
+    public VillagerTradesEvent(VillagerProfession type) {
+        this.type = type;
+        for (int i = 1; i <= 5; i++) trades.put(i, new ArrayList<>());
+    }
+
+    public VillagerProfession getType() {
+        return type;
+    }
+
+    public Map<Integer, List<Object>> getTrades() {
+        return trades;
+    }
+}
+//// FILE: mc/client/BossOverlay.java
+package net.mcreator.boh.compat.mc.client;
+
+/** 1.20 Gui / BossHealthOverlay queries used by the sky renderers. */
+public final class BossOverlay {
+
+    public static final BossOverlay INSTANCE = new BossOverlay();
+
+    public BossOverlay getBossOverlay() {
+        return this;
+    }
+
+    public boolean shouldCreateWorldFog() {
+        return false;
+    }
+
+    public boolean shouldDarkenScreen() {
+        return false;
+    }
+
+    public boolean shouldPlayMusic() {
+        return false;
+    }
+}

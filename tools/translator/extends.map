@@ -1,0 +1,13 @@
+# superclass simple name (after type mapping) -> replacement FQN for classes the mod itself declares
+EntityMob -> net.mcreator.boh.compat.entity.BohMonster
+EntityCreature -> net.mcreator.boh.compat.entity.BohPathfinderMob
+EntityTameable -> net.mcreator.boh.compat.entity.BohTamableAnimal
+EntityAnimal -> net.mcreator.boh.compat.entity.BohAnimal
+EntitySpider -> net.mcreator.boh.compat.entity.BohSpider
+EntityArrow -> net.mcreator.boh.compat.entity.BohAbstractArrow
+Item -> net.mcreator.boh.compat.item.BohItem
+Block -> net.mcreator.boh.compat.block.BohBlock
+Potion -> net.mcreator.boh.compat.effect.BohMobEffect
+Enchantment -> net.mcreator.boh.compat.item.BohEnchantment
+ItemBlock -> net.mcreator.boh.compat.item.BohBlockItem
+GuiScreen -> net.mcreator.boh.compat.client.gui.BohScreen
