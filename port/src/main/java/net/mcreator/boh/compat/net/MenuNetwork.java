@@ -32,7 +32,7 @@ public final class MenuNetwork {
         m.windowId = windowId;
         m.title = title;
         m.data = data;
-        channel.sendTo(m, p);
+        if (CompatNetwork.connected(p)) channel.sendTo(m, p);
     }
 
     public static final class OpenMsg implements IMessage {

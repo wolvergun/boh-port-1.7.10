@@ -38,7 +38,7 @@ import cpw.mods.fml.common.gameevent.TickEvent;
  * black dye + Haunted Paper into a random document, and every document used inside a ring of 4 Rift Stabilizers
  * summons its entity (and one used without the ring summons nothing). High above the spawn, which stays loaded.
  */
-final class RiftTest {
+public final class RiftTest {
 
     private static final int Y = 200;
     private static final int SUMMON_WAIT = 80, COMPUTER_WAIT = 23 * 15 + 60;

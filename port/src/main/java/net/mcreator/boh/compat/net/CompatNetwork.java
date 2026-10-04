@@ -42,8 +42,18 @@ public final class CompatNetwork {
     }
 
     /** Stops a sound (1.7.10 name, empty = all) on the client of the player. */
+    /** Fake players (other mods' machines using items, the self-test) have no connection to send to. */
+    public static boolean connected(EntityPlayerMP p) {
+        return p != null && !(p instanceof net.minecraftforge.common.util.FakePlayer) && p.playerNetServerHandler != null;
+    }
+
+    private static void sendTo(cpw.mods.fml.common.network.simpleimpl.IMessage m, EntityPlayerMP p) {
+        if (!connected(p)) return;
+        CHANNEL.sendTo(m, p);
+    }
+
     public static void sendStopSound(EntityPlayerMP p, String legacyName) {
-        CHANNEL.sendTo(new StopSoundMsg(legacyName), p);
+        sendTo(new StopSoundMsg(legacyName), p);
     }
 
     public static final class StopSoundMsg implements IMessage {
@@ -77,15 +87,15 @@ public final class CompatNetwork {
     }
 
     public static void sendActionBar(EntityPlayerMP p, String text) {
-        CHANNEL.sendTo(new TextMsg(text), p);
+        sendTo(new TextMsg(text), p);
     }
 
     public static void sendCooldown(EntityPlayerMP p, Item item, int ticks) {
-        CHANNEL.sendTo(new CooldownMsg(Item.getIdFromItem(item), ticks), p);
+        sendTo(new CooldownMsg(Item.getIdFromItem(item), ticks), p);
     }
 
     public static void sendBossBar(EntityPlayerMP p, java.util.UUID id, String name, float progress, int color, int notches, boolean show) {
-        CHANNEL.sendTo(new BossBarMsg(id, name == null ? "" : name, progress, color, notches, show), p);
+        sendTo(new BossBarMsg(id, name == null ? "" : name, progress, color, notches, show), p);
     }
 
     public static final class BossBarMsg implements IMessage {

@@ -91,7 +91,7 @@ public final class SimpleChannel {
         Envelope env = wrap(msg);
         switch (target.kind) {
             case "player":
-                wrapper.sendTo(env, (EntityPlayerMP) target.arg);
+                if (net.mcreator.boh.compat.net.CompatNetwork.connected((EntityPlayerMP) target.arg)) wrapper.sendTo(env, (EntityPlayerMP) target.arg);
                 break;
             case "dimension":
                 Object a = target.arg;
@@ -107,7 +107,8 @@ public final class SimpleChannel {
     }
 
     public <M> void sendTo(M msg, Object connection, Object direction) {
-        if (connection instanceof EntityPlayerMP) wrapper.sendTo(wrap(msg), (EntityPlayerMP) connection);
+        if (connection instanceof EntityPlayerMP && net.mcreator.boh.compat.net.CompatNetwork.connected((EntityPlayerMP) connection))
+            wrapper.sendTo(wrap(msg), (EntityPlayerMP) connection);
     }
 
     @SuppressWarnings("unchecked")
