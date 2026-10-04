@@ -75,7 +75,7 @@ public class GunWithOneBulletItemRenderer extends GeoItemRenderer<GunWithOneBull
             renderingArms = true;
         }
         if (M.firstPerson(this.transformType) && renderingArms) {
-            AbstractClientPlayer player = M.player(mc);
+            net.minecraft.entity.player.EntityPlayer player = M.player(mc);
             float armsAlpha = M.isInvisible(player) ? 0.15F : 1.0F;
             PlayerRenderer playerRenderer = (PlayerRenderer) M.getEntityRenderDispatcher(mc).getRenderer(player);
             PlayerModel<AbstractClientPlayer> model = (PlayerModel<AbstractClientPlayer>) M.getModel(playerRenderer);

@@ -46,6 +46,8 @@ jobs:
           grep -F "[BOH-SELFTEST]" server.log > selftest.txt || echo "no self-test output" > selftest.txt
           cat selftest.txt
           { echo '### Self-test'; echo '```'; cat selftest.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          # fail the run when the server crashed before the self-test finished
+          grep -qF "[BOH-SELFTEST] done" server.log || { grep -m1 -A3 -E "Exception|Error:" server.log; echo "::error::self-test did not finish"; exit 1; }
 
       - uses: actions/upload-artifact@v4
         if: always()

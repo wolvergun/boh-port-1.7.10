@@ -409,7 +409,7 @@ public class MEvent extends MEntity {
     }
 
     @SideOnly(Side.CLIENT)
-    public static net.minecraft.util.ResourceLocation getSkinTextureLocation(net.minecraft.client.entity.AbstractClientPlayer p) {
+    public static net.minecraft.util.ResourceLocation getSkinTextureLocation(EntityPlayer p) {
         return MClientImpl.skin(p);
     }
 
@@ -579,7 +579,7 @@ public class MEvent extends MEntity {
     // ------------------------------------------------------------------ client (bodies delegate to MClientImpl)
 
     @SideOnly(Side.CLIENT)
-    public static net.minecraft.client.entity.AbstractClientPlayer player(Minecraft mc) {
+    public static EntityPlayer player(Minecraft mc) {
         return MClientImpl.player();
     }
 
