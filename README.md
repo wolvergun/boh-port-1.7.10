@@ -95,6 +95,9 @@ Compatibility fixes to know about:
    mutated variants 1.20 merged into them (taiga = Taiga, Taiga Hills, Taiga M), and `#is_overworld` is supported
    (kindness flowers, spinel ore). Kindness flowers are rare by design: about 2 per 100 chunks, as in 1.20.
 4. ~~Apply villager trades and brewing recipes~~: hooked up (trade handler + PotionBrewEvent), needs in-game testing.
-5. Polish arm poses and 3D weapon positioning; optionally make the Xenomorph's see-through head solid.
+5. Arm poses: the custom third-person poses (guns, crucifix, drill, sirenphone held up to aim) are applied through
+   the player renderer's models (`compat/client/ArmPoses`); first-person placement already matches 1.20's
+   transform. The Xenomorph's see-through head is the original's look (a translucent dome and empty faces in
+   its texture, drawn with 1.20's translucent render type), so it is kept.
 6. Some mobs don't attack the player or other mobs: target goals are now ports of the 1.20 ones (line of sight to
    acquire, 15 s revenge memory, ...) and ground pathfinding is capped at 64 blocks; needs in-game testing.

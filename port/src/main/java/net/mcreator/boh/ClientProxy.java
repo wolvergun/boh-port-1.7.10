@@ -46,6 +46,7 @@ public class ClientProxy extends CommonProxy {
         BlockModels.assignRenderIds();
         net.mcreator.boh.compat.client.VillagerSkins.register();
         net.mcreator.boh.compat.client.BiomeAmbience.register();
+        net.mcreator.boh.compat.client.ArmPoses.install();
         RenderingRegistry.registerEntityRenderingHandler(net.mcreator.boh.compat.entity.BohAreaEffectCloud.class, new net.minecraft.client.renderer.entity.Render() {
 
             @Override
