@@ -40,7 +40,9 @@ jobs:
           echo "eula=true" > run/server/eula.txt
           printf "level-seed=12345\nonline-mode=false\n" > run/server.properties
           cp run/server.properties run/server/server.properties
-          timeout 1500 ./gradlew --stacktrace runServer --mcJvmArgs=-Dboh.selftest=true < /dev/null 2>&1 | tee server.log || true
+          # runServer25: Java 25 + lwjgl3ify/RetroFuturaBootstrap like the real pack (plain runServer is Java 8, which
+          # cannot read the mod's Java 25 classes); the delayed "stop" ends the server if the self-test never runs
+          (sleep 900; echo stop) | timeout 1500 ./gradlew --stacktrace runServer25 --mcJvmArgs=-Dboh.selftest=true 2>&1 | tee server.log || true
           grep -F "[BOH-SELFTEST]" server.log > selftest.txt || echo "no self-test output" > selftest.txt
           cat selftest.txt
           { echo '### Self-test'; echo '```'; cat selftest.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
