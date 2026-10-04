@@ -2682,7 +2682,7 @@
     ]
   },
   "level_0_ost": {
-    "category": "hostile",
+    "category": "music",
     "sounds": [
       {
         "name": "boh:level_0_ost",
@@ -2691,7 +2691,7 @@
     ]
   },
   "level_0_sounds": {
-    "category": "hostile",
+    "category": "ambient",
     "sounds": [
       {
         "name": "boh:level_0_sounds_1",
@@ -2704,7 +2704,7 @@
     ]
   },
   "level_0_mood": {
-    "category": "hostile",
+    "category": "ambient",
     "sounds": [
       {
         "name": "boh:level_0_mood",
