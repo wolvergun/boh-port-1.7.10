@@ -58,8 +58,8 @@ public final class SelfTest {
         } catch (Throwable t) {
             BohMod.LOGGER.error("[BOH-SELFTEST] failed", t);
         }
-        log("done");
-        server.initiateShutdown();
+        // the document chain runs over the next ticks and stops the server when done
+        RiftTest.start(server.worldServerForDimension(0));
     }
 
     /** Loads a 12x12 chunk area far from anything generated and reports per-chunk load times and block entities. */
