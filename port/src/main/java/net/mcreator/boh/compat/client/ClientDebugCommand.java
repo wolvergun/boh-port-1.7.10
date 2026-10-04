@@ -55,6 +55,9 @@ public class ClientDebugCommand extends CommandBase {
             for (EntityLivingBase e : list.subList(0, Math.min(8, list.size()))) {
                 s.addChatMessage(new ChatComponentText(String.format("  %s #%d at %.1f %.1f %.1f (%.1f) hp=%.1f deathTime=%d dead=%s", e.getClass().getSimpleName(),
                     e.getEntityId(), e.posX, e.posY, e.posZ, mc.thePlayer.getDistanceToEntity(e), e.getHealth(), e.deathTime, e.isDead)));
+                // ticks: does the client still update it; serverPos: last position packet; lerp: interpolation steps left
+                s.addChatMessage(new ChatComponentText(String.format("    ticks=%d serverPos=%.1f %.1f %.1f lerp=%s", e.ticksExisted, e.serverPosX / 32.0,
+                    e.serverPosY / 32.0, e.serverPosZ / 32.0, lerpSteps(e))));
             }
             return;
         }
@@ -72,5 +75,20 @@ public class ClientDebugCommand extends CommandBase {
         s.addChatMessage(new ChatComponentText("[client] exe_static=" + mc.thePlayer.getEntityData().getDouble("exe_static") + " exe_apparison="
             + mc.thePlayer.getEntityData().getDouble("exe_apparison") + " overlayEvents=" + ClientEventBridge.overlayEvents
             + " framesWithFlag=" + ClientEventBridge.flagFrames + " clientEffectTicks=" + net.mcreator.boh.compat.effect.BohMobEffect.clientTicks));
+    }
+
+    private static String lerpSteps(EntityLivingBase e) {
+        try {
+            java.lang.reflect.Field f;
+            try {
+                f = EntityLivingBase.class.getDeclaredField("newPosRotationIncrements");
+            } catch (NoSuchFieldException ex) {
+                f = EntityLivingBase.class.getDeclaredField("field_70716_bi");
+            }
+            f.setAccessible(true);
+            return String.valueOf(f.getInt(e));
+        } catch (ReflectiveOperationException ex) {
+            return "?";
+        }
     }
 }

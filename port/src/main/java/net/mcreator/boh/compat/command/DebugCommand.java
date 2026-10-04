@@ -27,7 +27,7 @@ public class DebugCommand extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender s) {
-        return "/bohdebug [effect <boh effect name> [seconds] | dim <dimension> | inspect [radius]]";
+        return "/bohdebug [effect <boh effect name> [seconds] | dim <dimension> | inspect [radius] [name]]";
     }
 
     @Override
@@ -51,7 +51,14 @@ public class DebugCommand extends CommandBase {
             return;
         }
         if (args.length >= 1 && args[0].equals("inspect")) {
-            inspect(s, p, args.length >= 2 ? parseDoubleBounded(s, args[1], 1, 128) : 16);
+            // /bohdebug inspect [radius] [name filter], e.g. /bohdebug inspect lifeform
+            String filter = null;
+            double radius = 16;
+            for (int i = 1; i < args.length; i++) {
+                if (args[i].matches("[0-9.]+")) radius = parseDoubleBounded(s, args[i], 1, 128);
+                else filter = args[i].toLowerCase();
+            }
+            inspect(s, p, radius, filter);
             return;
         }
         if (args.length >= 2 && args[0].equals("effect")) {
@@ -78,11 +85,12 @@ public class DebugCommand extends CommandBase {
     }
 
     /** Server-side state of the nearest non-player living entity, for chasing mobs that look dead or never fight. */
-    private static void inspect(ICommandSender s, EntityPlayerMP p, double radius) {
+    private static void inspect(ICommandSender s, EntityPlayerMP p, double radius, String filter) {
         EntityLivingBase best = null;
         double bestD = Double.MAX_VALUE;
         for (Object o : p.worldObj.getEntitiesWithinAABBExcludingEntity(p, p.boundingBox.expand(radius, radius, radius))) {
-            if (o instanceof EntityLivingBase && !(o instanceof EntityPlayer)) {
+            if (o instanceof EntityLivingBase && !(o instanceof EntityPlayer)
+                && (filter == null || o.getClass().getSimpleName().toLowerCase().contains(filter))) {
                 double d = p.getDistanceSqToEntity((Entity) o);
                 if (d < bestD) {
                     bestD = d;
