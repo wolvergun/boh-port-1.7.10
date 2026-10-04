@@ -90,7 +90,7 @@ public final class SelfTest {
         for (int[] p : points) {
             double[] spot = StructureSets.findArrival(w, spec.biome.key, p[0], p[1]);
             if (spot == null) {
-                log("%s arrival from %d,%d: NO ROOM FOUND", spec.name, p[0], p[1]);
+                log("%s arrival from %d,%d: NO ROOM FOUND (%s)", spec.name, p[0], p[1], StructureSets.lastArrivalMiss);
                 continue;
             }
             int x = (int) Math.floor(spot[0]), y = (int) spot[1], z = (int) Math.floor(spot[2]);

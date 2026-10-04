@@ -115,7 +115,11 @@ public final class StructureSets {
      * original procedures do) usually means falling into the void; this finds the room the player should land in.
      * Loads (and so generates and populates) the chunks around it.
      */
+    /** Why the last findArrival call returned null (for the self-test). */
+    public static String lastArrivalMiss;
+
     public static double[] findArrival(World w, ResourceLocation biome, double px, double pz) {
+        lastArrivalMiss = "no biome";
         if (biome == null) return null;
         int pcx = (int) Math.floor(px) >> 4, pcz = (int) Math.floor(pz) >> 4;
         Entry best = null;
@@ -138,7 +142,12 @@ public final class StructureSets {
                     }
                 }
         }
-        if (best == null) return null;
+        if (best == null) {
+            StringBuilder b = new StringBuilder("no structure set for biome " + biome + "; sets have:");
+            for (Entry e : SETS) b.append(' ').append(e.biomes);
+            lastArrivalMiss = b.toString();
+            return null;
+        }
         for (int x = bcx - 1; x <= bcx + 2; x++) for (int z = bcz - 1; z <= bcz + 2; z++) w.getChunkFromChunkCoords(x, z);
         StructureTemplate t = StructureTemplateManager.INSTANCE.getOrCreate(new ResourceLocation(best.pool));
         Rotation rot = Rotation.values()[new Random(w.getSeed() ^ (bcx * 31L + bcz) * 0x9E3779B97F4A7C15L ^ best.salt).nextInt(4)];
@@ -156,6 +165,15 @@ public final class StructureSets {
                         && !w.getBlock(x, y + 1, z).getMaterial().blocksMovement()) return new double[] { x + 0.5, y, z + 0.5 };
                 }
             }
+        int solid = 0, minY = 999, maxY = -1;
+        for (int x = bcx * 16 - 16; x < bcx * 16 + 48; x++) for (int z = bcz * 16 - 16; z < bcz * 16 + 48; z++) for (int y = 0; y < 64; y++)
+            if (!w.isAirBlock(x, y, z)) {
+                solid++;
+                minY = Math.min(minY, y);
+                maxY = Math.max(maxY, y);
+            }
+        lastArrivalMiss = String.format("%s start chunk %d,%d rot %s size %s centre %d,%d: no floor within 8; %d blocks around it (y %d..%d), start populated %s",
+            best.structure, bcx, bcz, rot, t.getSize(), ox, oz, solid, minY, maxY, w.getChunkFromChunkCoords(bcx, bcz).isTerrainPopulated);
         return null;
     }
 }
