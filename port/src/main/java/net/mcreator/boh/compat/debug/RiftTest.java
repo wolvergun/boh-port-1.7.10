@@ -138,6 +138,8 @@ public final class RiftTest {
             w.setBlock(x, Y + 1, z + 1, stabilizer, 0, 2);
             w.setBlock(x, Y + 1, z - 1, stabilizer, 0, 2);
             spots.add(new int[] { x, z });
+            // Bruce (a shark) is summoned into water
+            if (docs.get(i).equals("boh:document_bruce")) w.setBlock(x, Y + 1, z, Blocks.flowing_water, 0, 2); // as a bucket places it
             use(docs.get(i), x, z);
         }
         // the same document without the stabilizer ring must do nothing
@@ -192,7 +194,7 @@ public final class RiftTest {
 
     private String mobsAt(int x, int z) {
         List<String> names = new ArrayList<>();
-        for (Object o : w.getEntitiesWithinAABB(EntityLiving.class, AxisAlignedBB.getBoundingBox(x - 3, Y - 2, z - 3, x + 4, Y + 8, z + 4))) {
+        for (Object o : w.getEntitiesWithinAABB(EntityLiving.class, AxisAlignedBB.getBoundingBox(x - 4, Y - 2, z - 4, x + 5, Y + 12, z + 5))) {
             Entity e = (Entity) o;
             names.add(EntityList.getEntityString(e));
             e.setDead();
@@ -237,6 +239,11 @@ public final class RiftTest {
             if (w.getBlock(x, Y + 1, z + 1) == stabilizer) left++;
             if (w.getBlock(x, Y + 1, z - 1) == stabilizer) left++;
             String d = docs.get(i).replace("boh:", "");
+            // some documents leave a block instead (the Xenomorph's Ovamorph egg, Vita's crawl) or, for Flowers, send
+            // the user to the Baseplate
+            String placed = Block.blockRegistry.getNameForObject(w.getBlock(x, Y + 1, z));
+            if (mobs.isEmpty() && placed != null && !placed.equals("minecraft:air") && !placed.contains("water")) mobs = "block " + placed;
+            if (mobs.isEmpty() && d.equals("document_flowers") && player.dimension != 0) mobs = "teleported to dimension " + player.dimension;
             if (!mobs.isEmpty() && left == 0) ok++;
             else bad.append(String.format(" %s (mobs '%s', %d stabilizers left);", d, mobs, left));
             all.append(String.format(" %s=%s", d, mobs.isEmpty() ? "-" : mobs.replace("boh.", "")));

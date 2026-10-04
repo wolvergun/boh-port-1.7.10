@@ -243,6 +243,10 @@ public class MWorld extends MItem {
     public static BlockState getBlockState(IBlockAccess w, BlockPos pos) {
         Block b = w.getBlock(pos.getX(), pos.getY(), pos.getZ());
         int meta = w.getBlockMetadata(pos.getX(), pos.getY(), pos.getZ());
+        // 1.20 has one water and one lava block; 1.7.10 splits them into still and flowing (bucket-placed sources are
+        // flowing), so report the still block, which is what Blocks.WATER / Blocks.LAVA are
+        if (b == net.minecraft.init.Blocks.flowing_water) b = net.minecraft.init.Blocks.water;
+        else if (b == net.minecraft.init.Blocks.flowing_lava) b = net.minecraft.init.Blocks.lava;
         int ext = 0;
         if (b instanceof BohBlock && ((BohBlock) b).getStateDefinition().needsExtended() && w instanceof World)
             ext = ExtendedStateStore.get((World) w).getExt(pos.getX(), pos.getY(), pos.getZ());
