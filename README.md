@@ -99,5 +99,9 @@ Compatibility fixes to know about:
    the player renderer's models (`compat/client/ArmPoses`); first-person placement already matches 1.20's
    transform. The Xenomorph's see-through head is the original's look (a translucent dome and empty faces in
    its texture, drawn with 1.20's translucent render type), so it is kept.
+7. Documents (checked by the self-test): Soul Stealer kills drop souls -> Haunted Paper -> the Computer (black dye +
+   Haunted Paper) prints a random document -> right-click the ground inside 4 Rift Stabilizers (one block up, on
+   the four sides) to summon. All 46 documents summon; Bruce needs water in the spot, the Xenomorph leaves an
+   Ovamorph egg, Vita leaves Vita Crawl, Flowers sends you to the Baseplate.
 6. Some mobs don't attack the player or other mobs: target goals are now ports of the 1.20 ones (line of sight to
    acquire, 15 s revenge memory, ...) and ground pathfinding is capped at 64 blocks; needs in-game testing.
