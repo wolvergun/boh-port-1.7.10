@@ -63,6 +63,8 @@ public class StructureTemplate {
     private final List<Info> blocks = new ArrayList<>();
     private final List<NBTTagCompound> entities = new ArrayList<>();
     private int sx, sy, sz;
+    /** Converted palette per (quarter turns, mirror): converting per block cost a registry lookup and map copies. */
+    private final Map<Integer, VanillaStates.Legacy[]> converted = new HashMap<>();
 
     void load(NBTTagCompound tag) {
         NBTTagList size = tag.getTagList("size", 3);
@@ -141,6 +143,19 @@ public class StructureTemplate {
     }
 
     public boolean placeInWorld(World world, BlockPos pos, BlockPos pivot, StructurePlaceSettings settings, Random random, int flags) {
+        return place(world, pos, settings, random, flags, false);
+    }
+
+    /**
+     * Placement during world generation: blocks in chunks that are not populated yet (so never sent to a client) are
+     * written straight into chunk storage, without per-block lighting, neighbour updates or onBlockAdded (as 1.20
+     * worldgen does); sky light is recomputed once per chunk and block light only around light sources.
+     */
+    public boolean placeInWorldgen(World world, BlockPos pos, StructurePlaceSettings settings, Random random) {
+        return place(world, pos, settings, random, 2, true);
+    }
+
+    private boolean place(World world, BlockPos pos, StructurePlaceSettings settings, Random random, int flags, boolean worldgen) {
         if (world == null || world.isRemote || blocks.isEmpty()) return false;
         Mirror mirror = settings.mirror;
         int t = turns(settings.rotation);
@@ -149,25 +164,35 @@ public class StructureTemplate {
             mx = true;
             t = (t + 2) & 3;
         }
+        VanillaStates.Legacy[] pal = convertedPalette(t, mx);
+        boolean[] skip = new boolean[palette.size()];
+        for (int i = 0; i < skip.length; i++) skip[i] = pal[i] == null || ignored(settings, palette.get(i).name);
         List<Object[]> deferred = new ArrayList<>();
+        java.util.Set<net.minecraft.world.chunk.Chunk> fastChunks = new java.util.HashSet<>();
+        List<int[]> lights = new ArrayList<>();
         // two passes: solid blocks first, then attachables (torches, doors, plants) so they find support
         for (int pass = 0; pass < 2; pass++) {
             for (Info b : blocks) {
-                if (b.state < 0 || b.state >= palette.size()) continue;
-                PState ps = palette.get(b.state);
-                if (ignored(settings, ps.name)) continue;
-                VanillaStates.Legacy l = VanillaStates.convert(ps.name, VanillaStates.rotate(ps.props, t, mx));
-                if (l == null) continue;
+                if (b.state < 0 || b.state >= skip.length || skip[b.state]) continue;
+                VanillaStates.Legacy l = pal[b.state];
                 boolean attach = needsSupport(l.block);
                 if ((pass == 0) == attach) continue;
                 int[] p = transform(b.x, b.y, b.z, mirror, settings.rotation);
                 int wx = pos.getX() + p[0], wy = pos.getY() + p[1], wz = pos.getZ() + p[2];
                 if (wy < 0 || wy > 255) continue;
-                if (l.modState != null) M.setBlock(world, new BlockPos(wx, wy, wz), l.modState, 2);
-                else world.setBlock(wx, wy, wz, l.block, l.meta, 2);
-                if (b.nbt != null) deferred.add(new Object[] { b, ps, new int[] { wx, wy, wz } });
+                if (!worldgen || !setFast(world, wx, wy, wz, l, fastChunks, lights)) {
+                    if (l.modState != null) M.setBlock(world, new BlockPos(wx, wy, wz), l.modState, 2);
+                    else world.setBlock(wx, wy, wz, l.block, l.meta, 2);
+                }
+                // block entities without data are created lazily by the chunk when first used
+                if (b.nbt != null && !isEmptyBlockEntity(b.nbt)) deferred.add(new Object[] { b, palette.get(b.state), new int[] { wx, wy, wz } });
             }
         }
+        for (net.minecraft.world.chunk.Chunk c : fastChunks) {
+            c.generateSkylightMap();
+            c.setChunkModified();
+        }
+        for (int[] l : lights) world.func_147451_t(l[0], l[1], l[2]);
         for (Object[] d : deferred) applyBlockEntity(world, (Info) d[0], (PState) d[1], (int[]) d[2], random);
         if (!settings.ignoreEntities) for (NBTTagCompound e : entities) spawnEntity(world, e, pos, mirror, settings.rotation);
         if ((flags & 1) != 0) {
@@ -182,6 +207,54 @@ public class StructureTemplate {
 
     public boolean placeInWorld(World world, BlockPos pos, BlockPos pivot, StructurePlaceSettings settings, Object random, int flags) {
         return placeInWorld(world, pos, pivot, settings, random instanceof Random ? (Random) random : world.rand, flags);
+    }
+
+    private VanillaStates.Legacy[] convertedPalette(int turns, boolean mirrorX) {
+        return converted.computeIfAbsent(turns * 2 + (mirrorX ? 1 : 0), k -> {
+            VanillaStates.Legacy[] out = new VanillaStates.Legacy[palette.size()];
+            for (int i = 0; i < out.length; i++) {
+                PState ps = palette.get(i);
+                out[i] = VanillaStates.convert(ps.name, VanillaStates.rotate(ps.props, turns, mirrorX));
+            }
+            return out;
+        });
+    }
+
+    /** {"id": ..., "Items": []} and the like: nothing to restore, so the block entity can be created lazily. */
+    private static boolean isEmptyBlockEntity(NBTTagCompound nbt) {
+        for (Object k : nbt.func_150296_c()) {
+            String key = (String) k;
+            if (key.equals("id")) continue;
+            NBTBase v = nbt.getTag(key);
+            if (v instanceof NBTTagList && ((NBTTagList) v).tagCount() == 0) continue;
+            return false;
+        }
+        return true;
+    }
+
+    /** Direct chunk-storage write for chunks that are still being generated; false to use World.setBlock. */
+    private static boolean setFast(World world, int x, int y, int z, VanillaStates.Legacy l, java.util.Set<net.minecraft.world.chunk.Chunk> touched,
+        List<int[]> lights) {
+        if (!world.blockExists(x, y, z)) return false;
+        net.minecraft.world.chunk.Chunk c = world.getChunkFromChunkCoords(x >> 4, z >> 4);
+        if (c.isTerrainPopulated) return false;
+        net.minecraft.world.chunk.storage.ExtendedBlockStorage[] st = c.getBlockStorageArray();
+        int sec = y >> 4;
+        if (st[sec] == null) {
+            if (l.block == net.minecraft.init.Blocks.air) return true;
+            st[sec] = new net.minecraft.world.chunk.storage.ExtendedBlockStorage(sec << 4, !world.provider.hasNoSky);
+        }
+        if (st[sec].getBlockByExtId(x & 15, y & 15, z & 15).hasTileEntity(st[sec].getExtBlockMetadata(x & 15, y & 15, z & 15)))
+            c.removeTileEntity(x & 15, y, z & 15);
+        int meta = l.modState != null ? l.modState.meta() : l.meta;
+        st[sec].func_150818_a(x & 15, y & 15, z & 15, l.block);
+        st[sec].setExtBlockMetadata(x & 15, y & 15, z & 15, meta);
+        if (l.modState != null && l.block instanceof net.mcreator.boh.compat.block.BohBlock
+            && ((net.mcreator.boh.compat.block.BohBlock) l.block).getStateDefinition().needsExtended())
+            net.mcreator.boh.compat.mc.world.level.block.state.ExtendedStateStore.get(world).setExt(x, y, z, l.modState.ext());
+        if (l.block.getLightValue() > 0) lights.add(new int[] { x, y, z });
+        touched.add(c);
+        return true;
     }
 
     private static boolean ignored(StructurePlaceSettings s, String name) {

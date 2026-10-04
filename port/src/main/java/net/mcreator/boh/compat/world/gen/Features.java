@@ -190,7 +190,7 @@ public final class Features {
                     JsonArray o = c.getAsJsonArray("offset");
                     for (int i = 0; i < 3; i++) off[i] = o.get(i).getAsInt();
                 }
-                t.placeInWorld(w, new BlockPos(p[0] + off[0], p[1] + off[1], p[2] + off[2]), new BlockPos(0, 0, 0), s, r, 2);
+                t.placeInWorldgen(w, new BlockPos(p[0] + off[0], p[1] + off[1], p[2] + off[2]), s, r);
                 break;
             }
             case "minecraft:tree":

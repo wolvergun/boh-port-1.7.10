@@ -97,7 +97,7 @@ public final class StructureSets {
             StructurePlaceSettings s = new StructurePlaceSettings().setRotation(Rotation.values()[pr.nextInt(4)])
                 .addProcessor(BlockIgnoreProcessor.STRUCTURE_BLOCK);
             try {
-                boolean ok = t.placeInWorld(w, new BlockPos(x, y, z), new BlockPos(0, 0, 0), s, pr, 2);
+                boolean ok = t.placeInWorldgen(w, new BlockPos(x, y, z), s, pr);
                 if (LOGGED.add(e.structure)) net.mcreator.boh.BohMod.LOGGER.info("Structure {} ({}) at {} {} {}: {}", e.structure, e.pool, x, y, z,
                     ok ? "placed" : "template empty or not placed");
             } catch (Throwable ex) {
