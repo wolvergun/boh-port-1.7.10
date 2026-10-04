@@ -20,7 +20,8 @@ public class BohBiome extends BiomeGenBase {
     public final int skyColor, fogColor, grassColor, foliageColor;
 
     public BohBiome(int id, ResourceLocation key, JsonObject json) {
-        super(id, false);
+        // register in BiomeGenBase's biome list: the overworld generator and saved chunks look biomes up by id
+        super(id, true);
         this.key = key;
         this.json = json;
         JsonObject fx = json.getAsJsonObject("effects");
