@@ -169,6 +169,7 @@ public class StructureTemplate {
         for (int i = 0; i < skip.length; i++) skip[i] = pal[i] == null || ignored(settings, palette.get(i).name);
         List<Object[]> deferred = new ArrayList<>();
         java.util.Set<net.minecraft.world.chunk.Chunk> fastChunks = new java.util.HashSet<>();
+        java.util.Map<net.minecraft.world.chunk.Chunk, Boolean> writable = new java.util.HashMap<>();
         List<int[]> lights = new ArrayList<>();
         // two passes: solid blocks first, then attachables (torches, doors, plants) so they find support
         for (int pass = 0; pass < 2; pass++) {
@@ -180,7 +181,7 @@ public class StructureTemplate {
                 int[] p = transform(b.x, b.y, b.z, mirror, settings.rotation);
                 int wx = pos.getX() + p[0], wy = pos.getY() + p[1], wz = pos.getZ() + p[2];
                 if (wy < 0 || wy > 255) continue;
-                if (!worldgen || !setFast(world, wx, wy, wz, l, fastChunks, lights)) {
+                if (!worldgen || !setFast(world, wx, wy, wz, l, fastChunks, writable, lights)) {
                     if (l.modState != null) M.setBlock(world, new BlockPos(wx, wy, wz), l.modState, 2);
                     else world.setBlock(wx, wy, wz, l.block, l.meta, 2);
                 }
@@ -232,12 +233,17 @@ public class StructureTemplate {
         return true;
     }
 
-    /** Direct chunk-storage write for chunks that are still being generated; false to use World.setBlock. */
+    /**
+     * Direct chunk-storage write for chunks no player has received yet (always the case while generating, including
+     * the chunk being populated, which vanilla already flags as populated); false to use World.setBlock.
+     */
     private static boolean setFast(World world, int x, int y, int z, VanillaStates.Legacy l, java.util.Set<net.minecraft.world.chunk.Chunk> touched,
-        List<int[]> lights) {
+        java.util.Map<net.minecraft.world.chunk.Chunk, Boolean> writable, List<int[]> lights) {
         if (!world.blockExists(x, y, z)) return false;
         net.minecraft.world.chunk.Chunk c = world.getChunkFromChunkCoords(x >> 4, z >> 4);
-        if (c.isTerrainPopulated) return false;
+        Boolean ok = writable.get(c);
+        if (ok == null) writable.put(c, ok = !sentToPlayer(world, c.xPosition, c.zPosition));
+        if (!ok) return false;
         net.minecraft.world.chunk.storage.ExtendedBlockStorage[] st = c.getBlockStorageArray();
         int sec = y >> 4;
         if (st[sec] == null) {
@@ -255,6 +261,14 @@ public class StructureTemplate {
         if (l.block.getLightValue() > 0) lights.add(new int[] { x, y, z });
         touched.add(c);
         return true;
+    }
+
+    private static boolean sentToPlayer(World world, int cx, int cz) {
+        if (!(world instanceof net.minecraft.world.WorldServer)) return true;
+        net.minecraft.server.management.PlayerManager pm = ((net.minecraft.world.WorldServer) world).getPlayerManager();
+        for (Object o : world.playerEntities)
+            if (o instanceof net.minecraft.entity.player.EntityPlayerMP && pm.isPlayerWatchingChunk((net.minecraft.entity.player.EntityPlayerMP) o, cx, cz)) return true;
+        return false;
     }
 
     private static boolean ignored(StructurePlaceSettings s, String name) {
