@@ -179,17 +179,6 @@ public final class SelfTest {
                 else if (b == spinel) ore++;
             }
         }
-        // forced kindness flower patches: what the positions look like
-        int forced = 0;
-        StringBuilder sample = new StringBuilder();
-        for (int cx = bx - 5; cx < bx + 5 && sample.length() < 600; cx += 2) for (int cz = bz - 5; cz < bz + 5; cz += 2) {
-            for (int[] p : Features.place(new net.minecraft.util.ResourceLocation("boh", "kindness_flower"), w, rand, cx, cz, true)) {
-                if (w.getBlock(p[0], p[1], p[2]) == flower) forced++;
-                if (sample.length() < 600) sample.append(String.format(" [%d %d %d: %s on %s]", p[0], p[1], p[2], Block.blockRegistry.getNameForObject(w.getBlock(p[0], p[1], p[2])),
-                    Block.blockRegistry.getNameForObject(w.getBlock(p[0], p[1] - 1, p[2]))));
-            }
-        }
-        log("overworld forced kindness_flower: %d at the patch centres;%s", forced, sample);
         // the patch rate itself: 300 forced patches in one plains chunk
         int before = 0, after = 0;
         for (int x = bx * 16 - 8; x < bx * 16 + 40; x++) for (int z = bz * 16 - 8; z < bz * 16 + 40; z++) for (int y = 50; y < 110; y++)
