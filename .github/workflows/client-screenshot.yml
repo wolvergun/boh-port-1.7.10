@@ -1,0 +1,72 @@
+name: Client screenshot
+
+# Starts the real client on a virtual display (Xvfb + Mesa), waits for the title screen and publishes screenshots as
+# the "client-screenshot" release, to check rendering problems without a player. Run it by hand.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  shot:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        angelica: [true, false]
+    defaults:
+      run:
+        working-directory: port
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: zulu
+          java-version: |
+            25
+            21
+
+      - uses: gradle/actions/setup-gradle@v5
+
+      - name: Install a virtual display
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq xvfb imagemagick mesa-utils libgl1-mesa-dri x11-utils > /dev/null
+
+      - name: Run the client and take screenshots
+        env:
+          LIBGL_ALWAYS_SOFTWARE: "1"
+          MESA_GL_VERSION_OVERRIDE: "4.6"
+          MESA_GLSL_VERSION_OVERRIDE: "460"
+        run: |
+          chmod +x gradlew
+          extra=""
+          if [ "${{ matrix.angelica }}" = "true" ]; then extra="-PwithAngelica"; fi
+          Xvfb :99 -screen 0 1280x720x24 &
+          export DISPLAY=:99
+          ./gradlew --stacktrace runClient25 $extra > client.log 2>&1 &
+          for i in $(seq 1 90); do
+            sleep 10
+            if grep -q "Sound engine started\|The game loaded" client.log; then break; fi
+            if ! pgrep -f GradleWorkerMain > /dev/null && ! pgrep -f "runClient" > /dev/null && [ $i -gt 30 ]; then break; fi
+          done
+          sleep 40
+          mkdir -p shots
+          import -window root "shots/title-angelica-${{ matrix.angelica }}.png" || true
+          sleep 10
+          import -window root "shots/title2-angelica-${{ matrix.angelica }}.png" || true
+          pkill -f java || true
+          cp client.log "shots/client-angelica-${{ matrix.angelica }}.log"
+          ls -la shots
+          grep -E "ERROR|Exception" client.log | head -40 || true
+
+      - name: Publish
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view client-screenshot > /dev/null 2>&1 || gh release create client-screenshot --prerelease --title "Client screenshots" --notes "Made by the Client screenshot workflow."
+          gh release upload client-screenshot shots/* --clobber

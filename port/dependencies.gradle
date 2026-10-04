@@ -35,4 +35,8 @@
  */
 dependencies {
     //runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.7.69-GTNH:dev")
+    // the client screenshot workflow runs with the same renderer as the test pack: -PwithAngelica
+    if (project.hasProperty("withAngelica")) {
+        runtimeOnlyNonPublishable("com.github.GTNewHorizons:Angelica:2.2.25:dev")
+    }
 }
