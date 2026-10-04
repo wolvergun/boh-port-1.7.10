@@ -48,6 +48,9 @@ jobs:
           chmod +x gradlew
           extra=""
           if [ "${{ matrix.angelica }}" = "true" ]; then extra="-PwithAngelica"; fi
+          # lwjgl3ify writes a desktop entry under $XDG_DATA_HOME on Linux
+          export XDG_DATA_HOME="$HOME/.local/share"
+          mkdir -p "$XDG_DATA_HOME"
           Xvfb :99 -screen 0 1280x720x24 &
           export DISPLAY=:99
           ./gradlew --stacktrace runClient25 $extra > client.log 2>&1 &
@@ -71,5 +74,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release view client-screenshot > /dev/null 2>&1 || gh release create client-screenshot --prerelease --title "Client screenshots" --notes "Made by the Client screenshot workflow."
-          gh release upload client-screenshot shots/* --clobber
+          # both matrix jobs publish here; the second may race the first to create the release
+          for i in 1 2 3; do
+            gh release view client-screenshot > /dev/null 2>&1 || gh release create client-screenshot --target "$GITHUB_SHA" --prerelease \
+              --title "Client screenshots" --notes "Made by the Client screenshot workflow." || true
+            gh release upload client-screenshot shots/* --clobber && break
+            sleep 10
+          done
