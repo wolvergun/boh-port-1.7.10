@@ -211,7 +211,7 @@ public class MEntity extends MWorld {
     }
 
     public static void setYHeadRot(Entity e, float v) {
-        e.setRotationYawHead(v);
+        if (e instanceof EntityLivingBase) ((EntityLivingBase) e).rotationYawHead = v; // setRotationYawHead is client-only
     }
 
     public static float getYHeadRot(Entity e) {
@@ -240,7 +240,7 @@ public class MEntity extends MWorld {
         double h = Math.sqrt(dx * dx + dz * dz);
         e.rotationPitch = MathHelper.wrapAngleTo180_float((float) (-(Math.atan2(dy, h) * 180.0 / Math.PI)));
         e.rotationYaw = MathHelper.wrapAngleTo180_float((float) (Math.atan2(dz, dx) * 180.0 / Math.PI) - 90.0F);
-        e.setRotationYawHead(e.rotationYaw);
+        if (e instanceof EntityLivingBase) ((EntityLivingBase) e).rotationYawHead = e.rotationYaw; // setRotationYawHead is client-only
         e.prevRotationPitch = e.rotationPitch;
         e.prevRotationYaw = e.rotationYaw;
         if (e instanceof EntityPlayerMP)
@@ -519,7 +519,10 @@ public class MEntity extends MWorld {
     }
 
     public static float getAttackAnim(EntityLivingBase e, float partial) {
-        return e.getSwingProgress(partial);
+        // EntityLivingBase.getSwingProgress is client-only
+        float d = e.swingProgress - e.prevSwingProgress;
+        if (d < 0) d++;
+        return e.prevSwingProgress + d * partial;
     }
 
     public static void updateSwingTime(EntityLivingBase e) {}
@@ -711,7 +714,8 @@ public class MEntity extends MWorld {
     }
 
     public static ItemStack getUseItem(EntityLivingBase e) {
-        return e instanceof EntityPlayer ? stack(((EntityPlayer) e).getItemInUse()) : EMPTY;
+        // EntityPlayer.getItemInUse is client-only; the item in use is always the held item
+        return e instanceof EntityPlayer && ((EntityPlayer) e).isUsingItem() ? stack(e.getHeldItem()) : EMPTY;
     }
 
     public static InteractionHand getUsedItemHand(EntityLivingBase e) {

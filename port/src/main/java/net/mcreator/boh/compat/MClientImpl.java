@@ -159,6 +159,10 @@ public final class MClientImpl {
         else Minecraft.getMinecraft().entityRenderer.disableLightmap(0);
     }
 
+    public static String formattedText(net.minecraft.util.IChatComponent c) {
+        return c.getFormattedText();
+    }
+
     public static net.minecraft.util.ResourceLocation skin(net.minecraft.entity.player.EntityPlayer p) {
         return p instanceof net.minecraft.client.entity.AbstractClientPlayer ? ((net.minecraft.client.entity.AbstractClientPlayer) p).getLocationSkin()
             : net.minecraft.client.entity.AbstractClientPlayer.locationStevePng;

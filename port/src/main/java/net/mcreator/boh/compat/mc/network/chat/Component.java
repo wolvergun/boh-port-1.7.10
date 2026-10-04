@@ -47,7 +47,9 @@ public class Component {
     }
 
     public String getFormattedText() {
-        return handle.getFormattedText();
+        // IChatComponent.getFormattedText is client-only
+        return cpw.mods.fml.common.FMLCommonHandler.instance().getSide().isClient() ? net.mcreator.boh.compat.MClientImpl.formattedText(handle)
+            : handle.getUnformattedText();
     }
 
     public MutableComponent copy() {

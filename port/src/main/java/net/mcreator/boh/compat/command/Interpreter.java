@@ -191,7 +191,7 @@ public final class Interpreter {
                 return 1;
             case "gamemode":
                 for (Entity e : Selectors.resolve(i + 2 < t.size() ? t.get(i + 2) : "@s", ctx))
-                    if (e instanceof EntityPlayerMP) ((EntityPlayerMP) e).setGameType(net.minecraft.world.WorldSettings.GameType.getByName(t.get(i + 1)));
+                    if (e instanceof EntityPlayerMP) ((EntityPlayerMP) e).setGameType(gameType(t.get(i + 1)));
                 return 1;
             default:
                 return 0;
@@ -684,5 +684,12 @@ public final class Interpreter {
         int n = 0;
         for (String l : lines) n += run(l, ctx);
         return n;
+    }
+
+    /** WorldSettings.GameType.getByName is client-only. */
+    private static net.minecraft.world.WorldSettings.GameType gameType(String name) {
+        for (net.minecraft.world.WorldSettings.GameType g : net.minecraft.world.WorldSettings.GameType.values())
+            if (g.getName().equals(name) || String.valueOf(g.getID()).equals(name)) return g;
+        return net.minecraft.world.WorldSettings.GameType.SURVIVAL;
     }
 }

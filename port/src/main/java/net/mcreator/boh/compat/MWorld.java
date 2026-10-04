@@ -166,7 +166,7 @@ public class MWorld extends MItem {
     }
 
     public static int getMoonPhase(World w) {
-        return w.getMoonPhase();
+        return w.provider.getMoonPhase(w.getWorldTime());
     }
 
     public static float getRainLevel(World w, float partial) {

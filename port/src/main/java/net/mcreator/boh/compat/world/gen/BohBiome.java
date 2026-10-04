@@ -100,11 +100,13 @@ public class BohBiome extends BiomeGenBase {
     }
 
     @Override
+    @cpw.mods.fml.relauncher.SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
     public int getBiomeGrassColor(int x, int y, int z) {
         return grassColor < 0 ? super.getBiomeGrassColor(x, y, z) : grassColor;
     }
 
     @Override
+    @cpw.mods.fml.relauncher.SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
     public int getBiomeFoliageColor(int x, int y, int z) {
         return foliageColor < 0 ? super.getBiomeFoliageColor(x, y, z) : foliageColor;
     }

@@ -37,8 +37,11 @@ public enum ChatFormatting {
         return toVanilla().toString();
     }
 
+    private static final java.util.regex.Pattern FORMATTING_CODE = java.util.regex.Pattern.compile("(?i)\u00a7[0-9a-fk-or]");
+
     public static String stripFormatting(String s) {
-        return EnumChatFormatting.getTextWithoutFormattingCodes(s);
+        // EnumChatFormatting.getTextWithoutFormattingCodes is client-only
+        return s == null ? null : FORMATTING_CODE.matcher(s).replaceAll("");
     }
 
     public static ChatFormatting getByName(String name) {

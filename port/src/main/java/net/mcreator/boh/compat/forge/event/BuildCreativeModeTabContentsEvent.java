@@ -27,6 +27,8 @@ public class BuildCreativeModeTabContentsEvent extends Event {
     }
 
     public void accept(Object o) {
+        // creative tabs only matter on the client, and Item.getCreativeTab doesn't exist on a server
+        if (!cpw.mods.fml.common.FMLCommonHandler.instance().getSide().isClient()) return;
         Item item = o instanceof Supplier ? toItem(((Supplier<?>) o).get()) : toItem(o);
         if (item == null || item.getCreativeTab() != null) return;
         item.setCreativeTab(vanillaTab(tabKey));
