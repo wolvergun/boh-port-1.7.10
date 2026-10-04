@@ -88,8 +88,10 @@ Compatibility fixes to know about:
    Fix it, then check the other mobs for the same problem.
 2. Level 0 ambience (sound loop, mood sounds, music, ash particles); the Boiler Room's random Freddy laugh; Shrouded
    Cliffs' fog colour in the overworld.
-3. Test Baseplate, Boiler Room and Gaster's room in-game, plus the overworld structures (Sadako well, Siren Head
-   nests, forest structures).
+3. Baseplate, Boiler Room and Gaster's room: the CI self-test now checks they generate whole and that arriving puts
+   you inside the room (structures wider than 2x2 chunks used to be cut off, and arrival used to miss the room).
+   Still to check in-game: those rooms, plus the overworld structures (Sadako well, Siren Head nests, forest
+   structures).
 4. ~~Apply villager trades and brewing recipes~~: hooked up (trade handler + PotionBrewEvent), needs in-game testing.
 5. Polish arm poses and 3D weapon positioning; optionally make the Xenomorph's see-through head solid.
 6. Some mobs don't attack the player or other mobs: target goals are now ports of the 1.20 ones (line of sight to
