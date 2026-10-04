@@ -123,7 +123,8 @@ public class BohMod {
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         MOD_BUS.post(new FMLCommonSetupEvent());
-        if (cpw.mods.fml.common.FMLCommonHandler.instance().getSide().isClient()) net.mcreator.boh.compat.client.ItemTabs.assign();
+        if (cpw.mods.fml.common.FMLCommonHandler.instance().getSide().isClient() && !ClientProxy.off("itemTabs"))
+            net.mcreator.boh.compat.client.ItemTabs.assign();
         net.mcreator.boh.compat.forge.event.BuildCreativeModeTabContentsEvent.postAll(MOD_BUS);
         MOD_BUS.post(new net.mcreator.boh.compat.forge.registries.RegisterEvent());
         Advancements.init();

@@ -20,6 +20,8 @@ public class Particle extends EntityFX {
     public float gravity, friction = 0.98F, quadSize;
     public float rCol = 1, gCol = 1, bCol = 1, alpha = 1;
     public float roll, oRoll;
+    /** Stays vertical and only turns to face the camera horizontally (the rift tear), instead of a full billboard. */
+    public boolean upright;
     public boolean hasPhysics = true, removed, speedUpWhenYMotionIsBlocked;
     public final Random random = new Random();
     protected IIcon sprite;
@@ -193,6 +195,17 @@ public class Particle extends EntityFX {
         float r = oRoll + (roll - oRoll) * partial;
         float[][] corners = { { -1, -1 }, { -1, 1 }, { 1, 1 }, { 1, -1 } };
         float[][] uv = { { u1, v1 }, { u1, v0 }, { u0, v0 }, { u0, v1 } };
+        if (upright) {
+            // horizontal right vector (rx, 0, rz) is unit length; up is world up
+            float len = MathHelper.sqrt_float(rx * rx + rz * rz);
+            if (len > 1.0E-4F) {
+                rx /= len;
+                rz /= len;
+            }
+            ryz = 0;
+            rxz = 1;
+            rxy = 0;
+        }
         float cos = MathHelper.cos(r), sin = MathHelper.sin(r);
         for (int i = 0; i < 4; i++) {
             float cx = corners[i][0] * cos - corners[i][1] * sin, cy = corners[i][0] * sin + corners[i][1] * cos;

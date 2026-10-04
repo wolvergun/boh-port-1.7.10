@@ -9,3 +9,4 @@ PacketDistributor.DIMENSION.with(level::dimension) => PacketDistributor.DIMENSIO
 _serverworld.random,  => M.random(_serverworld), 
 return world instanceof World serverLevelAcc ? (BohModVariables.MapVariables) => return world instanceof World serverLevelAcc && !M.isClientSide(serverLevelAcc) ? (BohModVariables.MapVariables)
 AbstractClientPlayer player = M.player(mc); => net.minecraft.entity.player.EntityPlayer player = M.player(mc);
+this.quadSize *= 15.0F; => this.quadSize *= 15.0F; this.upright = true;

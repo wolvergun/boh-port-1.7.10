@@ -80,7 +80,10 @@ public final class ParticleEngine {
 
     @SubscribeEvent
     public void onStitch(TextureStitchEvent.Pre event) {
-        if (event.map.getTextureType() != 1) return;
+        // only the game's item atlas: other mods' item-type atlases (Fisk's hero atlas) stitch too, and registering here
+        // would point the particle icons into an atlas that is never bound for particles
+        if (event.map.getTextureType() != 1
+            || event.map != Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.locationItemsTexture)) return;
         TextureMap map = event.map;
         for (Sprites s : SPRITES.values()) {
             s.icons.clear();

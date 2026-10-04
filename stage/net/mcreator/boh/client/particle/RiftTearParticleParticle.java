@@ -25,6 +25,7 @@ public class RiftTearParticleParticle extends TextureSheetParticle {
         this.spriteSet = spriteSet;
         M.setSize(this, 0.2F, 0.2F);
         this.quadSize *= 15.0F;
+        this.upright = true;
         this.lifetime = 48;
         this.gravity = 0.0F;
         this.hasPhysics = true;

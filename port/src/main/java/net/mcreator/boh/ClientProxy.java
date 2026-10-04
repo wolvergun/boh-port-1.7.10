@@ -44,9 +44,10 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void init() {
         BlockModels.assignRenderIds();
-        net.mcreator.boh.compat.client.VillagerSkins.register();
-        net.mcreator.boh.compat.client.BiomeAmbience.register();
-        net.mcreator.boh.compat.client.ArmPoses.install();
+        // -Dboh.off=villagerSkins,biomeAmbience,armPoses,itemTabs turns client features off (for finding mod clashes)
+        if (!off("villagerSkins")) net.mcreator.boh.compat.client.VillagerSkins.register();
+        if (!off("biomeAmbience")) net.mcreator.boh.compat.client.BiomeAmbience.register();
+        if (!off("armPoses")) net.mcreator.boh.compat.client.ArmPoses.install();
         RenderingRegistry.registerEntityRenderingHandler(net.mcreator.boh.compat.entity.BohAreaEffectCloud.class, new net.minecraft.client.renderer.entity.Render() {
 
             @Override
@@ -88,5 +89,12 @@ public class ClientProxy extends CommonProxy {
         BohMod.MOD_BUS.post(fx);
         DimensionSpecialEffectsManager.set(ImmutableMap.copyOf(fx.effects));
         BohMod.MOD_BUS.post(new FMLClientSetupEvent());
+    }
+
+    public static boolean off(String feature) {
+        String v = System.getProperty("boh.off", "");
+        boolean o = ("," + v.replace(" ", "") + ",").contains("," + feature + ",");
+        if (o) BohMod.LOGGER.info("Client feature {} is off (-Dboh.off)", feature);
+        return o;
     }
 }
