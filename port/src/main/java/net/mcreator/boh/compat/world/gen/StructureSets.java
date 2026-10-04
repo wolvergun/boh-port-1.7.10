@@ -105,4 +105,54 @@ public final class StructureSets {
             }
         }
     }
+
+    /**
+     * A standing spot inside the nearest structure of a mod biome (Boiler Room, Gaster's room, ...), or null. The mod
+     * dimensions are void with one structure per grid cell, so arriving at the coordinates you left from (as the
+     * original procedures do) usually means falling into the void; this finds the room the player should land in.
+     * Loads (and so generates and populates) the chunks around it.
+     */
+    public static double[] findArrival(World w, ResourceLocation biome, double px, double pz) {
+        if (biome == null) return null;
+        int pcx = (int) Math.floor(px) >> 4, pcz = (int) Math.floor(pz) >> 4;
+        Entry best = null;
+        int bcx = 0, bcz = 0;
+        long bestD = Long.MAX_VALUE;
+        for (Entry e : SETS) {
+            if (!e.biomes.equals(biome.toString())) continue;
+            int range = Math.max(1, e.spacing - e.separation);
+            for (int sx = Math.floorDiv(pcx, e.spacing) - 2; sx <= Math.floorDiv(pcx, e.spacing) + 2; sx++)
+                for (int sz = Math.floorDiv(pcz, e.spacing) - 2; sz <= Math.floorDiv(pcz, e.spacing) + 2; sz++) {
+                    // same start chunk as generate()
+                    Random r = new Random(sx * 341873128712L + sz * 132897987541L + w.getSeed() + e.salt);
+                    int cx = sx * e.spacing + r.nextInt(range), cz = sz * e.spacing + r.nextInt(range);
+                    long dx = cx - pcx, dz = cz - pcz, d = dx * dx + dz * dz;
+                    if (d < bestD) {
+                        bestD = d;
+                        best = e;
+                        bcx = cx;
+                        bcz = cz;
+                    }
+                }
+        }
+        if (best == null) return null;
+        for (int x = bcx - 1; x <= bcx + 2; x++) for (int z = bcz - 1; z <= bcz + 2; z++) w.getChunkFromChunkCoords(x, z);
+        StructureTemplate t = StructureTemplateManager.INSTANCE.getOrCreate(new ResourceLocation(best.pool));
+        Rotation rot = Rotation.values()[new Random(w.getSeed() ^ (bcx * 31L + bcz) * 0x9E3779B97F4A7C15L ^ best.salt).nextInt(4)];
+        int hx = t.getSize().getX() / 2, hz = t.getSize().getZ() / 2;
+        int[] c = rot == Rotation.CLOCKWISE_90 ? new int[] { -hz, hx } : rot == Rotation.CLOCKWISE_180 ? new int[] { -hx, -hz }
+            : rot == Rotation.COUNTERCLOCKWISE_90 ? new int[] { hz, -hx } : new int[] { hx, hz };
+        int ox = bcx * 16 + 16 + c[0], oz = bcz * 16 + 16 + c[1];
+        // nearest column to the middle with a floor and two free blocks above it, lowest floor first
+        for (int rad = 0; rad <= 8; rad++)
+            for (int dx = -rad; dx <= rad; dx++) for (int dz = -rad; dz <= rad; dz++) {
+                if (Math.max(Math.abs(dx), Math.abs(dz)) != rad) continue;
+                int x = ox + dx, z = oz + dz;
+                for (int y = 1; y < w.getActualHeight() - 2; y++) {
+                    if (w.getBlock(x, y - 1, z).getMaterial().blocksMovement() && !w.getBlock(x, y, z).getMaterial().blocksMovement()
+                        && !w.getBlock(x, y + 1, z).getMaterial().blocksMovement()) return new double[] { x + 0.5, y, z + 0.5 };
+                }
+            }
+        return null;
+    }
 }

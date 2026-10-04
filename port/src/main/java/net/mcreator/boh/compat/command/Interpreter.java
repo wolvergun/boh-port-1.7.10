@@ -480,6 +480,17 @@ public final class Interpreter {
             for (int attempt = 0; attempt < 20; attempt++) {
                 int x = (int) Math.floor(cx + (r.nextDouble() * 2 - 1) * maxRange), z = (int) Math.floor(cz + (r.nextDouble() * 2 - 1) * maxRange);
                 int y = Math.min(maxHeight, ctx.world.getActualHeight() - 1);
+                if (ctx.world.provider instanceof net.mcreator.boh.compat.world.gen.BohWorldProvider
+                    && ((net.mcreator.boh.compat.world.gen.BohWorldProvider) ctx.world.provider).spec().floor != null) {
+                    // floored mod dimensions (Level 0) are a maze under one roof: 1.20 would drop the mob on the roof,
+                    // which looks like it sinks into the ceiling; use the walkable floor level instead
+                    int f = 1;
+                    while (f < y && !(ctx.world.getBlock(x, f - 1, z).getMaterial().blocksMovement() && ctx.world.isAirBlock(x, f, z)
+                        && ctx.world.isAirBlock(x, f + 1, z))) f++;
+                    if (f >= y) continue;
+                    M.teleportTo(e, x + 0.5, f, z + 0.5);
+                    break;
+                }
                 while (y > 1 && ctx.world.isAirBlock(x, y, z)) y--;
                 while (y > 1 && !ctx.world.isAirBlock(x, y, z) && maxHeight < 256) {
                     // under <maxHeight>: find a free spot below the ceiling

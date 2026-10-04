@@ -52,12 +52,19 @@ public final class Dimensions {
         MinecraftServer server = MinecraftServer.getServer();
         WorldServer target = server.worldServerForDimension(dim);
         if (target == null) return;
+        double[] spot = safeArrival(target, x, y, z);
+        if (spot != null) {
+            x = spot[0];
+            y = spot[1];
+            z = spot[2];
+        }
+        final double fx = x, fy = y, fz = z;
         if (player.dimension != dim) {
             server.getConfigurationManager().transferPlayerToDimension(player, dim, new Teleporter(target) {
 
                 @Override
                 public void placeInPortal(net.minecraft.entity.Entity e, double px, double py, double pz, float rot) {
-                    e.setLocationAndAngles(x, y, z, yaw, pitch);
+                    e.setLocationAndAngles(fx, fy, fz, yaw, pitch);
                     e.motionX = e.motionY = e.motionZ = 0;
                 }
 
@@ -77,5 +84,19 @@ public final class Dimensions {
             });
         }
         player.playerNetServerHandler.setPlayerLocation(x, y, z, yaw, pitch);
+    }
+
+    /**
+     * Into a mod dimension over nothing (void dimensions with rooms on a grid): the spot inside the nearest room,
+     * else null to keep the requested position. Dimensions with a floor everywhere (Level 0) never need it.
+     */
+    private static double[] safeArrival(WorldServer target, double x, double y, double z) {
+        if (!(target.provider instanceof net.mcreator.boh.compat.world.gen.BohWorldProvider)) return null;
+        int bx = net.minecraft.util.MathHelper.floor_double(x), bz = net.minecraft.util.MathHelper.floor_double(z);
+        target.getChunkFromBlockCoords(bx, bz);
+        for (int by = Math.min(net.minecraft.util.MathHelper.floor_double(y), target.getActualHeight() - 1); by >= 0; by--)
+            if (target.getBlock(bx, by, bz).getMaterial().blocksMovement()) return null;
+        net.mcreator.boh.compat.world.gen.BohWorldProvider p = (net.mcreator.boh.compat.world.gen.BohWorldProvider) target.provider;
+        return net.mcreator.boh.compat.world.gen.StructureSets.findArrival(target, p.spec().biome.key, x, z);
     }
 }
