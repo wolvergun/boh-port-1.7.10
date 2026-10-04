@@ -93,6 +93,9 @@ public final class StructureSets {
             int x = cx * 16 + 16, z = cz * 16 + 16;
             // jigsaw: first free height at the start + start_height, minus the single pool element ground level delta (1)
             int y = e.heightmap == null ? e.startY + 64 : BohWorldProvider.baseHeight(w, x, z) + e.startY - 1;
+            // void dimensions have no ground to sink into: 1.20 would put the bottom layer (the Boiler Room's floor)
+            // below the world, so keep the whole template inside it
+            if (y < 0) y = 0;
             Random pr = new Random(w.getSeed() ^ (cx * 31L + cz) * 0x9E3779B97F4A7C15L ^ e.salt);
             StructurePlaceSettings s = new StructurePlaceSettings().setRotation(Rotation.values()[pr.nextInt(4)])
                 .addProcessor(BlockIgnoreProcessor.STRUCTURE_BLOCK);

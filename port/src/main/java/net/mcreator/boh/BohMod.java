@@ -92,6 +92,7 @@ public class BohMod {
         EventBridge.install();
         net.mcreator.boh.compat.world.SafeScoreboardSave.install();
         net.mcreator.boh.compat.forge.common.brewing.BrewingHooks.install();
+        net.mcreator.boh.compat.debug.SelfTest.installIfEnabled();
 
         BohModSounds.REGISTRY.register(MOD_BUS);
         BohModBlocks.REGISTRY.register(MOD_BUS);
