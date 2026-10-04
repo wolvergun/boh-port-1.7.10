@@ -90,6 +90,17 @@ public class DebugCommand extends CommandBase {
                 }
             }
         }
+        // also scan the world's entity list: a mob missing from its chunk's list would not show up in the box search above
+        java.util.List<EntityLivingBase> all = new java.util.ArrayList<>();
+        for (Object o : p.worldObj.loadedEntityList) {
+            if (o instanceof EntityLivingBase && !(o instanceof EntityPlayer) && p.getDistanceToEntity((Entity) o) <= radius * 2) all.add((EntityLivingBase) o);
+        }
+        all.sort(java.util.Comparator.comparingDouble(e -> p.getDistanceToEntity(e)));
+        StringBuilder near = new StringBuilder("[server] mobs within " + radius * 2 + ":");
+        for (EntityLivingBase e : all.subList(0, Math.min(8, all.size()))) {
+            near.append(String.format(" %s#%d(%.1f)", e.getClass().getSimpleName(), e.getEntityId(), p.getDistanceToEntity(e)));
+        }
+        msg(s, near.toString());
         if (best == null) {
             s.addChatMessage(new ChatComponentText("No mob within " + radius + " blocks"));
             return;
