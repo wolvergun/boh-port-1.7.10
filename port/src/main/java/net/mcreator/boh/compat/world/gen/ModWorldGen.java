@@ -80,6 +80,7 @@ public final class ModWorldGen implements IWorldGenerator {
     }
 
     private static boolean loggedFirst;
+    private static final Set<ResourceLocation> FAILED = java.util.Collections.synchronizedSet(new java.util.HashSet<>());
 
     public void populate(Random random, int cx, int cz, World world, BiomeGenBase biome) {
         if (world.provider instanceof BohWorldProvider && !loggedFirst) {
@@ -101,7 +102,7 @@ public final class ModWorldGen implements IWorldGenerator {
                 try {
                     Features.place(f, world, random, cx, cz);
                 } catch (Exception e) {
-                    net.mcreator.boh.BohMod.LOGGER.debug("feature " + f + " failed", e);
+                    if (FAILED.add(f)) net.mcreator.boh.BohMod.LOGGER.warn("feature " + f + " failed", e);
                 }
             }
         } finally {

@@ -160,21 +160,26 @@ public final class SelfTest {
             }
             log("overworld %s (%s): %s", id, names, result);
         }
-        // natural population: kindness flowers and spinel ore are in every overworld biome
+        // natural population, in plains (open grass: kindness flowers are in every overworld biome, spinel ore too)
+        java.util.List<net.minecraft.world.biome.BiomeGenBase> plains = java.util.Collections.singletonList(net.minecraft.world.biome.BiomeGenBase.plains);
+        net.minecraft.world.ChunkPosition pl = w.getWorldChunkManager().findBiomePosition(-4800, 4800, 1500, plains, rand);
+        int bx = pl == null ? -4800 : pl.chunkPosX >> 4, bz = pl == null ? 4800 : pl.chunkPosZ >> 4;
         int flowers = 0, ore = 0, n = 0;
+        java.util.Map<String, Integer> biomes = new java.util.TreeMap<>();
         Block flower = Block.getBlockFromName("boh:kindness_flower"), spinel = Block.getBlockFromName("boh:spinel_ore_ore");
-        for (int cx = -300; cx < -290; cx++) for (int cz = 300; cz < 310; cz++) for (int x = cx - 1; x <= cx + 1; x++) for (int z = cz - 1; z <= cz + 1; z++)
-            w.theChunkProviderServer.loadChunk(x, z);
-        for (int cx = -300; cx < -290; cx++) for (int cz = 300; cz < 310; cz++) {
+        for (int cx = bx - 6; cx < bx + 6; cx++) for (int cz = bz - 6; cz < bz + 6; cz++) w.theChunkProviderServer.loadChunk(cx, cz);
+        for (int cx = bx - 5; cx < bx + 5; cx++) for (int cz = bz - 5; cz < bz + 5; cz++) {
             Chunk c = w.getChunkFromChunkCoords(cx, cz);
             if (!c.isTerrainPopulated) continue;
             n++;
+            biomes.merge(w.getBiomeGenForCoords(cx * 16 + 8, cz * 16 + 8).biomeName, 1, Integer::sum);
             for (int x = 0; x < 16; x++) for (int z = 0; z < 16; z++) for (int y = 1; y < 128; y++) {
                 Block b = c.getBlock(x, y, z);
                 if (b == flower) flowers++;
                 else if (b == spinel) ore++;
             }
         }
-        log("overworld population: %d chunks, %d kindness flowers, %.1f spinel ore/chunk (%s, %s)", n, flowers, ore / (double) Math.max(1, n), flower, spinel);
+        log("overworld population around chunk %d,%d: %d chunks %s, %d kindness flowers, %.1f spinel ore/chunk", bx, bz, n, biomes, flowers,
+            ore / (double) Math.max(1, n));
     }
 }
