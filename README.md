@@ -62,6 +62,7 @@ Debug commands:
 
 - `/bohdebug dim <level_0|baseplate_dimension|boiler_room_dimension|gaster_dimension|overworld>`: teleport between dimensions
 - `/bohdebug effect <name>`: apply a mod effect
+- `/bohdebug inspect [radius]`: dump the server-side state of the nearest mob (health, death timer, hitbox, AI target, running goals)
 
 ## Status
 

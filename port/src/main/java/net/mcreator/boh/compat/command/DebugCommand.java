@@ -2,12 +2,22 @@ package net.mcreator.boh.compat.command;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.EntityAITasks;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ChatComponentText;
 
-/** /bohdebug [effect <name> [seconds]] - shows the player's mod effects and overlay flags, or applies a mod effect. */
+/**
+ * /bohdebug [effect <name> [seconds] | dim <dimension> | inspect [radius]] - shows the player's mod effects and overlay
+ * flags, applies a mod effect, teleports between dimensions, or dumps the server-side state of the nearest mob.
+ */
 public class DebugCommand extends CommandBase {
 
     @Override
@@ -17,7 +27,7 @@ public class DebugCommand extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender s) {
-        return "/bohdebug [effect <boh effect name> [seconds] | dim <dimension>]";
+        return "/bohdebug [effect <boh effect name> [seconds] | dim <dimension> | inspect [radius]]";
     }
 
     @Override
@@ -38,6 +48,10 @@ public class DebugCommand extends CommandBase {
             }
             net.mcreator.boh.compat.world.Dimensions.transferPlayer(p, id, p.posX, id == 0 ? 100 : p.posY, p.posZ, p.rotationYaw, p.rotationPitch);
             s.addChatMessage(new ChatComponentText("Sent to " + key.location() + " (dimension id " + id + ")"));
+            return;
+        }
+        if (args.length >= 1 && args[0].equals("inspect")) {
+            inspect(s, p, args.length >= 2 ? parseDoubleBounded(s, args[1], 1, 128) : 16);
             return;
         }
         if (args.length >= 2 && args[0].equals("effect")) {
@@ -61,5 +75,68 @@ public class DebugCommand extends CommandBase {
         net.minecraft.nbt.NBTTagCompound d = p.getEntityData();
         s.addChatMessage(new ChatComponentText("exe_static=" + d.getDouble("exe_static") + " exe_apparison=" + d.getDouble("exe_apparison")
             + " (server side; overlays use the client copy)"));
+    }
+
+    /** Server-side state of the nearest non-player living entity, for chasing mobs that look dead or never fight. */
+    private static void inspect(ICommandSender s, EntityPlayerMP p, double radius) {
+        EntityLivingBase best = null;
+        double bestD = Double.MAX_VALUE;
+        for (Object o : p.worldObj.getEntitiesWithinAABBExcludingEntity(p, p.boundingBox.expand(radius, radius, radius))) {
+            if (o instanceof EntityLivingBase && !(o instanceof EntityPlayer)) {
+                double d = p.getDistanceSqToEntity((Entity) o);
+                if (d < bestD) {
+                    bestD = d;
+                    best = (EntityLivingBase) o;
+                }
+            }
+        }
+        if (best == null) {
+            s.addChatMessage(new ChatComponentText("No mob within " + radius + " blocks"));
+            return;
+        }
+        EntityLivingBase e = best;
+        msg(s, e.getClass().getSimpleName() + " #" + e.getEntityId() + String.format(" at %.1f %.1f %.1f (%.1f blocks)", e.posX, e.posY, e.posZ, Math.sqrt(bestD)));
+        msg(s, "health=" + e.getHealth() + "/" + e.getMaxHealth() + " isDead=" + e.isDead + " alive=" + e.isEntityAlive() + " deathTime=" + e.deathTime
+            + " hurtTime=" + e.hurtTime + " invulnerable=" + e.isEntityInvulnerable() + " hurtResistantTime=" + e.hurtResistantTime);
+        msg(s, String.format("size=%.2fx%.2f box=[%.1f %.1f %.1f -> %.1f %.1f %.1f] onGround=%s riding=%s ridden=%s sleeping=%s", e.width, e.height,
+            e.boundingBox.minX, e.boundingBox.minY, e.boundingBox.minZ, e.boundingBox.maxX, e.boundingBox.maxY, e.boundingBox.maxZ, e.onGround,
+            name(e.ridingEntity), name(e.riddenByEntity), e instanceof EntityPlayer && ((EntityPlayer) e).isPlayerSleeping()));
+        if (e instanceof net.mcreator.boh.compat.entity.BohMob) {
+            msg(s, "noAi=" + ((net.mcreator.boh.compat.entity.BohMob) e).isNoAi());
+        }
+        if (e instanceof EntityLiving) {
+            EntityLiving l = (EntityLiving) e;
+            msg(s, "attackTarget=" + name(l.getAttackTarget()) + (l instanceof EntityCreature ? " entityToAttack=" + name(((EntityCreature) l).getEntityToAttack()) : "")
+                + " path=" + (l.getNavigator().noPath() ? "none" : "yes") + " persistent=" + l.isNoDespawnRequired());
+            msg(s, "running goals: " + running(l.tasks) + " | targets: " + running(l.targetTasks));
+        }
+    }
+
+    private static String running(EntityAITasks tasks) {
+        StringBuilder b = new StringBuilder();
+        try {
+            java.lang.reflect.Field f;
+            try {
+                f = EntityAITasks.class.getDeclaredField("executingTaskEntries");
+            } catch (NoSuchFieldException ex) {
+                f = EntityAITasks.class.getDeclaredField("field_75780_b");
+            }
+            f.setAccessible(true);
+            for (Object o : (java.util.List<?>) f.get(tasks)) {
+                EntityAIBase a = ((EntityAITasks.EntityAITaskEntry) o).action;
+                b.append(b.length() > 0 ? ", " : "").append(a.getClass().getName().replaceAll(".*[.$]", ""));
+            }
+        } catch (ReflectiveOperationException ex) {
+            return "? (" + ex + ")";
+        }
+        return b.length() == 0 ? "none" : b.toString();
+    }
+
+    private static String name(Entity e) {
+        return e == null ? "none" : e.getClass().getSimpleName() + "#" + e.getEntityId();
+    }
+
+    private static void msg(ICommandSender s, String text) {
+        s.addChatMessage(new ChatComponentText(text));
     }
 }
