@@ -78,6 +78,9 @@ Compatibility fixes to know about:
 - **EndlessIDs:** the vanilla biome-array accessors crash under it, so the mod uses its `setBiomeShortArray`.
 - **Fisk's Superheroes** leaves scoreboard scores without an objective, which crash world saving. A safety net
   (`compat/world/SafeScoreboardSave`) clears them before saving.
+- **Dedicated servers:** common code must never make the JVM load a `net.minecraft.client` class (FML refuses it on
+  the server, and the verifier loads classes for assignability checks, not only when code runs). Helpers with client
+  types in their signature are `@SideOnly(Side.CLIENT)`. The `Self-test` workflow boots a dedicated server on every push.
 
 ### To do (priority order)
 
