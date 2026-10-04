@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "aab",
+    "ccd",
+    "ccd"
+  ],
+  "key": {
+    "a": {
+      "item": "boh:exotic_soul"
+    },
+    "b": {
+      "item": "minecraft:book"
+    },
+    "c": {
+      "tag": "minecraft:planks"
+    },
+    "d": {
+      "item": "boh:spinel"
+    }
+  },
+  "result": {
+    "item": "boh:gametable",
+    "count": 1
+  }
+}

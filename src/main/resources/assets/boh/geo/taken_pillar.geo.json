@@ -1,0 +1,65 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.taken_pillar",
+				"texture_width": 128,
+				"texture_height": 128,
+				"visible_bounds_width": 2,
+				"visible_bounds_height": 8,
+				"visible_bounds_offset": [0, -3, 0]
+			},
+			"bones": [
+				{
+					"name": "shadow",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-14, 0, -14], "size": [28, 0, 28], "uv": [-24, 36]}
+					]
+				},
+				{
+					"name": "pillar",
+					"pivot": [0, -0.5, 0],
+					"cubes": [
+						{"origin": [-8, -0.5, -8], "size": [16, 16, 16], "uv": [0, 0]},
+						{"origin": [-8, 15.5, -8], "size": [16, 16, 16], "uv": [0, 0]},
+						{"origin": [-8, 31.5, -8], "size": [16, 16, 16], "uv": [0, 0]},
+						{"origin": [-8, 47.5, -8], "size": [16, 16, 16], "uv": [0, 0]},
+						{"origin": [-8, 63.5, -8], "size": [16, 16, 16], "uv": [0, 0]},
+						{"origin": [-8, 79.5, -8], "size": [16, 16, 16], "uv": [0, 0]},
+						{"origin": [-8, 95.5, -8], "size": [16, 16, 16], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "pillar2",
+					"parent": "pillar",
+					"pivot": [0, -0.5, 0],
+					"cubes": [
+						{"origin": [-8, -0.5, -8], "size": [16, 16, 16], "inflate": 0.35, "uv": [64, 0]},
+						{"origin": [-8, 15.5, -8], "size": [16, 16, 16], "inflate": 0.35, "uv": [64, 0]},
+						{"origin": [-8, 31.5, -8], "size": [16, 16, 16], "inflate": 0.35, "uv": [64, 0]},
+						{"origin": [-8, 47.5, -8], "size": [16, 16, 16], "inflate": 0.35, "uv": [64, 0]},
+						{"origin": [-8, 63.5, -8], "size": [16, 16, 16], "inflate": 0.35, "uv": [64, 0]},
+						{"origin": [-8, 79.5, -8], "size": [16, 16, 16], "inflate": 0.35, "uv": [64, 0]},
+						{"origin": [-8, 95.5, -8], "size": [16, 16, 16], "inflate": 0.35, "uv": [64, 0]}
+					]
+				},
+				{
+					"name": "glow",
+					"pivot": [0, -2, 0],
+					"cubes": [
+						{"origin": [-14, 0, -14], "size": [28, 0, 28], "uv": [-24, 64]}
+					]
+				},
+				{
+					"name": "glow2",
+					"pivot": [0, -2, 0],
+					"cubes": [
+						{"origin": [-14, 0, -14], "size": [28, 0, 28], "uv": [-24, 64]}
+					]
+				}
+			]
+		}
+	]
+}

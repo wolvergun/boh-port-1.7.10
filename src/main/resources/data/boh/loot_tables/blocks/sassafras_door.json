@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:block",
+  "random_sequence": "boh:blocks/sassafras_door",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "boh:sassafras_door",
+          "conditions": [
+            {
+              "block": "boh:sassafras_door",
+              "condition": "minecraft:block_state_property",
+              "properties": {
+                "half": "lower"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

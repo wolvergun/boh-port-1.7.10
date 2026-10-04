@@ -1,0 +1,8 @@
+{
+  "parent": "block/button",
+  "textures": {
+    "particle": "boh:block/sinistree_plank",
+    "texture": "boh:block/sinistree_plank"
+  },
+  "render_type": "solid"
+}

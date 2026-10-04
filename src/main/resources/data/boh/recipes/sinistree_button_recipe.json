@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "wooden_button",
+  "category": "redstone",
+  "ingredients": [
+    {
+      "item": "boh:sinistree_planks"
+    }
+  ],
+  "result": {
+    "item": "boh:sinistree_button",
+    "count": 1
+  }
+}

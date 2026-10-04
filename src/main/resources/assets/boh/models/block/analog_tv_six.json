@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/analog_tv_six",
+  "textures": {
+    "all": "boh:block/analog_tv_six",
+    "particle": "boh:block/analog_tv_six",
+    "0": "boh:block/analog_tv_six"
+  },
+  "render_type": "solid"
+}

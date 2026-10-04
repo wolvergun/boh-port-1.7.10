@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "aaa",
+    "aba",
+    "ccd"
+  ],
+  "key": {
+    "a": {
+      "tag": "minecraft:logs"
+    },
+    "b": {
+      "item": "minecraft:tinted_glass"
+    },
+    "c": {
+      "item": "minecraft:cobbled_deepslate"
+    },
+    "d": {
+      "item": "minecraft:stone_button"
+    }
+  },
+  "result": {
+    "item": "boh:analog_television",
+    "count": 1
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "boh:custom/stephano",
+  "textures": {
+    "0": "boh:block/stephano",
+    "particle": "boh:item/stephano"
+  }
+}

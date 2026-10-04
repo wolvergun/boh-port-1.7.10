@@ -1,0 +1,8 @@
+{
+  "parent": "block/fence_side",
+  "textures": {
+    "texture": "boh:block/blackwalnut_planks",
+    "particle": "boh:block/blackwalnut_planks"
+  },
+  "render_type": "solid"
+}

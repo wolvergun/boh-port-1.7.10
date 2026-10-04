@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:block",
+  "random_sequence": "boh:blocks/black_walnut_door",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "boh:black_walnut_door",
+          "conditions": [
+            {
+              "block": "boh:black_walnut_door",
+              "condition": "minecraft:block_state_property",
+              "properties": {
+                "half": "lower"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

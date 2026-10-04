@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/computer",
+  "textures": {
+    "all": "boh:block/computer_on_bonzi",
+    "particle": "boh:block/computer_on_bonzi",
+    "0": "boh:block/computer_off"
+  },
+  "render_type": "cutout_mipped"
+}

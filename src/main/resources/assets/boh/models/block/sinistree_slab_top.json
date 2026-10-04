@@ -1,0 +1,10 @@
+{
+  "parent": "block/slab_top",
+  "textures": {
+    "particle": "boh:block/sinistree_plank",
+    "bottom": "boh:block/sinistree_plank",
+    "top": "boh:block/sinistree_plank",
+    "side": "boh:block/sinistree_plank"
+  },
+  "render_type": "solid"
+}

@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "abb",
+    "bcc"
+  ],
+  "key": {
+    "a": {
+      "item": "boh:spinel"
+    },
+    "b": {
+      "item": "minecraft:iron_ingot"
+    },
+    "c": {
+      "item": "boh:exotic_soul"
+    }
+  },
+  "result": {
+    "item": "boh:ray_gun",
+    "count": 1
+  }
+}

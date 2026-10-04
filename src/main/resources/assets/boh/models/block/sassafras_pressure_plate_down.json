@@ -1,0 +1,8 @@
+{
+  "parent": "block/pressure_plate_down",
+  "textures": {
+    "particle": "boh:block/sassafras_planks",
+    "texture": "boh:block/sassafras_planks"
+  },
+  "render_type": "solid"
+}

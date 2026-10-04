@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "wooden_button",
+  "category": "redstone",
+  "ingredients": [
+    {
+      "item": "boh:sassafras_planks"
+    }
+  ],
+  "result": {
+    "item": "boh:sassafras_button",
+    "count": 1
+  }
+}

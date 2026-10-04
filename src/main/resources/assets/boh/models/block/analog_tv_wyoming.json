@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/analog_tv_wyoming",
+  "textures": {
+    "all": "boh:block/analog_tv_wyoming",
+    "particle": "boh:block/analog_tv_wyoming",
+    "missing": "boh:block/analog_tv_wyoming"
+  },
+  "render_type": "solid"
+}

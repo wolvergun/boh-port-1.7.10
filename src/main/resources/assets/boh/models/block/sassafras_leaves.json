@@ -1,0 +1,7 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "boh:block/sassafras_leaves",
+    "particle": "boh:block/sassafras_leaves"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/analog_tv_billy",
+  "textures": {
+    "all": "boh:block/analog_tv_billy",
+    "particle": "boh:block/analog_tv_billy",
+    "missing": "boh:block/analog_tv_billy"
+  },
+  "render_type": "solid"
+}

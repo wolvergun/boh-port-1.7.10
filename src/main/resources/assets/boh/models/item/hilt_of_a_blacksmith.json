@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "boh:item/hilt_of_a_blacksmith"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "type": "forge:add_spawns",
+  "biomes": [
+    "plains",
+    "old_growth_spruce_taiga",
+    "taiga"
+  ],
+  "spawners": {
+    "type": "boh:light_head",
+    "weight": 1,
+    "minCount": 1,
+    "maxCount": 1
+  }
+}

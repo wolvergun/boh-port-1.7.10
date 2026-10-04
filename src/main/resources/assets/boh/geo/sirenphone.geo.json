@@ -1,0 +1,45 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.sirenphone",
+				"texture_width": 256,
+				"texture_height": 256,
+				"visible_bounds_width": 6,
+				"visible_bounds_height": 9.5,
+				"visible_bounds_offset": [0, 4.25, 0]
+			},
+			"bones": [
+				{
+					"name": "bone",
+					"pivot": [0, 6.5, -1],
+					"rotation": [0, 90, 0],
+					"cubes": [
+						{"origin": [-2, -3.5, -2], "size": [2, 14, 2], "uv": [114, 89]},
+						{"origin": [-2, -0.5, -1], "size": [8, 8, 0], "uv": [113, 73]}
+					]
+				},
+				{
+					"name": "Siren2",
+					"parent": "bone",
+					"pivot": [0, 6.5, -1],
+					"cubes": [
+						{"origin": [0, 4, -3], "size": [8, 5, 4], "uv": [120, 9]},
+						{"origin": [0, 4, -3], "size": [8, 5, 4], "inflate": 0.4, "uv": [120, 0]},
+						{"origin": [0, 4, -3], "size": [8, 5, 4], "inflate": 0.4, "uv": [120, 0]}
+					]
+				},
+				{
+					"name": "teeth",
+					"parent": "Siren2",
+					"pivot": [8.25, 6.5, -1],
+					"cubes": [
+						{"origin": [8.25, 8, -3], "size": [0, 1, 4], "uv": [76, 73]},
+						{"origin": [8.25, 4, -3], "size": [0, 1, 4], "uv": [76, 72]}
+					]
+				}
+			]
+		}
+	]
+}

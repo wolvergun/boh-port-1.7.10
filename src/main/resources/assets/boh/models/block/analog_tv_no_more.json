@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/analog_tv_nomore",
+  "textures": {
+    "all": "boh:block/analog_tv_nomoreinnocense",
+    "particle": "boh:block/analog_tv_nomoreinnocense",
+    "missing": "boh:block/analog_tv_nomoreinnocense"
+  },
+  "render_type": "solid"
+}

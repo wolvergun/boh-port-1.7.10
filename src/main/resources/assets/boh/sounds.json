@@ -1,0 +1,5439 @@
+{
+  "pyramidhead_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:pyramidhead_idle_1",
+        "stream": false
+      },
+      {
+        "name": "boh:pyramidhead_idle_2",
+        "stream": false
+      },
+      {
+        "name": "boh:pyramidhead_idle_3",
+        "stream": false
+      },
+      {
+        "name": "boh:pyramidhead_idle_4",
+        "stream": false
+      },
+      {
+        "name": "boh:pyramidhead_idle_5",
+        "stream": false
+      },
+      {
+        "name": "boh:pyramidhead_idle_6",
+        "stream": false
+      },
+      {
+        "name": "boh:pyramidhead_idle_7",
+        "stream": false
+      },
+      {
+        "name": "boh:pyramidhead_idle_8",
+        "stream": false
+      }
+    ]
+  },
+  "pyramidhead_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:pyramidhead_hurt_1",
+        "stream": false
+      },
+      {
+        "name": "boh:pyramidhead_hurt_2",
+        "stream": false
+      },
+      {
+        "name": "boh:pyramidhead_hurt_3",
+        "stream": false
+      },
+      {
+        "name": "boh:pyramidhead_hurt_4",
+        "stream": false
+      },
+      {
+        "name": "boh:pyramidhead_hurt_5",
+        "stream": false
+      }
+    ]
+  },
+  "pyramidhead_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:pyramidhead_death_1",
+        "stream": false
+      },
+      {
+        "name": "boh:pyramidhead_death_2",
+        "stream": false
+      },
+      {
+        "name": "boh:pyramidhead_death_3",
+        "stream": false
+      },
+      {
+        "name": "boh:pyramidhead_death_4",
+        "stream": false
+      },
+      {
+        "name": "boh:pyramidhead_death_5",
+        "stream": false
+      }
+    ]
+  },
+  "sawrunner_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:sawrunner_hurt_1",
+        "stream": false
+      },
+      {
+        "name": "boh:sawrunner_hurt_2",
+        "stream": false
+      }
+    ]
+  },
+  "sawrunner_attack": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:sawrunner_attack_1",
+        "stream": false
+      },
+      {
+        "name": "boh:sawrunner_attack_2",
+        "stream": false
+      }
+    ]
+  },
+  "sawrunner_ambient": {
+    "category": "ambient",
+    "sounds": [
+      {
+        "name": "boh:sawrunner_ambient",
+        "stream": false
+      }
+    ]
+  },
+  "sawrunner_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:sawrunner_death",
+        "stream": false
+      }
+    ]
+  },
+  "slender_jumpscare": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:slender_jumpscare_1",
+        "stream": false
+      },
+      {
+        "name": "boh:slender_jumpscare_2",
+        "stream": false
+      },
+      {
+        "name": "boh:slender_jumpscare_3",
+        "stream": false
+      }
+    ]
+  },
+  "slender_kill": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:slender_kill_1",
+        "stream": false
+      },
+      {
+        "name": "boh:slender_kill_2",
+        "stream": false
+      }
+    ]
+  },
+  "ben_laughing": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:ben_laugh2",
+        "stream": false
+      },
+      {
+        "name": "boh:ben_laugh1",
+        "stream": false
+      }
+    ]
+  },
+  "ben_burning": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:ben_burning",
+        "stream": true
+      }
+    ]
+  },
+  "xenomorph_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:xenomorph_death1",
+        "stream": false
+      },
+      {
+        "name": "boh:xenomorph_death2",
+        "stream": false
+      }
+    ]
+  },
+  "xenomorph_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:xenomorph_hurt1",
+        "stream": false
+      },
+      {
+        "name": "boh:xenomorph_hurt2",
+        "stream": false
+      },
+      {
+        "name": "boh:xenomorph_hurt3",
+        "stream": false
+      }
+    ]
+  },
+  "xenomorph_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:xenomorph_idle1",
+        "stream": false
+      },
+      {
+        "name": "boh:xenomorph_idle2",
+        "stream": false
+      },
+      {
+        "name": "boh:xenomorph_idle3",
+        "stream": false
+      },
+      {
+        "name": "boh:xenomorph_idle4",
+        "stream": false
+      },
+      {
+        "name": "boh:xenomorph_idle5",
+        "stream": false
+      },
+      {
+        "name": "boh:xenomorph_idle6",
+        "stream": false
+      },
+      {
+        "name": "boh:xenomorph_idle7",
+        "stream": false
+      },
+      {
+        "name": "boh:xenomorph_idle8",
+        "stream": false
+      },
+      {
+        "name": "boh:xenomorph_idle9",
+        "stream": false
+      },
+      {
+        "name": "boh:xenomorph_idle10",
+        "stream": false
+      },
+      {
+        "name": "boh:xenomorph_idle11",
+        "stream": false
+      }
+    ]
+  },
+  "xenomorph_kill": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:xenomorph_kill",
+        "stream": false
+      }
+    ]
+  },
+  "xenomorph_step": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "boh:xenomorph_step1",
+        "stream": false
+      },
+      {
+        "name": "boh:xenomorph_step2",
+        "stream": false
+      },
+      {
+        "name": "boh:xenomorph_step3",
+        "stream": false
+      }
+    ]
+  },
+  "slender_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:slender_idle_1",
+        "stream": false
+      },
+      {
+        "name": "boh:slender_idle_2",
+        "stream": false
+      },
+      {
+        "name": "boh:slender_idle_3",
+        "stream": false
+      },
+      {
+        "name": "boh:slender_idle_4",
+        "stream": false
+      },
+      {
+        "name": "boh:slender_idle_5",
+        "stream": false
+      },
+      {
+        "name": "boh:slender_idle_6",
+        "stream": false
+      }
+    ]
+  },
+  "slender_ambient": {
+    "category": "ambient",
+    "sounds": [
+      {
+        "name": "boh:slender_ambient_1",
+        "stream": false
+      },
+      {
+        "name": "boh:slender_ambient_2",
+        "stream": false
+      }
+    ]
+  },
+  "lifeform_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:lifefor_idle1",
+        "stream": false
+      },
+      {
+        "name": "boh:lifefor_idle2",
+        "stream": false
+      },
+      {
+        "name": "boh:lifefor_idle3",
+        "stream": false
+      },
+      {
+        "name": "boh:lifefor_idle4",
+        "stream": false
+      },
+      {
+        "name": "boh:lifefor_idle5",
+        "stream": false
+      },
+      {
+        "name": "boh:lifefor_idle6",
+        "stream": false
+      },
+      {
+        "name": "boh:lifefor_idle7",
+        "stream": false
+      },
+      {
+        "name": "boh:lifefor_idle7-2",
+        "stream": false
+      },
+      {
+        "name": "boh:lifefor_idle8",
+        "stream": false
+      },
+      {
+        "name": "boh:lifefor_idle9",
+        "stream": false
+      }
+    ]
+  },
+  "lifeform_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:lifefor_death",
+        "stream": false
+      }
+    ]
+  },
+  "lifeform_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:lifefor_hurt2",
+        "stream": false
+      },
+      {
+        "name": "boh:lifefor_hurt10",
+        "stream": false
+      }
+    ]
+  },
+  "jeff": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:jeff",
+        "stream": false
+      }
+    ]
+  },
+  "sirenhead_stomp": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:siren_head_stomp",
+        "stream": false
+      }
+    ]
+  },
+  "chestburster_kill": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:chestburster_kill",
+        "stream": false
+      }
+    ]
+  },
+  "facehugger_attack": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:facehugger_attack",
+        "stream": false
+      }
+    ]
+  },
+  "facehugger_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:facehugger_death",
+        "stream": false
+      }
+    ]
+  },
+  "facehugger_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:facehugger_hurt1",
+        "stream": false
+      },
+      {
+        "name": "boh:facehugger_hurt2",
+        "stream": false
+      }
+    ]
+  },
+  "facehugger_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:facehugger_idle1",
+        "stream": false
+      },
+      {
+        "name": "boh:facehugger_idle2",
+        "stream": false
+      },
+      {
+        "name": "boh:facehugger_idle3",
+        "stream": false
+      },
+      {
+        "name": "boh:facehugger_idle4",
+        "stream": false
+      },
+      {
+        "name": "boh:facehugger_idle5",
+        "stream": false
+      }
+    ]
+  },
+  "ovamorph_open": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:ovamorph_open1",
+        "stream": false
+      },
+      {
+        "name": "boh:ovamorph_open2",
+        "stream": false
+      },
+      {
+        "name": "boh:ovamorph_open3",
+        "stream": false
+      }
+    ]
+  },
+  "page_pickup": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:page_pickup",
+        "stream": false
+      }
+    ]
+  },
+  "jeff_sleep": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:jeff_sleep",
+        "stream": false
+      }
+    ]
+  },
+  "demogorgon_attack": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:demogorgon_attack_1",
+        "stream": false
+      },
+      {
+        "name": "boh:demogorgon_attack_2",
+        "stream": false
+      },
+      {
+        "name": "boh:demogorgon_attack_3",
+        "stream": false
+      }
+    ]
+  },
+  "demogorgon_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:demogorgon_death_1",
+        "stream": false
+      },
+      {
+        "name": "boh:demogorgon_death_2",
+        "stream": false
+      }
+    ]
+  },
+  "demogorgon_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:demogorgon_hurt_1",
+        "stream": false
+      },
+      {
+        "name": "boh:demogorgon_hurt_2",
+        "stream": false
+      },
+      {
+        "name": "boh:demogorgon_hurt_3",
+        "stream": false
+      },
+      {
+        "name": "boh:demogorgon_hurt_4",
+        "stream": false
+      }
+    ]
+  },
+  "demogorgon_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:demogorgon_idle_1",
+        "stream": false
+      },
+      {
+        "name": "boh:demogorgon_idle_2",
+        "stream": false
+      },
+      {
+        "name": "boh:demogorgon_idle_3",
+        "stream": false
+      },
+      {
+        "name": "boh:demogorgon_idle_4",
+        "stream": false
+      },
+      {
+        "name": "boh:demogorgon_idle_5",
+        "stream": false
+      },
+      {
+        "name": "boh:demogorgon_idle_6",
+        "stream": false
+      },
+      {
+        "name": "boh:demogorgon_idle_7",
+        "stream": false
+      },
+      {
+        "name": "boh:demogorgon_idle_8",
+        "stream": false
+      },
+      {
+        "name": "boh:demogorgon_idle_9",
+        "stream": false
+      },
+      {
+        "name": "boh:demogorgon_idle_10",
+        "stream": false
+      }
+    ]
+  },
+  "demogorgon_roar": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:demogorgon_roar_2",
+        "stream": false
+      },
+      {
+        "name": "boh:demogorgon_roar_3",
+        "stream": false
+      },
+      {
+        "name": "boh:demogorgon_roar_4",
+        "stream": false
+      },
+      {
+        "name": "boh:demogorgon_roar_5",
+        "stream": false
+      }
+    ]
+  },
+  "im_dead": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:imdead1",
+        "stream": false
+      },
+      {
+        "name": "boh:imdead2",
+        "stream": false
+      }
+    ]
+  },
+  "necoarc_spawn": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:hell_has_been_spawned",
+        "stream": false
+      }
+    ]
+  },
+  "necoarc_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:necoarc_hurt1",
+        "stream": false
+      },
+      {
+        "name": "boh:necoarc_hurt2",
+        "stream": false
+      },
+      {
+        "name": "boh:necoarc_hurt3",
+        "stream": false
+      }
+    ]
+  },
+  "necoarc_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:necoarc_idle1",
+        "stream": false
+      },
+      {
+        "name": "boh:necoarc_idle2",
+        "stream": false
+      },
+      {
+        "name": "boh:necoarc_idle3",
+        "stream": false
+      },
+      {
+        "name": "boh:necoarc_idle4",
+        "stream": false
+      },
+      {
+        "name": "boh:necoarc_idle5",
+        "stream": false
+      },
+      {
+        "name": "boh:necoarc_idle6",
+        "stream": false
+      },
+      {
+        "name": "boh:necoarc_idle7",
+        "stream": false
+      },
+      {
+        "name": "boh:necoarc_idle8",
+        "stream": false
+      },
+      {
+        "name": "boh:necoarc_idle9",
+        "stream": false
+      },
+      {
+        "name": "boh:necoarc_idle10",
+        "stream": false
+      },
+      {
+        "name": "boh:necoarc_idle11",
+        "stream": false
+      },
+      {
+        "name": "boh:necoarc_idle12",
+        "stream": false
+      },
+      {
+        "name": "boh:necoarc_idle13",
+        "stream": false
+      },
+      {
+        "name": "boh:necoarc_idle14",
+        "stream": false
+      },
+      {
+        "name": "boh:necoarc_idle15",
+        "stream": false
+      },
+      {
+        "name": "boh:necoarc_idle16",
+        "stream": false
+      },
+      {
+        "name": "boh:necoarc_idle17",
+        "stream": false
+      },
+      {
+        "name": "boh:necoarc_idle18",
+        "stream": false
+      }
+    ]
+  },
+  "whiteface_ambience": {
+    "category": "ambient",
+    "sounds": [
+      {
+        "name": "boh:whiteface_ambience",
+        "stream": false
+      }
+    ]
+  },
+  "whiteface_laugh": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:whiteface_laugh",
+        "stream": false
+      }
+    ]
+  },
+  "michael_spotted": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:blood",
+        "stream": false
+      },
+      {
+        "name": "boh:carnage",
+        "stream": false
+      },
+      {
+        "name": "boh:corruption_thou_art_my_father",
+        "stream": false
+      },
+      {
+        "name": "boh:en_nombre_de_jesus",
+        "stream": false
+      },
+      {
+        "name": "boh:i_have_the_body_of_a_pig",
+        "stream": false
+      },
+      {
+        "name": "boh:run_run_run",
+        "stream": false
+      },
+      {
+        "name": "boh:suffer",
+        "stream": false
+      },
+      {
+        "name": "boh:worship_me",
+        "stream": false
+      }
+    ]
+  },
+  "michael_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:aaaaaaaaaaaaa",
+        "stream": false
+      },
+      {
+        "name": "boh:father",
+        "stream": false
+      },
+      {
+        "name": "boh:i_go_unwillingly",
+        "stream": false
+      },
+      {
+        "name": "boh:la_sangre_de_puta_madre",
+        "stream": false
+      },
+      {
+        "name": "boh:noooo",
+        "stream": false
+      },
+      {
+        "name": "boh:por_la_cruz_invertida",
+        "stream": false
+      },
+      {
+        "name": "boh:que_te_cojan_mil_cabras",
+        "stream": false
+      },
+      {
+        "name": "boh:you_know_nothing",
+        "stream": false
+      }
+    ]
+  },
+  "whiteface_scream": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:wf_scream",
+        "stream": false
+      }
+    ]
+  },
+  "springtrap_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:animatronic_movement_sounds",
+        "stream": false
+      },
+      {
+        "name": "boh:animatronic_movement_sounds-2",
+        "stream": false
+      },
+      {
+        "name": "boh:animatronic_movement_sounds-3",
+        "stream": false
+      },
+      {
+        "name": "boh:animatronic_movement_sounds-4",
+        "stream": false
+      },
+      {
+        "name": "boh:animatronic_movement_sounds-5",
+        "stream": false
+      },
+      {
+        "name": "boh:animatronic_movement_sounds-6",
+        "stream": false
+      },
+      {
+        "name": "boh:animatronic_movement_sounds-7",
+        "stream": false
+      },
+      {
+        "name": "boh:animatronic_movement_sounds-8",
+        "stream": false
+      },
+      {
+        "name": "boh:animatronic_movement_sounds-9",
+        "stream": false
+      },
+      {
+        "name": "boh:animatronic_movement_sounds-10",
+        "stream": false
+      }
+    ]
+  },
+  "springtrap_jumpscare": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:springtrap_jumpscare",
+        "stream": false
+      }
+    ]
+  },
+  "springtrap_kill": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:springtrap_kill",
+        "stream": false
+      },
+      {
+        "name": "boh:springtrap_kill-2",
+        "stream": false
+      },
+      {
+        "name": "boh:springtrap_kill-3",
+        "stream": false
+      },
+      {
+        "name": "boh:springtrap_kill-4",
+        "stream": false
+      }
+    ]
+  },
+  "springtrap_spawn": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:springtrap_spawn",
+        "stream": false
+      },
+      {
+        "name": "boh:springtrap_spawn-2",
+        "stream": false
+      },
+      {
+        "name": "boh:springtrap_spawn-3",
+        "stream": false
+      }
+    ]
+  },
+  "springtrap_step": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "boh:springtrap_step",
+        "stream": false
+      }
+    ]
+  },
+  "springtrap_fire": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:springtrap_fire",
+        "stream": false
+      }
+    ]
+  },
+  "springtrap_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:springtrap_death",
+        "stream": false
+      }
+    ]
+  },
+  "ao_oni_chase": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:ao_oni_chase",
+        "stream": false
+      }
+    ]
+  },
+  "rexy_step": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "boh:rexy_step",
+        "stream": false
+      }
+    ]
+  },
+  "rexy_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:rexy_idle_1",
+        "stream": false
+      },
+      {
+        "name": "boh:rexy_idle_2",
+        "stream": false
+      },
+      {
+        "name": "boh:rexy_idle_3",
+        "stream": false
+      },
+      {
+        "name": "boh:rexy_idle_4",
+        "stream": false
+      }
+    ]
+  },
+  "rexy_roar": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:rexy_roar_1",
+        "stream": false
+      },
+      {
+        "name": "boh:rexy_roar_2",
+        "stream": false
+      }
+    ]
+  },
+  "rexy_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:rexy_death_1",
+        "stream": false
+      },
+      {
+        "name": "boh:rexy_death_2",
+        "stream": false
+      },
+      {
+        "name": "boh:rexy_death_3",
+        "stream": false
+      },
+      {
+        "name": "boh:rexy_death_4",
+        "stream": false
+      }
+    ]
+  },
+  "rexy_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:rexy_hurt",
+        "stream": false
+      }
+    ]
+  },
+  "sirenhead_siren": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:sirenhead_siren_1",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenhead_siren_2",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenhead_siren_3",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenhead_siren_4",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenhead_siren_5",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenhead_siren_6",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenhead_siren_7",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenhead_siren_8",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenhead_siren_9",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenhead_siren_10",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenhead_siren_11",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenhead_siren_12",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenhead_siren_13",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenhead_siren_14",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenhead_siren_15",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenhead_siren_16",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenhead_siren_17",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenhead_siren_18",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenhead_siren_19",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenhead_siren_20",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenhead_siren_21",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenhead_siren_22",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenhead_siren_23",
+        "stream": false
+      }
+    ]
+  },
+  "exe_squelch": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:radio_squelch",
+        "stream": false
+      }
+    ]
+  },
+  "exe_kills": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:exe_kills",
+        "stream": false
+      }
+    ]
+  },
+  "exe_teleport": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:exe_teleport",
+        "stream": false
+      }
+    ]
+  },
+  "exe_static": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:exe_static",
+        "stream": false
+      }
+    ]
+  },
+  "exe_despawn": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:exe_despawn",
+        "stream": false
+      }
+    ]
+  },
+  "monitor_break": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:monitor_break",
+        "stream": false
+      }
+    ]
+  },
+  "six_oye": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:open_your_eyes",
+        "stream": false
+      }
+    ]
+  },
+  "rake_scream": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:rake_scream",
+        "stream": false
+      }
+    ]
+  },
+  "mothman_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:mothman_idle",
+        "stream": false
+      }
+    ]
+  },
+  "mothman_aggro": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:mothman_aggro",
+        "stream": false
+      }
+    ]
+  },
+  "raatma_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:raatma_idle1",
+        "stream": false
+      },
+      {
+        "name": "boh:raatma_idle2",
+        "stream": false
+      },
+      {
+        "name": "boh:raatma_idle3",
+        "stream": false
+      },
+      {
+        "name": "boh:raatma_idle4",
+        "stream": false
+      }
+    ]
+  },
+  "raatma_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:raatma_death",
+        "stream": false
+      }
+    ]
+  },
+  "raatma_attack": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:raatma_attack1",
+        "stream": false
+      },
+      {
+        "name": "boh:raatma_attack2",
+        "stream": false
+      }
+    ]
+  },
+  "raatma_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:raatma_hurt1",
+        "stream": false
+      },
+      {
+        "name": "boh:raatma_hurt2",
+        "stream": false
+      },
+      {
+        "name": "boh:raatma_hurt3",
+        "stream": false
+      }
+    ]
+  },
+  "raatma_scream": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:raatma_scream1",
+        "stream": false
+      },
+      {
+        "name": "boh:raatma_scream2",
+        "stream": false
+      }
+    ]
+  },
+  "gaster_ambience": {
+    "category": "ambient",
+    "sounds": [
+      {
+        "name": "boh:gaster_ambience",
+        "stream": false
+      }
+    ]
+  },
+  "gaster_disapear": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:gaster_disapear",
+        "stream": false
+      }
+    ]
+  },
+  "gaster_laugh": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:gaster_laugh_1",
+        "stream": false
+      },
+      {
+        "name": "boh:gaster_laugh_2",
+        "stream": false
+      },
+      {
+        "name": "boh:gaster_laugh_3",
+        "stream": false
+      },
+      {
+        "name": "boh:gaster_laugh_4",
+        "stream": false
+      },
+      {
+        "name": "boh:gaster_laugh_5",
+        "stream": false
+      },
+      {
+        "name": "boh:gaster_laugh_6",
+        "stream": false
+      },
+      {
+        "name": "boh:gaster_laugh_7",
+        "stream": false
+      }
+    ]
+  },
+  "mothman_fly": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:mothman_fly",
+        "stream": false
+      }
+    ]
+  },
+  "mothman_land": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:mothman_land",
+        "stream": false
+      }
+    ]
+  },
+  "seedeater_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:seedeater_idle_1",
+        "stream": false
+      },
+      {
+        "name": "boh:seedeater_idle_2",
+        "stream": false
+      },
+      {
+        "name": "boh:seedeater_idle_3",
+        "stream": false
+      },
+      {
+        "name": "boh:seedeater_idle_4",
+        "stream": false
+      }
+    ]
+  },
+  "seedeater_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:seedeater_hurt_1",
+        "stream": false
+      },
+      {
+        "name": "boh:seedeater_hurt_2",
+        "stream": false
+      }
+    ]
+  },
+  "seedeater_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:seedeater_death_1",
+        "stream": false
+      }
+    ]
+  },
+  "sh_siren": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:sh_siren",
+        "stream": false
+      }
+    ]
+  },
+  "raygun": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:raygun_shoot",
+        "stream": false
+      }
+    ]
+  },
+  "gray_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:gray_idle_1",
+        "stream": false
+      },
+      {
+        "name": "boh:gray_idle_2",
+        "stream": false
+      },
+      {
+        "name": "boh:gray_idle_3",
+        "stream": false
+      },
+      {
+        "name": "boh:gray_idle_4",
+        "stream": false
+      },
+      {
+        "name": "boh:gray_idle_5",
+        "stream": false
+      }
+    ]
+  },
+  "gray_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:gray_hurt",
+        "stream": false
+      }
+    ]
+  },
+  "gray_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:gray_death",
+        "stream": false
+      }
+    ]
+  },
+  "mother_ship_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:mother_ship_idle_1",
+        "stream": false
+      },
+      {
+        "name": "boh:mother_ship_idle_2",
+        "stream": false
+      },
+      {
+        "name": "boh:mother_ship_idle_3",
+        "stream": false
+      },
+      {
+        "name": "boh:mother_ship_idle_4",
+        "stream": false
+      },
+      {
+        "name": "boh:mother_ship_idle_5",
+        "stream": false
+      },
+      {
+        "name": "boh:mother_ship_idle_6",
+        "stream": false
+      },
+      {
+        "name": "boh:mother_ship_idle_7",
+        "stream": false
+      },
+      {
+        "name": "boh:mother_ship_idle_8",
+        "stream": false
+      },
+      {
+        "name": "boh:mother_ship_idle_9",
+        "stream": false
+      },
+      {
+        "name": "boh:mother_ship_idle_10",
+        "stream": false
+      },
+      {
+        "name": "boh:mother_ship_idle_11",
+        "stream": false
+      }
+    ]
+  },
+  "mother_ship_loop": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:mother_ship_loop",
+        "stream": false
+      }
+    ]
+  },
+  "invasion": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:invasion",
+        "stream": false
+      }
+    ]
+  },
+  "sotiris_stinger": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:sotiris_stinger",
+        "stream": false
+      }
+    ]
+  },
+  "sh_static": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:sh_static",
+        "stream": false
+      }
+    ]
+  },
+  "knock": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:knock_left_1",
+        "stream": false
+      },
+      {
+        "name": "boh:knock_left_2",
+        "stream": false
+      },
+      {
+        "name": "boh:knock_right_1",
+        "stream": false
+      },
+      {
+        "name": "boh:knock_right_2",
+        "stream": false
+      }
+    ]
+  },
+  "tv_on": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tv_on",
+        "stream": false
+      }
+    ]
+  },
+  "tv_static": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tv_static",
+        "stream": false
+      }
+    ]
+  },
+  "tv_off": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tv_off",
+        "stream": false
+      }
+    ]
+  },
+  "fresno_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:fresno_idle_1",
+        "stream": false
+      },
+      {
+        "name": "boh:fresno_idle_2",
+        "stream": false
+      },
+      {
+        "name": "boh:fresno_idle_3",
+        "stream": false
+      },
+      {
+        "name": "boh:fresno_idle_4",
+        "stream": false
+      },
+      {
+        "name": "boh:fresno_idle_5",
+        "stream": false
+      },
+      {
+        "name": "boh:fresno_idle_6",
+        "stream": false
+      }
+    ]
+  },
+  "fresno_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:fresno_hurt_1",
+        "stream": false
+      },
+      {
+        "name": "boh:fresno_hurt_2",
+        "stream": false
+      },
+      {
+        "name": "boh:fresno_hurt_3",
+        "stream": false
+      }
+    ]
+  },
+  "fresno_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:fresno_death",
+        "stream": false
+      }
+    ]
+  },
+  "simon_ost": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:simon_ost",
+        "stream": true
+      }
+    ]
+  },
+  "myers_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:myers_idle",
+        "stream": false
+      }
+    ]
+  },
+  "myers_swing": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:myers_swing",
+        "stream": false
+      }
+    ]
+  },
+  "myers_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:myers_death",
+        "stream": false
+      }
+    ]
+  },
+  "myers_charge": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:myers_charge",
+        "stream": false
+      }
+    ]
+  },
+  "myers_sting": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:myers_sting",
+        "stream": false
+      }
+    ]
+  },
+  "myers_chase": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:myers_chase",
+        "stream": false
+      }
+    ]
+  },
+  "wendigo_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:wendigo_idle_1",
+        "stream": false
+      },
+      {
+        "name": "boh:wendigo_idle_2",
+        "stream": false
+      },
+      {
+        "name": "boh:wendigo_idle_3",
+        "stream": false
+      },
+      {
+        "name": "boh:wendigo_idle_4",
+        "stream": false
+      },
+      {
+        "name": "boh:wendigo_idle_5",
+        "stream": false
+      },
+      {
+        "name": "boh:wendigo_idle_6",
+        "stream": false
+      },
+      {
+        "name": "boh:wendigo_idle_7",
+        "stream": false
+      }
+    ]
+  },
+  "wendigo_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:wendigo_death",
+        "stream": false
+      }
+    ]
+  },
+  "wendigo_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:wendigo_hurt_1",
+        "stream": false
+      },
+      {
+        "name": "boh:wendigo_hurt_2",
+        "stream": false
+      },
+      {
+        "name": "boh:wendigo_hurt_3",
+        "stream": false
+      }
+    ]
+  },
+  "namesis_roar": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:nemesis_roar",
+        "stream": false
+      }
+    ]
+  },
+  "nemesis_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:nemesis_idle_1",
+        "stream": false
+      },
+      {
+        "name": "boh:nemesis_idle_2",
+        "stream": false
+      },
+      {
+        "name": "boh:nemesis_idle_3",
+        "stream": false
+      },
+      {
+        "name": "boh:nemesis_idle_4",
+        "stream": false
+      },
+      {
+        "name": "boh:nemesis_idle_5",
+        "stream": false
+      },
+      {
+        "name": "boh:nemesis_idle_6",
+        "stream": false
+      },
+      {
+        "name": "boh:nemesis_idle_7",
+        "stream": false
+      },
+      {
+        "name": "boh:nemesis_idle_8",
+        "stream": false
+      }
+    ]
+  },
+  "nemesis_attack": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:nemesis_attack_1",
+        "stream": false
+      },
+      {
+        "name": "boh:nemesis_attack_2",
+        "stream": false
+      }
+    ]
+  },
+  "nemesis_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:nemesis_hurt",
+        "stream": false
+      }
+    ]
+  },
+  "nemesis_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:nemesis_death",
+        "stream": false
+      }
+    ]
+  },
+  "nemesis_stars": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:nemesis_stars",
+        "stream": false
+      }
+    ]
+  },
+  "jason_kikiki": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:jason_kikiki",
+        "stream": false
+      }
+    ]
+  },
+  "big_daddy_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:01-big_daddy_idle",
+        "stream": false
+      },
+      {
+        "name": "boh:02-big_daddy_idle",
+        "stream": false
+      },
+      {
+        "name": "boh:03-big_daddy_idle",
+        "stream": false
+      },
+      {
+        "name": "boh:04-big_daddy_idle",
+        "stream": false
+      },
+      {
+        "name": "boh:05-big_daddy_idle",
+        "stream": false
+      },
+      {
+        "name": "boh:06-big_daddy_idle",
+        "stream": false
+      },
+      {
+        "name": "boh:07-big_daddy_idle",
+        "stream": false
+      },
+      {
+        "name": "boh:08-big_daddy_idle",
+        "stream": false
+      },
+      {
+        "name": "boh:09-big_daddy_idle",
+        "stream": false
+      },
+      {
+        "name": "boh:10-big_daddy_idle",
+        "stream": false
+      },
+      {
+        "name": "boh:11-big_daddy_idle",
+        "stream": false
+      },
+      {
+        "name": "boh:12-big_daddy_idle",
+        "stream": false
+      },
+      {
+        "name": "boh:13-big_daddy_idle",
+        "stream": false
+      }
+    ]
+  },
+  "big_daddy_melee": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:14-big_daddy_melee",
+        "stream": false
+      },
+      {
+        "name": "boh:15-big_daddy_melee",
+        "stream": false
+      },
+      {
+        "name": "boh:16-big_daddy_melee",
+        "stream": false
+      },
+      {
+        "name": "boh:17-big_daddy_melee",
+        "stream": false
+      },
+      {
+        "name": "boh:18-big_daddy_melee",
+        "stream": false
+      },
+      {
+        "name": "boh:19-big_daddy_melee",
+        "stream": false
+      },
+      {
+        "name": "boh:20-big_daddy_melee",
+        "stream": false
+      }
+    ]
+  },
+  "big_daddy_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:21-big_daddy_hurt",
+        "stream": false
+      },
+      {
+        "name": "boh:22-big_daddy_hurt",
+        "stream": false
+      },
+      {
+        "name": "boh:23-big_daddy_hurt",
+        "stream": false
+      },
+      {
+        "name": "boh:24-big_daddy_hurt",
+        "stream": false
+      },
+      {
+        "name": "boh:25-big_daddy_hurt",
+        "stream": false
+      },
+      {
+        "name": "boh:26-big_daddy_hurt",
+        "stream": false
+      },
+      {
+        "name": "boh:27-big_daddy_hurt",
+        "stream": false
+      },
+      {
+        "name": "boh:28-big_daddy_hurt",
+        "stream": false
+      },
+      {
+        "name": "boh:29-big_daddy_hurt",
+        "stream": false
+      },
+      {
+        "name": "boh:30-big_daddy_hurt",
+        "stream": false
+      }
+    ]
+  },
+  "big_daddy_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:31-big_daddy_death",
+        "stream": false
+      },
+      {
+        "name": "boh:32-big_daddy_death",
+        "stream": false
+      },
+      {
+        "name": "boh:33-big_daddy_death",
+        "stream": false
+      },
+      {
+        "name": "boh:34-big_daddy_death",
+        "stream": false
+      }
+    ]
+  },
+  "big_daddy_threaten": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:big_daddy_threaten_1",
+        "stream": false
+      },
+      {
+        "name": "boh:big_daddy_threaten_2",
+        "stream": false
+      }
+    ]
+  },
+  "big_daddy_step": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "boh:big_daddy_step",
+        "stream": false
+      }
+    ]
+  },
+  "goji_roar": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:roar_1",
+        "stream": false
+      }
+    ]
+  },
+  "goji_buildup": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:roar_2",
+        "stream": false
+      }
+    ]
+  },
+  "goji_breath": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:atomic_spillage",
+        "stream": false
+      }
+    ]
+  },
+  "little_sister_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:71-ls_idle_35",
+        "stream": false
+      },
+      {
+        "name": "boh:70-ls_idle_34",
+        "stream": false
+      },
+      {
+        "name": "boh:69-ls_idle_33",
+        "stream": false
+      },
+      {
+        "name": "boh:68-ls_idle_32",
+        "stream": false
+      },
+      {
+        "name": "boh:67-ls_idle_31",
+        "stream": false
+      },
+      {
+        "name": "boh:66-ls_idle_30",
+        "stream": false
+      },
+      {
+        "name": "boh:65-ls_idle_29",
+        "stream": false
+      },
+      {
+        "name": "boh:64-ls_idle_28",
+        "stream": false
+      },
+      {
+        "name": "boh:63-ls_idle_27",
+        "stream": false
+      },
+      {
+        "name": "boh:62-ls_idle_26",
+        "stream": false
+      },
+      {
+        "name": "boh:61-ls_idle_25",
+        "stream": false
+      },
+      {
+        "name": "boh:56-ls_idle_24",
+        "stream": false
+      },
+      {
+        "name": "boh:55-ls_idle_23",
+        "stream": false
+      },
+      {
+        "name": "boh:54-ls_idle_22",
+        "stream": false
+      },
+      {
+        "name": "boh:53-ls_idle_21",
+        "stream": false
+      },
+      {
+        "name": "boh:52-ls_idle_20",
+        "stream": false
+      },
+      {
+        "name": "boh:51-ls_idle_19",
+        "stream": false
+      },
+      {
+        "name": "boh:46-ls_idle_18",
+        "stream": false
+      },
+      {
+        "name": "boh:45-ls_idle_17",
+        "stream": false
+      },
+      {
+        "name": "boh:42-ls_idle_16",
+        "stream": false
+      },
+      {
+        "name": "boh:41-ls_idle_15",
+        "stream": false
+      },
+      {
+        "name": "boh:36-ls_idle_14",
+        "stream": false
+      },
+      {
+        "name": "boh:35-ls_idle_13",
+        "stream": false
+      },
+      {
+        "name": "boh:34-ls_idle_12",
+        "stream": false
+      },
+      {
+        "name": "boh:33-ls_idle_11",
+        "stream": false
+      },
+      {
+        "name": "boh:32-ls_idle_10",
+        "stream": false
+      },
+      {
+        "name": "boh:31-ls_idle_9",
+        "stream": false
+      },
+      {
+        "name": "boh:30-ls_idle_8",
+        "stream": false
+      },
+      {
+        "name": "boh:29-ls_idle_7",
+        "stream": false
+      },
+      {
+        "name": "boh:23-ls_idle_6",
+        "stream": false
+      },
+      {
+        "name": "boh:22-ls_idle_5",
+        "stream": false
+      },
+      {
+        "name": "boh:21-ls_idle_4",
+        "stream": false
+      },
+      {
+        "name": "boh:20-ls_idle_3",
+        "stream": false
+      },
+      {
+        "name": "boh:19-ls_idle_2",
+        "stream": false
+      },
+      {
+        "name": "boh:12-ls_idle_1",
+        "stream": false
+      }
+    ]
+  },
+  "little_sister_alone": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:87-ls_idle_alone_11",
+        "stream": false
+      },
+      {
+        "name": "boh:86-ls_idle_alone_10",
+        "stream": false
+      },
+      {
+        "name": "boh:85-ls_idle_alone_9",
+        "stream": false
+      },
+      {
+        "name": "boh:84-ls_idle_alone_8",
+        "stream": false
+      },
+      {
+        "name": "boh:83-ls_idle_alone_7",
+        "stream": false
+      },
+      {
+        "name": "boh:82-ls_idle_alone_6",
+        "stream": false
+      },
+      {
+        "name": "boh:81-ls_idle_alone_5",
+        "stream": false
+      },
+      {
+        "name": "boh:80-ls_idle_alone_4",
+        "stream": false
+      },
+      {
+        "name": "boh:79-ls_idle_alone_3",
+        "stream": false
+      },
+      {
+        "name": "boh:78-ls_idle_alone_2",
+        "stream": false
+      },
+      {
+        "name": "boh:77-ls_idle_alone_1",
+        "stream": false
+      }
+    ]
+  },
+  "little_sister_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:60-ls_idle_hurt_4",
+        "stream": false
+      },
+      {
+        "name": "boh:59-ls_idle_hurt_3",
+        "stream": false
+      },
+      {
+        "name": "boh:58-ls_idle_hurt_2",
+        "stream": false
+      },
+      {
+        "name": "boh:57-ls_idle_hurt_1",
+        "stream": false
+      }
+    ]
+  },
+  "little_sister_hurt_near_bd": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:44-ls_bd_nearby_hurt_2",
+        "stream": false
+      },
+      {
+        "name": "boh:43-ls_bd_nearby_hurt_1",
+        "stream": false
+      }
+    ]
+  },
+  "little_sister_bd_dies": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:38-ls_bd_dies_3",
+        "stream": false
+      },
+      {
+        "name": "boh:37-ls_bd_dies_2",
+        "stream": false
+      },
+      {
+        "name": "boh:02-ls_bd_dies_2",
+        "stream": false
+      },
+      {
+        "name": "boh:01-ls_bd_dies_1",
+        "stream": false
+      }
+    ]
+  },
+  "little_sister_spot_player": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:08-ls_spot_player_4",
+        "stream": false
+      },
+      {
+        "name": "boh:06-ls_spot_player_3",
+        "stream": false
+      },
+      {
+        "name": "boh:05-ls_spot_player_2",
+        "stream": false
+      },
+      {
+        "name": "boh:04-ls_spot_player_1",
+        "stream": false
+      }
+    ]
+  },
+  "little_sister_aggro": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:18-ls_aggro_5",
+        "stream": false
+      },
+      {
+        "name": "boh:17-ls_aggro_4",
+        "stream": false
+      },
+      {
+        "name": "boh:16-ls_aggro_4",
+        "stream": false
+      },
+      {
+        "name": "boh:15-ls_aggro_3",
+        "stream": false
+      },
+      {
+        "name": "boh:14-ls_aggro_2",
+        "stream": false
+      },
+      {
+        "name": "boh:13-ls_aggro_1",
+        "stream": false
+      },
+      {
+        "name": "boh:28-ls_scared_5",
+        "stream": false
+      },
+      {
+        "name": "boh:27-ls_scared_4",
+        "stream": false
+      },
+      {
+        "name": "boh:26-ls_scared_3",
+        "stream": false
+      },
+      {
+        "name": "boh:25-ls_scared_2",
+        "stream": false
+      },
+      {
+        "name": "boh:24-ls_scared_1",
+        "stream": false
+      }
+    ]
+  },
+  "little_sister_multiple": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:39-ls_bd_mult_1",
+        "stream": false
+      },
+      {
+        "name": "boh:40-ls_bd_mult_2",
+        "stream": false
+      }
+    ]
+  },
+  "little_sister_cry": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:47-ls_cry_1",
+        "stream": false
+      },
+      {
+        "name": "boh:48-ls_cry_2",
+        "stream": false
+      },
+      {
+        "name": "boh:49-ls_cry_3",
+        "stream": false
+      },
+      {
+        "name": "boh:50-ls_cry_4",
+        "stream": false
+      }
+    ]
+  },
+  "little_sister_bd_kills": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:76-ls_bd_kills_5",
+        "stream": false
+      },
+      {
+        "name": "boh:75-ls_bd_kills_4",
+        "stream": false
+      },
+      {
+        "name": "boh:74-ls_bd_kills_3",
+        "stream": false
+      },
+      {
+        "name": "boh:73-ls_bd_kills_2",
+        "stream": false
+      },
+      {
+        "name": "boh:72-ls_bd_kills_1",
+        "stream": false
+      },
+      {
+        "name": "boh:11-ls_bd_kills_4",
+        "stream": false
+      },
+      {
+        "name": "boh:10-ls_bd_kills_3",
+        "stream": false
+      },
+      {
+        "name": "boh:09-ls_bd_kills_2",
+        "stream": false
+      },
+      {
+        "name": "boh:07-ls_bd_kills_1",
+        "stream": false
+      },
+      {
+        "name": "boh:03-ls_bd_kills_player_1",
+        "stream": false
+      }
+    ]
+  },
+  "lighthead_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:lighthead_idle",
+        "stream": false
+      }
+    ]
+  },
+  "granny": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:granny",
+        "stream": false
+      }
+    ]
+  },
+  "deer_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:deer_idle",
+        "stream": false
+      }
+    ]
+  },
+  "deer_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:deer_death",
+        "stream": false
+      }
+    ]
+  },
+  "deer_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:deer_hurt",
+        "stream": false
+      }
+    ]
+  },
+  "sirenphone": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:sirenphone-01",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenphone-02",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenphone-03",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenphone-04",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenphone-05",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenphone-06",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenphone-07",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenphone-08",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenphone-09",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenphone-10",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenphone-11",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenphone-12",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenphone-13",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenphone-14",
+        "stream": false
+      },
+      {
+        "name": "boh:sirenphone-15",
+        "stream": false
+      }
+    ]
+  },
+  "sadako_24": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:sadako_24",
+        "stream": false
+      }
+    ]
+  },
+  "sadako_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:sadako_death",
+        "stream": false
+      }
+    ]
+  },
+  "sadako_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:sadako_idle",
+        "stream": false
+      }
+    ]
+  },
+  "sadako_kill": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:sadako_kill",
+        "stream": false
+      }
+    ]
+  },
+  "sadako_tv": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:sadako_tv",
+        "stream": false
+      }
+    ]
+  },
+  "tv_put_tape": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tv_put_tape",
+        "stream": false
+      }
+    ]
+  },
+  "specimen_9_boss": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:specimen_9_boss",
+        "stream": true
+      }
+    ]
+  },
+  "screampillar": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:scream_pillar",
+        "stream": false
+      }
+    ]
+  },
+  "damage_spooky": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:damage_spooky",
+        "stream": false
+      }
+    ]
+  },
+  "level_0_ost": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:level_0_ost",
+        "stream": true
+      }
+    ]
+  },
+  "level_0_sounds": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:level_0_sounds_1",
+        "stream": false
+      },
+      {
+        "name": "boh:level_0_sounds_2",
+        "stream": false
+      }
+    ]
+  },
+  "level_0_mood": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:level_0_mood",
+        "stream": false
+      }
+    ]
+  },
+  "ben_spawn": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:ben_spawn",
+        "stream": false
+      }
+    ]
+  },
+  "tv_bill": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tv_bill",
+        "stream": false
+      }
+    ]
+  },
+  "tv_billy": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tv_billy",
+        "stream": false
+      }
+    ]
+  },
+  "tv_courage": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tv_courage",
+        "stream": false
+      }
+    ]
+  },
+  "tv_cove": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tv_cove",
+        "stream": false
+      }
+    ]
+  },
+  "tv_fleshpit": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tv_fleshpit",
+        "stream": false
+      }
+    ]
+  },
+  "tv_gemini": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tv_gemini",
+        "stream": false
+      }
+    ]
+  },
+  "tv_local58": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tv_local58",
+        "stream": false
+      }
+    ]
+  },
+  "tv_max": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tv_max",
+        "stream": false
+      }
+    ]
+  },
+  "tv_needle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tv_needle",
+        "stream": false
+      }
+    ]
+  },
+  "tv_nomore": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tv_nomore",
+        "stream": false
+      }
+    ]
+  },
+  "tv_shamrock": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tv_shamrock",
+        "stream": false
+      }
+    ]
+  },
+  "tv_wyoming": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tv_wyoming",
+        "stream": false
+      }
+    ]
+  },
+  "exe_laugh": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:exe_laugh",
+        "stream": false
+      }
+    ]
+  },
+  "exe_chase": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:exe_chase",
+        "stream": false
+      }
+    ]
+  },
+  "sonicexe_chase": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:sonic_exe_chase",
+        "stream": false
+      }
+    ]
+  },
+  "painted_sword_hit": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:painted_sword_hit-01",
+        "stream": false
+      },
+      {
+        "name": "boh:painted_sword_hit-02",
+        "stream": false
+      }
+    ]
+  },
+  "painted_sword_sweep": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:painted_sword_sweep-01",
+        "stream": false
+      },
+      {
+        "name": "boh:painted_sword_sweep-02",
+        "stream": false
+      },
+      {
+        "name": "boh:painted_sword_sweep-03",
+        "stream": false
+      },
+      {
+        "name": "boh:painted_sword_sweep-04",
+        "stream": false
+      }
+    ]
+  },
+  "painted_sword_kill": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:painted_sword_kill",
+        "stream": false
+      }
+    ]
+  },
+  "effigy_sound": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:effigy_sound",
+        "stream": false
+      }
+    ]
+  },
+  "sonic_jump": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:sonic_jump",
+        "stream": false
+      }
+    ]
+  },
+  "lifeform_step": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "boh:lifeform_step",
+        "stream": false
+      }
+    ]
+  },
+  "agwob_shoot": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:agwob_shoot",
+        "stream": false
+      }
+    ]
+  },
+  "agwob_equip": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:agwob_equip",
+        "stream": false
+      }
+    ]
+  },
+  "rolling_giant_roll": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:rolling_giant_roll",
+        "stream": false
+      },
+      {
+        "name": "boh:rolling_giant_roll-2",
+        "stream": false
+      },
+      {
+        "name": "boh:rolling_giant_roll-3",
+        "stream": false
+      },
+      {
+        "name": "boh:rolling_giant_roll-4",
+        "stream": false
+      }
+    ]
+  },
+  "fresno_happy": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:fresno_happy",
+        "stream": false
+      }
+    ]
+  },
+  "chucky_attack": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:chucky_attack",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_attack-2",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_attack-3",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_attack-4",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_attack-5",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_attack-6",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_attack-7",
+        "stream": false
+      }
+    ]
+  },
+  "chucky_chase": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:chucky_chase",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_chase-2",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_chase-3",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_chase-4",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_chase-5",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_chase-6",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_chase-7",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_chase-8",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_chase-9",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_chase-10",
+        "stream": false
+      }
+    ]
+  },
+  "chucky_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:chucky_death",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_death-2",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_death-3",
+        "stream": false
+      }
+    ]
+  },
+  "chucky_grab": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:chucky_grab",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_grab-2",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_grab-3",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_grab-4",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_grab-5",
+        "stream": false
+      }
+    ]
+  },
+  "chucky_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:chucky_hurt",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_hurt-2",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_hurt-3",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_hurt-4",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_hurt-5",
+        "stream": false
+      }
+    ]
+  },
+  "chucky_spawn": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:chucky_spawn",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_spawn-2",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_spawn-3",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_spawn-4",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_spawn-5",
+        "stream": false
+      },
+      {
+        "name": "boh:chucky_spawn-6",
+        "stream": false
+      }
+    ]
+  },
+  "drill_dash": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:drill_dash",
+        "stream": false
+      }
+    ]
+  },
+  "rabbids": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:rabbids",
+        "stream": false
+      }
+    ]
+  },
+  "stopsign_hit": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:shove_hit_1",
+        "stream": false
+      },
+      {
+        "name": "boh:shove_hit_2",
+        "stream": false
+      }
+    ]
+  },
+  "stopsign_equip": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:shove_equip",
+        "stream": false
+      }
+    ]
+  },
+  "stopsign_charge": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:shove_charge",
+        "stream": false
+      }
+    ]
+  },
+  "stopsign_swing": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:shove_swing",
+        "stream": false
+      }
+    ]
+  },
+  "chainsaw_loop": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:chainsaw_loop",
+        "stream": false
+      }
+    ]
+  },
+  "chainsaw_rev_1": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:chainsaw_rev_1",
+        "stream": false
+      }
+    ]
+  },
+  "chainsaw_rev_2": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:chainsaw_rev_2",
+        "stream": false
+      }
+    ]
+  },
+  "chainsaw_rev_3": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:chainsaw_rev_3",
+        "stream": false
+      }
+    ]
+  },
+  "chainsaw_rev_4": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:chainsaw_rev_4",
+        "stream": false
+      }
+    ]
+  },
+  "chainsaw_stall": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:chainsaw_stall",
+        "stream": false
+      }
+    ]
+  },
+  "freddy_lullaby": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:freddy_lullaby",
+        "stream": false
+      }
+    ]
+  },
+  "freddy_chase": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:freddy_chase",
+        "stream": false
+      },
+      {
+        "name": "boh:freddy_chase-2",
+        "stream": false
+      },
+      {
+        "name": "boh:freddy_chase-3",
+        "stream": false
+      },
+      {
+        "name": "boh:freddy_chase-4",
+        "stream": false
+      },
+      {
+        "name": "boh:freddy_chase-5",
+        "stream": false
+      },
+      {
+        "name": "boh:freddy_chase-6",
+        "stream": false
+      },
+      {
+        "name": "boh:freddy_chase-7",
+        "stream": false
+      },
+      {
+        "name": "boh:freddy_chase-8",
+        "stream": false
+      },
+      {
+        "name": "boh:freddy_chase-9",
+        "stream": false
+      },
+      {
+        "name": "boh:freddy_chase-10",
+        "stream": false
+      },
+      {
+        "name": "boh:freddy_chase-11",
+        "stream": false
+      }
+    ]
+  },
+  "freddy_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:freddy_death",
+        "stream": false
+      }
+    ]
+  },
+  "freddy_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:freddy_hurt",
+        "stream": false
+      },
+      {
+        "name": "boh:freddy_hurt-2",
+        "stream": false
+      }
+    ]
+  },
+  "freddy_laugh": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:freddy_laugh",
+        "stream": false
+      }
+    ]
+  },
+  "tv_boiled": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tv_boiled",
+        "stream": false
+      }
+    ]
+  },
+  "boiled_one_trumpet": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:boiled_one_trumped",
+        "stream": false
+      },
+      {
+        "name": "boh:boiled_one_trumped-2",
+        "stream": false
+      },
+      {
+        "name": "boh:boiled_one_trumped-3",
+        "stream": false
+      }
+    ]
+  },
+  "boiled_one_speak": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:boiled_one_speak",
+        "stream": false
+      }
+    ]
+  },
+  "phantom_bb_spawn": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:phantom_bb_spawn_1",
+        "stream": false
+      },
+      {
+        "name": "boh:phantom_bb_spawn_2",
+        "stream": false
+      }
+    ]
+  },
+  "phantom_bb_laugh": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:phantom_bb_laugh",
+        "stream": false
+      }
+    ]
+  },
+  "phantom_mangle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:phantom_mangle",
+        "stream": false
+      }
+    ]
+  },
+  "phantom_puppet": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:phantom_puppet",
+        "stream": false
+      }
+    ]
+  },
+  "jason_ressurect": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:jason_ressurect",
+        "stream": false
+      }
+    ]
+  },
+  "ghost_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:ghost_idle",
+        "stream": false
+      },
+      {
+        "name": "boh:ghost_idle-2",
+        "stream": false
+      },
+      {
+        "name": "boh:ghost_idle-3",
+        "stream": false
+      }
+    ]
+  },
+  "ghost_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:ghost_hurt-1",
+        "stream": false
+      },
+      {
+        "name": "boh:ghost_hurt-2",
+        "stream": false
+      }
+    ]
+  },
+  "ghost_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:ghost_death",
+        "stream": false
+      },
+      {
+        "name": "boh:ghost_death-2",
+        "stream": false
+      }
+    ]
+  },
+  "vampire_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:vampire_idle",
+        "stream": false
+      },
+      {
+        "name": "boh:vampire_idle-2",
+        "stream": false
+      },
+      {
+        "name": "boh:vampire_idle-3",
+        "stream": false
+      }
+    ]
+  },
+  "vampire_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:vampire_hurt",
+        "stream": false
+      },
+      {
+        "name": "boh:vampire_hurt-2",
+        "stream": false
+      }
+    ]
+  },
+  "vampire_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:vampire_deaath",
+        "stream": false
+      },
+      {
+        "name": "boh:vampire_death",
+        "stream": false
+      }
+    ]
+  },
+  "demon_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:demon_idle",
+        "stream": false
+      },
+      {
+        "name": "boh:demon_idle-2",
+        "stream": false
+      },
+      {
+        "name": "boh:demon_idle-3",
+        "stream": false
+      }
+    ]
+  },
+  "demon_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:demon_hurt",
+        "stream": false
+      },
+      {
+        "name": "boh:demon_hurt-2",
+        "stream": false
+      },
+      {
+        "name": "boh:demon_hurt-3",
+        "stream": false
+      }
+    ]
+  },
+  "demon_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:demon_death",
+        "stream": false
+      },
+      {
+        "name": "boh:demon_death-2",
+        "stream": false
+      }
+    ]
+  },
+  "bendy_scream": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:bendy_jumpscare",
+        "stream": false
+      }
+    ]
+  },
+  "bendy_step": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "boh:bendy_step",
+        "stream": false
+      },
+      {
+        "name": "boh:bendy_step-2",
+        "stream": false
+      },
+      {
+        "name": "boh:bendy_step-3",
+        "stream": false
+      },
+      {
+        "name": "boh:bendy_step-4",
+        "stream": false
+      }
+    ]
+  },
+  "bendy_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:bendy_idle",
+        "stream": false
+      },
+      {
+        "name": "boh:bendy_idle-2",
+        "stream": false
+      },
+      {
+        "name": "boh:bendy_idle-3",
+        "stream": false
+      },
+      {
+        "name": "boh:bendy_idle-4",
+        "stream": false
+      }
+    ]
+  },
+  "bendy_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:bendy_hurt",
+        "stream": false
+      },
+      {
+        "name": "boh:bendy_hurt-2",
+        "stream": false
+      },
+      {
+        "name": "boh:bendy_hurt-3",
+        "stream": false
+      }
+    ]
+  },
+  "predator_distraction": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:pred_distraction-01",
+        "stream": false
+      },
+      {
+        "name": "boh:pred_distraction-02",
+        "stream": false
+      },
+      {
+        "name": "boh:pred_distraction-03",
+        "stream": false
+      },
+      {
+        "name": "boh:pred_distraction-04",
+        "stream": false
+      },
+      {
+        "name": "boh:pred_distraction-05",
+        "stream": false
+      }
+    ]
+  },
+  "predator_cloak": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:predator_cloak",
+        "stream": false
+      }
+    ]
+  },
+  "predator_console": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:predator_console-01",
+        "stream": false
+      }
+    ]
+  },
+  "predator_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:predator_death-01",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_death-02",
+        "stream": false
+      }
+    ]
+  },
+  "predator_decloak_water": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:predator_decloak_water",
+        "stream": false
+      }
+    ]
+  },
+  "predator_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:predator_hurt-01",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_hurt-02",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_hurt-03",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_hurt-04",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_hurt-05",
+        "stream": false
+      }
+    ]
+  },
+  "predator_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:predator_idle-01",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_idle-02",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_idle-03",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_idle-04",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_idle-05",
+        "stream": false
+      }
+    ]
+  },
+  "predator_kill": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:predator_kill-01",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_kill-02",
+        "stream": false
+      }
+    ]
+  },
+  "predator_scan": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:predator_scan",
+        "stream": false
+      }
+    ]
+  },
+  "predator_step": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "boh:predator_step-01",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_step-02",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_step-03",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_step-04",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_step-05",
+        "stream": false
+      }
+    ]
+  },
+  "predator_uncloak": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:prd_uncloak",
+        "stream": false
+      }
+    ]
+  },
+  "predator_swing": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:predator_swing-01",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_swing-02",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_swing-03",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_swing-04",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_swing-05",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_swing-06",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_swing-07",
+        "stream": false
+      }
+    ]
+  },
+  "predator_hurt_alien": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:predator_hurt_alien-01",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_hurt_alien-02",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_hurt_alien-03",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_hurt_alien-04",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_hurt_alien-05",
+        "stream": false
+      }
+    ]
+  },
+  "predator_hit": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:predator_hit-01",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_hit-02",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_hit-03",
+        "stream": false
+      }
+    ]
+  },
+  "predator_caster_confirm": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:predator_caster_confirm",
+        "stream": false
+      }
+    ]
+  },
+  "predator_caster_explosion": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:predator_caster_explosion-01",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_caster_explosion-02",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_caster_explosion-03",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_caster_explosion-04",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_caster_explosion-05",
+        "stream": false
+      }
+    ]
+  },
+  "predator_caster_lockon": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:predator_caster_lockon",
+        "stream": false
+      }
+    ]
+  },
+  "predator_caster_shoot": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:predator_caster_shoot-01",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_caster_shoot-02",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_caster_shoot-03",
+        "stream": false
+      },
+      {
+        "name": "boh:predator_caster_tracking",
+        "stream": false
+      }
+    ]
+  },
+  "predator_caster_tracking": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:predator_caster_tracking",
+        "stream": false
+      }
+    ]
+  },
+  "angler_attack": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:angler_attack",
+        "stream": false
+      }
+    ]
+  },
+  "angler_kill": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:angler_kill",
+        "stream": false
+      }
+    ]
+  },
+  "rexy_roar_novel": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:rexy_novel_roar_new",
+        "stream": false
+      }
+    ]
+  },
+  "rexy_attack": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:rexy_attack",
+        "stream": false
+      },
+      {
+        "name": "boh:rexy_attack-2",
+        "stream": false
+      },
+      {
+        "name": "boh:rexy_attack-3",
+        "stream": false
+      }
+    ]
+  },
+  "rex_roar": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:rex_roar",
+        "stream": false
+      }
+    ]
+  },
+  "computer_complete": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:computer_complete",
+        "stream": false
+      }
+    ]
+  },
+  "computer_load": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:computer_load",
+        "stream": false
+      }
+    ]
+  },
+  "computer_loadfail": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:computer_loadfail",
+        "stream": false
+      }
+    ]
+  },
+  "computer_mail": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:computer_mail",
+        "stream": false
+      }
+    ]
+  },
+  "sirenhead_sonicboom": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:sirenhead_sonicboom",
+        "stream": false
+      }
+    ]
+  },
+  "tinky_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tinky_hurt1",
+        "stream": false
+      },
+      {
+        "name": "boh:tinky_hurt2",
+        "stream": false
+      }
+    ]
+  },
+  "tinky_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tinky_death",
+        "stream": false
+      }
+    ]
+  },
+  "tinkywinky_jumpscare": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tinkywinky_jumpscare",
+        "stream": false
+      }
+    ]
+  },
+  "tinkywinky_chase": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tinkywinky_chasing",
+        "stream": false
+      }
+    ]
+  },
+  "tinkywinky_attack": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tinkywinky_attack",
+        "stream": false
+      }
+    ]
+  },
+  "stephano_kill": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "boh:stephano_kill",
+        "stream": false
+      }
+    ]
+  },
+  "baldi_ruler": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:baldi_ruler",
+        "stream": false
+      }
+    ]
+  },
+  "jumpscare_baldi": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:jumpscare_baldi",
+        "stream": false
+      }
+    ]
+  },
+  "holy_water_throw": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:holy_water_throw",
+        "stream": false
+      }
+    ]
+  },
+  "holy_water_splash": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:holy_water_splash",
+        "stream": false
+      }
+    ]
+  },
+  "baldi_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:baldi_idle_1",
+        "stream": false
+      },
+      {
+        "name": "boh:baldi_idle_2",
+        "stream": false
+      },
+      {
+        "name": "boh:baldi_idle_3",
+        "stream": false
+      },
+      {
+        "name": "boh:baldi_idle_4",
+        "stream": false
+      },
+      {
+        "name": "boh:baldi_idle_6",
+        "stream": false
+      },
+      {
+        "name": "boh:baldi_idle_5",
+        "stream": false
+      }
+    ]
+  },
+  "baldi_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:baldi_hurt_2",
+        "stream": false
+      },
+      {
+        "name": "boh:baldi_hurt_1",
+        "stream": false
+      }
+    ]
+  },
+  "baldi_aggro": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:baldi_aggro",
+        "stream": false
+      }
+    ]
+  },
+  "baldi_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:baldi_death",
+        "stream": false
+      }
+    ]
+  },
+  "cartooncat_jumpscare": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:cartoon_cat_jumpscare",
+        "stream": false
+      }
+    ]
+  },
+  "figure_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:figure_idle",
+        "stream": false
+      }
+    ]
+  },
+  "figure_aggro": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:figure_idle_aggro",
+        "stream": false
+      }
+    ]
+  },
+  "figure_kill": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:figure_kill",
+        "stream": false
+      }
+    ]
+  },
+  "figure_step": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "boh:figure_step",
+        "stream": false
+      },
+      {
+        "name": "boh:figure_step-2",
+        "stream": false
+      }
+    ]
+  },
+  "figure_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:figure_hurt",
+        "stream": false
+      }
+    ]
+  },
+  "figure_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:figure_death",
+        "stream": false
+      }
+    ]
+  },
+  "figure_scream": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:figure_aggro",
+        "stream": false
+      }
+    ]
+  },
+  "gaster_blaster_summon": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:gaster_blaster_summon",
+        "stream": false
+      }
+    ]
+  },
+  "gaster_blaster_fire": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:gaster_blaster_fire",
+        "stream": false
+      }
+    ]
+  },
+  "horror_sans_action": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:horror_sans_action",
+        "stream": false
+      }
+    ]
+  },
+  "horror_sans_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:horror_sans_death",
+        "stream": false
+      }
+    ]
+  },
+  "horror_sans_tp": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:horror_sans_tp",
+        "stream": false
+      }
+    ]
+  },
+  "rend_slash": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:rend_slash1",
+        "stream": false
+      },
+      {
+        "name": "boh:rend_slash2",
+        "stream": false
+      }
+    ]
+  },
+  "cartooncat_chase": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:cartoon_cat_chase",
+        "stream": false
+      }
+    ]
+  },
+  "gray_ost": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:enigma",
+        "stream": false
+      }
+    ]
+  },
+  "jeff_laugh": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:jeff_laugh",
+        "stream": false
+      }
+    ]
+  },
+  "cartoon_cat_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:death_cartoon_cat",
+        "stream": false
+      }
+    ]
+  },
+  "cartoon_cat_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:idle1_cartoon_cat",
+        "stream": false
+      },
+      {
+        "name": "boh:idle2_cartoon_cat",
+        "stream": false
+      },
+      {
+        "name": "boh:idle3_cartoon_cat",
+        "stream": false
+      }
+    ]
+  },
+  "sans_ost": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:endless_hunger",
+        "stream": true
+      }
+    ]
+  },
+  "stephano_equip": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "boh:stephano_montage",
+        "stream": false
+      },
+      {
+        "name": "boh:stephano_montage-2",
+        "stream": false
+      },
+      {
+        "name": "boh:stephano_montage-3",
+        "stream": false
+      },
+      {
+        "name": "boh:stephano_montage-4",
+        "stream": false
+      },
+      {
+        "name": "boh:stephano_montage-5",
+        "stream": false
+      },
+      {
+        "name": "boh:stephano_montage-6",
+        "stream": false
+      },
+      {
+        "name": "boh:stephano_montage-7",
+        "stream": false
+      },
+      {
+        "name": "boh:stephano_montage-8",
+        "stream": false
+      },
+      {
+        "name": "boh:stephano_montage-9",
+        "stream": false
+      }
+    ]
+  },
+  "x1_spawn": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:x1_spawn",
+        "stream": false
+      },
+      {
+        "name": "boh:x1_spawn-2",
+        "stream": false
+      },
+      {
+        "name": "boh:x1_spawn-3",
+        "stream": false
+      },
+      {
+        "name": "boh:x1_spawn-4",
+        "stream": false
+      },
+      {
+        "name": "boh:x1_spawn-5",
+        "stream": false
+      }
+    ]
+  },
+  "x1_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:x1_death",
+        "stream": false
+      },
+      {
+        "name": "boh:x1_death-2",
+        "stream": false
+      },
+      {
+        "name": "boh:x1_death-3",
+        "stream": false
+      }
+    ]
+  },
+  "x1_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:x1_idle",
+        "stream": false
+      },
+      {
+        "name": "boh:x1_idle-2",
+        "stream": false
+      },
+      {
+        "name": "boh:x1_idle-3",
+        "stream": false
+      },
+      {
+        "name": "boh:x1_idle-4",
+        "stream": false
+      },
+      {
+        "name": "boh:x1_idle-5",
+        "stream": false
+      }
+    ]
+  },
+  "x1_kill": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:x1_kill",
+        "stream": false
+      },
+      {
+        "name": "boh:x1_kill-2",
+        "stream": false
+      },
+      {
+        "name": "boh:x1_kill-3",
+        "stream": false
+      },
+      {
+        "name": "boh:x1_kill-4",
+        "stream": false
+      },
+      {
+        "name": "boh:x1_kill-5",
+        "stream": false
+      }
+    ]
+  },
+  "x1_slash": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:x1_slash",
+        "stream": false
+      },
+      {
+        "name": "boh:x1_slash-2",
+        "stream": false
+      }
+    ]
+  },
+  "vita_mimic_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:vita_mimic_death",
+        "stream": false
+      },
+      {
+        "name": "boh:vita_mimic_death-2",
+        "stream": false
+      },
+      {
+        "name": "boh:vita_mimic_death-3",
+        "stream": false
+      }
+    ]
+  },
+  "vita_mimic_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:vita_mimic_hurt",
+        "stream": false
+      }
+    ]
+  },
+  "vita_mimic_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:vita_mimic_idle",
+        "stream": false
+      },
+      {
+        "name": "boh:vita_mimic_idle-2",
+        "stream": false
+      }
+    ]
+  },
+  "trimming_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:trimming_idle",
+        "stream": false
+      },
+      {
+        "name": "boh:trimming_idle-2",
+        "stream": false
+      },
+      {
+        "name": "boh:trimming_idle-3",
+        "stream": false
+      }
+    ]
+  },
+  "trimming_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:trimming_hurt",
+        "stream": false
+      }
+    ]
+  },
+  "trimming_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:trimming_death",
+        "stream": false
+      },
+      {
+        "name": "boh:trimming_death-2",
+        "stream": false
+      }
+    ]
+  },
+  "subject3_chase": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:subject3_chase",
+        "stream": false
+      }
+    ]
+  },
+  "mx_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:mx_laugh-01",
+        "stream": false
+      },
+      {
+        "name": "boh:mx_laugh-02",
+        "stream": false
+      },
+      {
+        "name": "boh:mx_laugh-03",
+        "stream": false
+      }
+    ]
+  },
+  "pasta_night": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:pasta_night",
+        "stream": false
+      }
+    ]
+  },
+  "myers_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:myers_hurt1",
+        "stream": false
+      },
+      {
+        "name": "boh:myers_hurt2",
+        "stream": false
+      },
+      {
+        "name": "boh:myers_hurt3",
+        "stream": false
+      },
+      {
+        "name": "boh:myers_hurt4",
+        "stream": false
+      }
+    ]
+  },
+  "hypno_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:hypno_idle1",
+        "stream": false
+      },
+      {
+        "name": "boh:hypno_idle2",
+        "stream": false
+      },
+      {
+        "name": "boh:hypno_idle3",
+        "stream": false
+      }
+    ]
+  },
+  "hypno_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:hypno_death",
+        "stream": false
+      }
+    ]
+  },
+  "bateman_attack": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:bateman_attack",
+        "stream": false
+      }
+    ]
+  },
+  "bateman_kill": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:bateman_kill",
+        "stream": false
+      }
+    ]
+  },
+  "bateman_spawn": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:bateman_spawn",
+        "stream": false
+      },
+      {
+        "name": "boh:bateman_spawn-2",
+        "stream": false
+      }
+    ]
+  },
+  "laghingjack_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:laughingjack_idle",
+        "stream": false
+      }
+    ]
+  },
+  "laghingjack_ambience": {
+    "category": "ambient",
+    "sounds": [
+      {
+        "name": "boh:laughingjack_ambience",
+        "stream": false
+      }
+    ]
+  },
+  "laughingjack_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:laughingjack_idle",
+        "stream": false
+      }
+    ]
+  },
+  "krasue_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:krasue_idle",
+        "stream": false
+      },
+      {
+        "name": "boh:krasue_idle-2",
+        "stream": false
+      },
+      {
+        "name": "boh:krasue_idle-3",
+        "stream": false
+      },
+      {
+        "name": "boh:krasue_idle-4",
+        "stream": false
+      }
+    ]
+  },
+  "krasue_scream": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:krasue_scream",
+        "stream": false
+      }
+    ]
+  },
+  "mx_jump": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:mx_jump",
+        "stream": false
+      }
+    ]
+  },
+  "tailsdoll_jumpscare": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:tailsdoll_jumpscare",
+        "stream": false
+      }
+    ]
+  },
+  "suicidemouse_jumpscare": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:suicidemouse_jumpscare",
+        "stream": false
+      }
+    ]
+  },
+  "squidward_redmist": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:squidward_redmist",
+        "stream": false
+      }
+    ]
+  },
+  "shotgun_shoot": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:shotgun_shoot",
+        "stream": false
+      }
+    ]
+  },
+  "shotgun_cocking": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:shotgun_cocking",
+        "stream": false
+      }
+    ]
+  },
+  "music_disc_day": {
+    "category": "record",
+    "sounds": [
+      {
+        "name": "boh:music_disc_day",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc_lavender": {
+    "category": "record",
+    "sounds": [
+      {
+        "name": "boh:music_disc_lavender",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc_promise": {
+    "category": "record",
+    "sounds": [
+      {
+        "name": "boh:music_disc_promise",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc_sonic_cd_boss": {
+    "category": "record",
+    "sounds": [
+      {
+        "name": "boh:music_disc_sonic_cd_boss",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc_tallyhall": {
+    "category": "record",
+    "sounds": [
+      {
+        "name": "boh:music_disc_tallyhall",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc_touchtone": {
+    "category": "record",
+    "sounds": [
+      {
+        "name": "boh:music_disc_touchtone",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc_whitenoiz": {
+    "category": "record",
+    "sounds": [
+      {
+        "name": "boh:music_disc_whitenoiz",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc_mx": {
+    "category": "record",
+    "sounds": [
+      {
+        "name": "boh:music_disc_mx",
+        "stream": true
+      }
+    ]
+  },
+  "chase_mx": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:chase_mx",
+        "stream": false
+      }
+    ]
+  },
+  "camera_obscura": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:camera_obscura",
+        "stream": false
+      }
+    ]
+  },
+  "wf_pistol": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:wf_pistol",
+        "stream": false
+      }
+    ]
+  },
+  "bloodwave": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:bloodwave",
+        "stream": false
+      }
+    ]
+  },
+  "leatherface_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:leatherface_hurt1",
+        "stream": false
+      },
+      {
+        "name": "boh:leatherface_hurt2",
+        "stream": false
+      },
+      {
+        "name": "boh:leatherface_hurt3",
+        "stream": false
+      }
+    ]
+  },
+  "leatherface_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:leatherface_death",
+        "stream": false
+      }
+    ]
+  },
+  "leatherface_attack": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:leatherface_attack",
+        "stream": false
+      }
+    ]
+  },
+  "leatherface_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:leatherface_idle1",
+        "stream": false
+      },
+      {
+        "name": "boh:leatherface_idle2",
+        "stream": false
+      }
+    ]
+  },
+  "squidward_step": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "boh:squidward_step",
+        "stream": false
+      },
+      {
+        "name": "boh:squidward_step-2",
+        "stream": false
+      }
+    ]
+  },
+  "ghostface_knife_activate": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:ghostface_knife_activate",
+        "stream": false
+      },
+      {
+        "name": "boh:ghostface_knife_activate-2",
+        "stream": false
+      },
+      {
+        "name": "boh:ghostface_knife_activate-3",
+        "stream": false
+      },
+      {
+        "name": "boh:ghostface_knife_activate-4",
+        "stream": false
+      }
+    ]
+  },
+  "jason_stinger": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:jason_stinger",
+        "stream": false
+      }
+    ]
+  },
+  "myers_stinger": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:myers_stinger",
+        "stream": false
+      }
+    ]
+  },
+  "rift_open": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:rift_open_1",
+        "stream": false
+      },
+      {
+        "name": "boh:rift_open_2",
+        "stream": false
+      },
+      {
+        "name": "boh:rift_open_3",
+        "stream": false
+      },
+      {
+        "name": "boh:rift_open_4",
+        "stream": false
+      }
+    ]
+  },
+  "music_disc_smashing_windshields": {
+    "category": "record",
+    "sounds": [
+      {
+        "name": "boh:music_disc_smashing_windshields",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc_boys": {
+    "category": "record",
+    "sounds": [
+      {
+        "name": "boh:music_disc_boys",
+        "stream": true
+      }
+    ]
+  },
+  "mimicry_hit": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:mimicry_hit_1",
+        "stream": false
+      },
+      {
+        "name": "boh:mimicry_hit_2",
+        "stream": false
+      },
+      {
+        "name": "boh:mimicry_hit_3",
+        "stream": false
+      }
+    ]
+  },
+  "mimicry_dash": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:mimicry_dash",
+        "stream": false
+      }
+    ]
+  },
+  "sweep": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:mimicry_sweep",
+        "stream": false
+      }
+    ]
+  },
+  "mimicry_sweep": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:mimicry_sweep",
+        "stream": false
+      }
+    ]
+  },
+  "nothing_there_idle": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:nothing_there_idle",
+        "stream": false
+      },
+      {
+        "name": "boh:nothing_there_idle-2",
+        "stream": false
+      },
+      {
+        "name": "boh:nothing_there_idle-3",
+        "stream": false
+      }
+    ]
+  },
+  "nothing_there_aggro": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:nothing_there_aggro",
+        "stream": false
+      },
+      {
+        "name": "boh:nothing_there_aggro-2",
+        "stream": false
+      }
+    ]
+  },
+  "nothing_there_attack": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:nothing_there_attack",
+        "stream": false
+      },
+      {
+        "name": "boh:nothing_there_attack-2",
+        "stream": false
+      },
+      {
+        "name": "boh:nothing_there_attack-3",
+        "stream": false
+      }
+    ]
+  },
+  "nothing_there_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:nothing_there_death",
+        "stream": false
+      }
+    ]
+  },
+  "nothing_there_hit": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:nothing_there_hit",
+        "stream": false
+      }
+    ]
+  },
+  "nothing_there_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:nothing_there_hurt",
+        "stream": false
+      }
+    ]
+  },
+  "nothing_there_step": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "boh:nothing_there_step",
+        "stream": false
+      },
+      {
+        "name": "boh:nothing_there_step-2",
+        "stream": false
+      },
+      {
+        "name": "boh:nothing_there_step-3",
+        "stream": false
+      },
+      {
+        "name": "boh:nothing_there_step-4",
+        "stream": false
+      }
+    ]
+  },
+  "chase_nothing_there": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:chase_nothing_there",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc_neutral01": {
+    "category": "record",
+    "sounds": [
+      {
+        "name": "boh:music_disc_neutral01",
+        "stream": true
+      }
+    ]
+  },
+  "stud_footstep": {
+    "category": "block",
+    "sounds": [
+      {
+        "name": "boh:stud_footstep-01",
+        "stream": false
+      },
+      {
+        "name": "boh:stud_footstep-02",
+        "stream": false
+      },
+      {
+        "name": "boh:stud_footstep-03",
+        "stream": false
+      },
+      {
+        "name": "boh:stud_footstep-04",
+        "stream": false
+      }
+    ]
+  },
+  "npc_000_hurt": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:npc_000_hurt-01",
+        "stream": false
+      },
+      {
+        "name": "boh:npc_000_hurt-02",
+        "stream": false
+      },
+      {
+        "name": "boh:npc_000_hurt-03",
+        "stream": false
+      },
+      {
+        "name": "boh:npc_000_hurt-04",
+        "stream": false
+      }
+    ]
+  },
+  "noc_000_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:npc_000_death-01",
+        "stream": false
+      },
+      {
+        "name": "boh:npc_000_death-02",
+        "stream": false
+      },
+      {
+        "name": "boh:npc_000_death-03",
+        "stream": false
+      },
+      {
+        "name": "boh:npc_000_death-04",
+        "stream": false
+      }
+    ]
+  },
+  "npc_000_death": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:npc_000_death-01",
+        "stream": false
+      },
+      {
+        "name": "boh:npc_000_death-02",
+        "stream": false
+      },
+      {
+        "name": "boh:npc_000_death-03",
+        "stream": false
+      },
+      {
+        "name": "boh:npc_000_death-04",
+        "stream": false
+      }
+    ]
+  },
+  "baseplate_jump": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:baseplate_jump",
+        "stream": false
+      }
+    ]
+  },
+  "npc_000_roar": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:npc_000_roar",
+        "stream": false
+      }
+    ]
+  },
+  "npc_000_near": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:npc_000_near",
+        "stream": false
+      }
+    ]
+  },
+  "npc_000_far": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:npc_000_far",
+        "stream": false
+      }
+    ]
+  },
+  "flowers_whistle_damage": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:flowers_whistle_damage",
+        "stream": false
+      }
+    ]
+  },
+  "flowers_fight_ost": {
+    "category": "hostile",
+    "sounds": [
+      {
+        "name": "boh:flowers_fight_ost",
+        "stream": true
+      }
+    ]
+  },
+  "flowers_disc": {
+    "category": "record",
+    "sounds": [
+      {
+        "name": "boh:flowers_disc",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc_heaven_says": {
+    "category": "record",
+    "sounds": [
+      {
+        "name": "boh:music_disc_heaven_says",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc_enigma": {
+    "category": "record",
+    "sounds": [
+      {
+        "name": "boh:music_disc_enigma",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc_cartooncat": {
+    "category": "record",
+    "sounds": [
+      {
+        "name": "boh:music_disc_cartoon_cat",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc_hunger": {
+    "category": "record",
+    "sounds": [
+      {
+        "name": "boh:music_disc_hunger",
+        "stream": true
+      }
+    ]
+  }
+}

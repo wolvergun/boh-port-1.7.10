@@ -1,0 +1,18 @@
+package net.mcreator.boh.procedures;
+
+import net.mcreator.boh.compat.M;
+import net.mcreator.boh.compat.mc.world.phys.AABB;
+import net.mcreator.boh.compat.mc.world.phys.Vec3;
+import net.mcreator.boh.entity.SonicExeEntity;
+import net.minecraft.entity.Entity;
+import net.minecraft.world.World;
+
+public class ExeMonitorOnEntityTickUpdateProcedure {
+    public static void execute(World world, double x, double y, double z, Entity entity) {
+        if (entity != null
+            && M.isEmpty(M.getEntitiesOfClass(world, SonicExeEntity.class, AABB.ofSize(new Vec3(x, y, z), 10000.0, 10000.0, 10000.0), e -> true))
+            && !M.isClientSide(M.level(entity))) {
+            M.discard(entity);
+        }
+    }
+}

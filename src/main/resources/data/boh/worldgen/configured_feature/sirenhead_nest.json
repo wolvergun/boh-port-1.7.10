@@ -1,0 +1,14 @@
+{
+  "type": "boh:structure_feature",
+  "config": {
+    "structure": "boh:sirenhead_nest",
+    "random_rotation": true,
+    "random_mirror": true,
+    "ignored_blocks": "minecraft:structure_block",
+    "offset": [
+      0,
+      -1,
+      0
+    ]
+  }
+}

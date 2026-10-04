@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "abb",
+    " cd",
+    "cd "
+  ],
+  "key": {
+    "a": {
+      "item": "boh:killer_knife"
+    },
+    "b": {
+      "item": "minecraft:iron_ingot"
+    },
+    "c": {
+      "item": "minecraft:stick"
+    },
+    "d": {
+      "item": "boh:killers_soul"
+    }
+  },
+  "result": {
+    "item": "boh:zacks_scythe",
+    "count": 1
+  }
+}

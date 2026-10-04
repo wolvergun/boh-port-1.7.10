@@ -1,0 +1,13 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "down": "boh:block/sassafras_log_top",
+    "up": "boh:block/sassafras_log_top",
+    "north": "boh:block/sassafras_log_side",
+    "east": "boh:block/sassafras_log_side",
+    "south": "boh:block/sassafras_log_side",
+    "west": "boh:block/sassafras_log_side",
+    "particle": "boh:block/sassafras_log_top"
+  },
+  "render_type": "solid"
+}

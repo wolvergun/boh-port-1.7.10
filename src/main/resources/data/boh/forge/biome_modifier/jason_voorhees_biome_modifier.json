@@ -1,0 +1,14 @@
+{
+  "type": "forge:add_spawns",
+  "biomes": [
+    "mangrove_swamp",
+    "swamp",
+    "river"
+  ],
+  "spawners": {
+    "type": "boh:jason_voorhees",
+    "weight": 1,
+    "minCount": 1,
+    "maxCount": 1
+  }
+}

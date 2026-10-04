@@ -1,0 +1,10 @@
+{
+  "parent": "block/stairs",
+  "textures": {
+    "particle": "boh:block/dogwood_planks",
+    "bottom": "boh:block/dogwood_planks",
+    "top": "boh:block/dogwood_planks",
+    "side": "boh:block/dogwood_planks"
+  },
+  "render_type": "solid"
+}

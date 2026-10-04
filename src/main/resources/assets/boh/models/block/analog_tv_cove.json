@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/analog_tv_cove",
+  "textures": {
+    "all": "boh:block/analog_tv_cove",
+    "particle": "boh:block/analog_tv_cove",
+    "missing": "boh:block/analog_tv_cove"
+  },
+  "render_type": "solid"
+}

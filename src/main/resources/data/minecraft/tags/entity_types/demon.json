@@ -1,0 +1,20 @@
+{
+  "replace": false,
+  "values": [
+    "boh:ben_drowned",
+    "boh:neco_arc",
+    "boh:michael_davies",
+    "boh:ao_oni",
+    "boh:vampire",
+    "boh:vampire_bat",
+    "boh:ghost",
+    "boh:demon",
+    "zombie",
+    "zombie_horse",
+    "zombie_villager",
+    "skeleton",
+    "skeleton_horse",
+    "boh:werewolf",
+    "boh:laughing_jack"
+  ]
+}

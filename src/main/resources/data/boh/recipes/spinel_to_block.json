@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "aaa",
+    "aaa",
+    "aaa"
+  ],
+  "key": {
+    "a": {
+      "item": "boh:spinel"
+    }
+  },
+  "result": {
+    "item": "boh:spinel_block",
+    "count": 1
+  }
+}

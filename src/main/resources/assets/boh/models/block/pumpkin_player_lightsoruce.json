@@ -1,0 +1,13 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "down": "boh:block/structure_builder",
+    "up": "boh:block/structure_builder",
+    "north": "boh:block/structure_builder",
+    "east": "boh:block/structure_builder",
+    "south": "boh:block/structure_builder",
+    "west": "boh:block/structure_builder",
+    "particle": "boh:block/structure_builder"
+  },
+  "render_type": "translucent"
+}

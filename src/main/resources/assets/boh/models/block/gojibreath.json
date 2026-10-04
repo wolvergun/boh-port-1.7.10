@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/goji_breath",
+  "textures": {
+    "all": "boh:block/goji_breath",
+    "particle": "boh:block/goji_breath",
+    "0": "boh:block/goji_breath"
+  },
+  "render_type": "solid"
+}

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "powered=false": {
+      "model": "boh:block/dogwood_pressure_plate"
+    },
+    "powered=true": {
+      "model": "boh:block/dogwood_pressure_plate_down"
+    }
+  }
+}

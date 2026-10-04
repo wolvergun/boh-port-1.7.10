@@ -1,0 +1,8 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "boh:block/gaster_block_gray",
+    "particle": "boh:block/gaster_block_gray"
+  },
+  "render_type": "solid"
+}

@@ -1,0 +1,6 @@
+{
+  "type": "forge:add_features",
+  "biomes": "boh:level_0_biome",
+  "features": "boh:backrooms_placeholder",
+  "step": "surface_structures"
+}

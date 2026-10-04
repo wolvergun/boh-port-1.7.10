@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/analog_tv_max",
+  "textures": {
+    "all": "boh:block/analog_tv_max",
+    "particle": "boh:block/analog_tv_max",
+    "missing": "boh:block/analog_tv_max"
+  },
+  "render_type": "solid"
+}

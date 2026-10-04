@@ -1,0 +1,21 @@
+{
+  "type": "forge:add_spawns",
+  "biomes": [
+    "meadow",
+    "snowy_plains",
+    "sunflower_plains",
+    "birch_forest",
+    "dark_forest",
+    "flower_forest",
+    "forest",
+    "old_growth_birch_forest",
+    "badlands",
+    "plains"
+  ],
+  "spawners": {
+    "type": "boh:james_sunderland",
+    "weight": 1,
+    "minCount": 1,
+    "maxCount": 1
+  }
+}

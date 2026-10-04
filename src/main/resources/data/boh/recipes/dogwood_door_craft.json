@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "wooden_slab",
+  "category": "building",
+  "pattern": [
+    "aa",
+    "aa",
+    "aa"
+  ],
+  "key": {
+    "a": {
+      "item": "boh:dogwood_planks"
+    }
+  },
+  "result": {
+    "item": "boh:dogwood_door",
+    "count": 3
+  }
+}

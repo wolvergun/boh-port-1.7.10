@@ -1,0 +1,28 @@
+{
+  "replace": false,
+  "values": [
+    "boh:rexy",
+    "boh:xenomorph",
+    "boh:whiteface_friendly",
+    "boh:chestburster",
+    "boh:big_daddy",
+    "boh:demogorgon",
+    "boh:goji",
+    "boh:lifeform",
+    "boh:nemesis",
+    "boh:pyramid_head",
+    "boh:rolling_giant",
+    "boh:saw_runner",
+    "boh:specimen_9_boss",
+    "boh:swamp_monster",
+    "boh:vampire",
+    "boh:vampire_bat",
+    "boh:wendigo",
+    "boh:werewolf",
+    "boh:predator",
+    "boh:angler",
+    "boh:bruce",
+    "boh:trimming",
+    "boh:vita_mimic"
+  ]
+}

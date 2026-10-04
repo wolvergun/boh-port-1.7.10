@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "aba",
+    "bcb",
+    "dbd"
+  ],
+  "key": {
+    "a": {
+      "item": "minecraft:ghast_tear"
+    },
+    "b": {
+      "item": "minecraft:charcoal"
+    },
+    "c": {
+      "item": "boh:ectoplasm"
+    },
+    "d": {
+      "item": "minecraft:rotten_flesh"
+    }
+  },
+  "result": {
+    "item": "boh:singed_dream_catcher",
+    "count": 1
+  }
+}

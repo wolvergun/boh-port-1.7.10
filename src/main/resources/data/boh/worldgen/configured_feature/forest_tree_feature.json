@@ -1,0 +1,9 @@
+{
+  "type": "boh:structure_feature",
+  "config": {
+    "structure": "boh:slender_tree",
+    "random_rotation": true,
+    "random_mirror": true,
+    "ignored_blocks": "minecraft:structure_block"
+  }
+}

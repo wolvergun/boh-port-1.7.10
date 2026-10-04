@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/lifeform_growth",
+  "textures": {
+    "all": "boh:block/lifeform_growth",
+    "particle": "boh:block/lifeform_growth",
+    "0": "boh:block/lifeform_growth"
+  },
+  "render_type": "cutout"
+}

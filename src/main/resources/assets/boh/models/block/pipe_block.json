@@ -1,0 +1,13 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "down": "boh:block/pipe_upp",
+    "up": "boh:block/pipe_upp",
+    "north": "boh:block/pipe_side",
+    "east": "boh:block/pipe_side",
+    "south": "boh:block/pipe_side",
+    "west": "boh:block/pipe_side",
+    "particle": "boh:block/pipe_upp"
+  },
+  "render_type": "solid"
+}

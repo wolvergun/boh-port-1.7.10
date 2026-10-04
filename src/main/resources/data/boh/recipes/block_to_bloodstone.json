@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "a"
+  ],
+  "key": {
+    "a": {
+      "item": "boh:bloodstone_block"
+    }
+  },
+  "result": {
+    "item": "boh:blood_stone",
+    "count": 9
+  }
+}

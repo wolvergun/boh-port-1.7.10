@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "boh:block/sassafras_slab"
+    },
+    "type=top": {
+      "model": "boh:block/sassafras_slab_top"
+    },
+    "type=double": {
+      "model": "boh:block/sassafras_slab_full"
+    }
+  }
+}

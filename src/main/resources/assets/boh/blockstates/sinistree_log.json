@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "boh:block/sinistree_log",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "boh:block/sinistree_log"
+    },
+    "axis=z": {
+      "model": "boh:block/sinistree_log",
+      "x": 90
+    }
+  }
+}

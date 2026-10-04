@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "planks",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "boh:dogwood_stripped_wood"
+    }
+  ],
+  "result": {
+    "item": "boh:dogwood_planks",
+    "count": 4
+  }
+}

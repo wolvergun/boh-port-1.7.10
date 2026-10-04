@@ -1,0 +1,6 @@
+{
+  "parent": "boh:displaysettings/painted_sword.item",
+  "textures": {
+    "layer0": "boh:item/painted_sword"
+  }
+}

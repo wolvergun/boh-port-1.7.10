@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "boh:block/pipe_block",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "boh:block/pipe_block"
+    },
+    "axis=z": {
+      "model": "boh:block/pipe_block",
+      "x": 90
+    }
+  }
+}

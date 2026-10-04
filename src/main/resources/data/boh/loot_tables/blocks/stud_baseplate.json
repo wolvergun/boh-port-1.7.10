@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:block",
+  "random_sequence": "boh:blocks/stud_baseplate",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "boh:stud_baseplate"
+        }
+      ]
+    }
+  ]
+}

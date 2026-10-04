@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "wooden_slab",
+  "category": "building",
+  "pattern": [
+    "aa",
+    "aa",
+    "aa"
+  ],
+  "key": {
+    "a": {
+      "item": "boh:sassafras_planks"
+    }
+  },
+  "result": {
+    "item": "boh:sassafras_door",
+    "count": 3
+  }
+}

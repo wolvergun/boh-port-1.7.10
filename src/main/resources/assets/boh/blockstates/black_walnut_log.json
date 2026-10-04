@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "boh:block/black_walnut_log",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "boh:block/black_walnut_log"
+    },
+    "axis=z": {
+      "model": "boh:block/black_walnut_log",
+      "x": 90
+    }
+  }
+}

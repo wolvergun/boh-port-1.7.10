@@ -1,0 +1,6 @@
+{
+  "type": "forge:add_features",
+  "biomes": "boh:shrouded_cliffs",
+  "features": "boh:black_wallnut_tree_feature",
+  "step": "vegetal_decoration"
+}

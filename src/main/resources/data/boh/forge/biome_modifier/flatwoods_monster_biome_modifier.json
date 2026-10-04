@@ -1,0 +1,15 @@
+{
+  "type": "forge:add_spawns",
+  "biomes": [
+    "boh:shrouded_cliffs",
+    "old_growth_pine_taiga",
+    "old_growth_spruce_taiga",
+    "taiga"
+  ],
+  "spawners": {
+    "type": "boh:flatwoods_monster",
+    "weight": 2,
+    "minCount": 1,
+    "maxCount": 1
+  }
+}

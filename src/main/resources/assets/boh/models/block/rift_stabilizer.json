@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/rift_stabilizer",
+  "textures": {
+    "all": "boh:block/rift_stabilizer",
+    "particle": "boh:block/rift_stabilizer",
+    "0": "boh:block/rift_stabilizer"
+  },
+  "render_type": "cutout_mipped"
+}

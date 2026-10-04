@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "boh:block/analogtvsadakoc"
+    },
+    "facing=east": {
+      "model": "boh:block/analogtvsadakoc",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "boh:block/analogtvsadakoc",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "boh:block/analogtvsadakoc",
+      "y": 270
+    }
+  }
+}

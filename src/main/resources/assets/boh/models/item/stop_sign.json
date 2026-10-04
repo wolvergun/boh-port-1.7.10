@@ -1,0 +1,6 @@
+{
+  "parent": "boh:displaysettings/stop_sign.item",
+  "textures": {
+    "layer0": "boh:item/stop_sign"
+  }
+}

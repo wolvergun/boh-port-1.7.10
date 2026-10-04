@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "wooden_button",
+  "category": "redstone",
+  "ingredients": [
+    {
+      "item": "boh:black_walnut_planks"
+    }
+  ],
+  "result": {
+    "item": "boh:black_walnut_button",
+    "count": 1
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "type": "forge:add_spawns",
+  "biomes": [
+    "snowy_slopes",
+    "snowy_beach",
+    "snowy_plains",
+    "snowy_taiga"
+  ],
+  "spawners": {
+    "type": "boh:krampus",
+    "weight": 2,
+    "minCount": 1,
+    "maxCount": 1
+  }
+}

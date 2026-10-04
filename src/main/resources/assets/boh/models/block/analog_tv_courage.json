@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/analog_tv_courage",
+  "textures": {
+    "all": "boh:block/analog_tv_courage",
+    "particle": "boh:block/analog_tv_courage",
+    "missing": "boh:block/analog_tv_courage"
+  },
+  "render_type": "solid"
+}

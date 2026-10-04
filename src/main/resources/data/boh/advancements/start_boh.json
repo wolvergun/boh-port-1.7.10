@@ -1,0 +1,23 @@
+{
+  "display": {
+    "background": "boh:textures/screens/exe_static.png",
+    "icon": {
+      "item": "boh:icon_1"
+    },
+    "title": {
+      "translate": "advancements.start_boh.title"
+    },
+    "description": {
+      "translate": "advancements.start_boh.descr"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "start_boh_0": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

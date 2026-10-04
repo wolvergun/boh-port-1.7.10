@@ -1,0 +1,6 @@
+{
+  "type": "forge:add_features",
+  "biomes": "#is_overworld",
+  "features": "boh:kindness_flower",
+  "step": "vegetal_decoration"
+}

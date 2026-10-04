@@ -1,0 +1,14 @@
+{
+  "type": "forge:add_spawns",
+  "biomes": [
+    "plains",
+    "snowy_plains",
+    "sunflower_plains"
+  ],
+  "spawners": {
+    "type": "boh:saucer",
+    "weight": 1,
+    "minCount": 1,
+    "maxCount": 1
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/ovamorphopened",
+  "textures": {
+    "all": "boh:block/ovamorph_open",
+    "particle": "boh:block/ovamorph_open",
+    "0": "boh:block/ovamorph_open"
+  },
+  "render_type": "cutout"
+}

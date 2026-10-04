@@ -1,0 +1,16 @@
+{
+  "type": "forge:add_spawns",
+  "biomes": [
+    "soul_sand_valley",
+    "dark_forest",
+    "plains",
+    "stony_shore",
+    "boh:shrouded_cliffs"
+  ],
+  "spawners": {
+    "type": "boh:ghost",
+    "weight": 3,
+    "minCount": 1,
+    "maxCount": 2
+  }
+}

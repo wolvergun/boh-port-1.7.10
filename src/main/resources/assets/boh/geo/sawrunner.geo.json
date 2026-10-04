@@ -1,0 +1,114 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.sawrunner",
+				"texture_width": 128,
+				"texture_height": 128,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 3.5,
+				"visible_bounds_offset": [0, 1.25, 0]
+			},
+			"bones": [
+				{
+					"name": "All",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "LeftLeg",
+					"parent": "All",
+					"pivot": [2, 12, 0],
+					"cubes": [
+						{"origin": [0, 0, -2], "size": [4, 12, 4], "uv": [32, 0]}
+					]
+				},
+				{
+					"name": "RightLeg",
+					"parent": "All",
+					"pivot": [-2, 12, 0],
+					"cubes": [
+						{"origin": [-4, 0, -2], "size": [4, 12, 4], "uv": [32, 32]}
+					]
+				},
+				{
+					"name": "Body",
+					"parent": "All",
+					"pivot": [0, 12, 0],
+					"cubes": [
+						{"origin": [-4, 12, -2], "size": [8, 12, 4], "uv": [24, 16]}
+					]
+				},
+				{
+					"name": "Head",
+					"parent": "Body",
+					"pivot": [0, 24, 0],
+					"cubes": [
+						{"origin": [-4, 24, -4], "size": [8, 8, 8], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "Masks",
+					"parent": "Head",
+					"pivot": [0, 28, -4.5],
+					"cubes": [
+						{"origin": [-4, 24, -5], "size": [8, 8, 1], "uv": [48, 25]},
+						{"origin": [-4, 24, -5], "size": [8, 8, 1], "inflate": 0.25, "uv": [48, 16]},
+						{"origin": [0.5, 24, -9.5], "size": [8, 8, 1], "inflate": 0.25, "pivot": [0, 28, -4.5], "rotation": [0, -90, 0], "uv": [48, 16]},
+						{"origin": [0.5, 24, -9.5], "size": [8, 8, 1], "pivot": [0, 28, -4.5], "rotation": [0, -90, 0], "uv": [48, 25]},
+						{"origin": [-8.5, 24, -9.5], "size": [8, 8, 1], "inflate": 0.25, "pivot": [0, 28, -4.5], "rotation": [0, 90, 0], "uv": [48, 16], "mirror": true},
+						{"origin": [-8.5, 24, -9.5], "size": [8, 8, 1], "pivot": [0, 28, -4.5], "rotation": [0, 90, 0], "uv": [48, 25], "mirror": true}
+					]
+				},
+				{
+					"name": "RightArm",
+					"parent": "Body",
+					"pivot": [-5, 22, 0],
+					"cubes": [
+						{"origin": [-8, 12, -2], "size": [4, 12, 4], "uv": [16, 48]}
+					]
+				},
+				{
+					"name": "Chainsaw",
+					"parent": "RightArm",
+					"pivot": [-6, 14, 1]
+				},
+				{
+					"name": "bone",
+					"parent": "Chainsaw",
+					"pivot": [-7, 12.75, -2],
+					"cubes": [
+						{"origin": [-8.5, 11, -2], "size": [3, 4, 5], "uv": [55, 48]},
+						{"origin": [-9.5, 17, -11], "size": [5, 4, 1], "uv": [50, 71]},
+						{"origin": [-10.5, 10, -11], "size": [7, 7, 9], "uv": [32, 48]}
+					]
+				},
+				{
+					"name": "handle",
+					"parent": "bone",
+					"pivot": [-7, 10.5, -10.5],
+					"rotation": [-25, 0, 0],
+					"cubes": [
+						{"origin": [-11, 10, -11], "size": [8, 13, 1], "uv": [32, 71]}
+					]
+				},
+				{
+					"name": "saw",
+					"parent": "bone",
+					"pivot": [-7, 13.5, -11],
+					"cubes": [
+						{"origin": [-7, 10, -27], "size": [0, 7, 16], "uv": [32, 48]}
+					]
+				},
+				{
+					"name": "LeftArm",
+					"parent": "Body",
+					"pivot": [5, 22, 0],
+					"cubes": [
+						{"origin": [4, 12, -2], "size": [4, 12, 4], "uv": [0, 48]}
+					]
+				}
+			]
+		}
+	]
+}

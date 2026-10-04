@@ -1,0 +1,8 @@
+{
+  "parent": "block/template_orientable_trapdoor_open",
+  "textures": {
+    "texture": "boh:block/sassafras_trapdoor",
+    "particle": "boh:block/sassafras_trapdoor"
+  },
+  "render_type": "solid"
+}

@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/vita_crawl",
+  "textures": {
+    "all": "boh:block/vita_crawl",
+    "particle": "boh:block/vita_crawl",
+    "0": "boh:block/vita_crawl"
+  },
+  "render_type": "cutout_mipped"
+}

@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/voodoo_doll",
+  "textures": {
+    "all": "boh:block/voodoo_doll",
+    "particle": "boh:block/voodoo_doll",
+    "0": "boh:block/voodoo_doll"
+  },
+  "render_type": "cutout_mipped"
+}

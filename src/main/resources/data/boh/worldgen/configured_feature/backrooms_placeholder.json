@@ -1,0 +1,7 @@
+{
+  "type": "boh:structure_feature",
+  "config": {
+    "structure": "boh:backrooms_placeholder",
+    "ignored_blocks": "minecraft:structure_block"
+  }
+}

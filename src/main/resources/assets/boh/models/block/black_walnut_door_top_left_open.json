@@ -1,0 +1,9 @@
+{
+  "parent": "block/door_top_left_open",
+  "textures": {
+    "particle": "boh:block/blackwalnut_door_bottom",
+    "bottom": "boh:block/blackwalnut_door_bottom",
+    "top": "boh:block/blackwalnut_door_top"
+  },
+  "render_type": "solid"
+}

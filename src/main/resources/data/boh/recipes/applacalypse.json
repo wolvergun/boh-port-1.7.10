@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "aab",
+    "cdb",
+    "cee"
+  ],
+  "key": {
+    "a": {
+      "item": "boh:exotic_soul"
+    },
+    "b": {
+      "item": "boh:demonic_soul"
+    },
+    "c": {
+      "item": "boh:monstrous_soul"
+    },
+    "d": {
+      "item": "minecraft:golden_apple"
+    },
+    "e": {
+      "item": "boh:killers_soul"
+    }
+  },
+  "result": {
+    "item": "boh:applalypse",
+    "count": 1
+  }
+}

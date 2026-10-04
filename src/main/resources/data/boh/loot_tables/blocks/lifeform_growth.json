@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:block",
+  "random_sequence": "boh:blocks/lifeform_growth",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "boh:lifeform_growth"
+        }
+      ]
+    }
+  ]
+}

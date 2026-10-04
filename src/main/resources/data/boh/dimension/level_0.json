@@ -1,0 +1,28 @@
+{
+  "type": "boh:level_0",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "boh:level_0_biome",
+      "lakes": false,
+      "features": true,
+      "layers": [
+      	{
+          "block": "boh:backrooms_floor",
+          "height": 1
+        }
+      ],
+      "structure_overrides": [
+        "boh:backrooms_1",
+        "boh:backrooms_2",
+        "boh:backrooms_3",
+        "boh:backrooms_4",
+        "boh:backrooms_5",
+        "boh:backrooms_6",
+        "boh:backrooms_7",
+        "boh:backrooms_8",
+        "boh:backrooms_9"
+      ]
+    }
+  }
+}

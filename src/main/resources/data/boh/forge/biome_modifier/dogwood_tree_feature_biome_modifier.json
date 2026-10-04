@@ -1,0 +1,6 @@
+{
+  "type": "forge:add_features",
+  "biomes": "boh:shrouded_cliffs",
+  "features": "boh:dogwood_tree_feature",
+  "step": "vegetal_decoration"
+}

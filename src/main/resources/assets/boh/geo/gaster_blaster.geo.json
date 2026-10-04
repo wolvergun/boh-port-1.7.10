@@ -1,0 +1,43 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.gaster_blaster",
+				"texture_width": 128,
+				"texture_height": 128,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 3.5,
+				"visible_bounds_offset": [0, 1.25, 0]
+			},
+			"bones": [
+				{
+					"name": "bone",
+					"pivot": [0, 15, 0],
+					"cubes": [
+						{"origin": [-6, 13, -10], "size": [12, 8, 20], "uv": [0, 0]},
+						{"origin": [-6, 13, -10], "size": [12, 8, 20], "inflate": -0.025, "uv": [2, 59]},
+						{"origin": [6, 16, 1], "size": [3, 3, 10], "pivot": [6, 17.5, 1], "rotation": [17.5, 15, 0], "uv": [44, 30]},
+						{"origin": [-9, 16, 1], "size": [3, 3, 10], "pivot": [-6, 17.5, 1], "rotation": [17.5, -15, 0], "uv": [44, 30], "mirror": true}
+					]
+				},
+				{
+					"name": "left_jaw",
+					"parent": "bone",
+					"pivot": [0, 13.25, 6.5],
+					"cubes": [
+						{"origin": [-1, 9, -9], "size": [6, 6, 15], "uv": [0, 28]}
+					]
+				},
+				{
+					"name": "right_jaw",
+					"parent": "bone",
+					"pivot": [0, 13.25, 6.5],
+					"cubes": [
+						{"origin": [-5, 9, -9], "size": [6, 6, 15], "uv": [0, 28], "mirror": true}
+					]
+				}
+			]
+		}
+	]
+}

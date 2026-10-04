@@ -1,0 +1,6 @@
+{
+  "parent": "boh:displaysettings/machete.item",
+  "textures": {
+    "layer0": "boh:item/machete"
+  }
+}

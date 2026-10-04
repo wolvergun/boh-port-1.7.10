@@ -1,0 +1,4 @@
+#when slender is seen
+execute as @p at @s anchored eyes facing entity @e[distance=..25,type=boh:slender_man] eyes anchored feet positioned ^ ^ ^1 rotated as @s positioned ^ ^ ^-1 if entity @s[distance=..1] run effect give @s[distance=0..25,gamemode=!creative] boh:slender_influence_effect 1 0 true
+execute as @p at @s anchored eyes facing entity @e[distance=..25,type=boh:slender_man] eyes anchored feet positioned ^ ^ ^1 rotated as @s positioned ^ ^ ^-1 if entity @s[distance=..1] run effect give @s[distance=0..25,gamemode=!creative] minecraft:blindness 3 0 true
+execute as @p at @s anchored eyes facing entity @e[distance=..25,type=boh:slender_man] eyes anchored feet positioned ^ ^ ^1 rotated as @s positioned ^ ^ ^-1 if entity @s[distance=..1] run effect give @s[distance=0..25,gamemode=!creative] minecraft:wither 2 0 true

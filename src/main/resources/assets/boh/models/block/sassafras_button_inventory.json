@@ -1,0 +1,8 @@
+{
+  "parent": "block/button_inventory",
+  "textures": {
+    "particle": "boh:block/sassafras_planks",
+    "texture": "boh:block/sassafras_planks"
+  },
+  "render_type": "solid"
+}

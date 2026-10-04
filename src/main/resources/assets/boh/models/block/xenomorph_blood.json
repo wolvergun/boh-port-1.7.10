@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/xenomorphblood",
+  "textures": {
+    "all": "boh:block/xenomorphblood",
+    "particle": "boh:block/xenomorphblood",
+    "0": "boh:block/xenomorphblood"
+  },
+  "render_type": "solid"
+}

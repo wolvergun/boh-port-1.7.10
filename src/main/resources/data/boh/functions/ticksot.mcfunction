@@ -1,0 +1,1 @@
+execute as @e[type=boh:sotiris] at @s run execute as @p at @s anchored eyes facing entity @e[type=boh:sotiris,distance=..64] eyes run function boh:raycastsot

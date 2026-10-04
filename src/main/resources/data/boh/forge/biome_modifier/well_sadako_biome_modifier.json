@@ -1,0 +1,10 @@
+{
+  "type": "forge:add_features",
+  "biomes": [
+    "plains",
+    "mangrove_swamp",
+    "swamp"
+  ],
+  "features": "boh:well_sadako",
+  "step": "surface_structures"
+}

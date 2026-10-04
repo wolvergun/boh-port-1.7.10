@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/analog_tv_operator",
+  "textures": {
+    "all": "boh:block/analog_tv_operator",
+    "particle": "boh:block/analog_tv_operator",
+    "missing": "boh:block/analog_tv_operator"
+  },
+  "render_type": "solid"
+}

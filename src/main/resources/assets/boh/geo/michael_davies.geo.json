@@ -1,0 +1,75 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.michael_davies",
+				"texture_width": 64,
+				"texture_height": 64,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 2.5,
+				"visible_bounds_offset": [0, 0.75, 0]
+			},
+			"bones": [
+				{
+					"name": "all",
+					"pivot": [0, 2, 0]
+				},
+				{
+					"name": "body",
+					"parent": "all",
+					"pivot": [0, 26, -0.5]
+				},
+				{
+					"name": "hip",
+					"parent": "body",
+					"pivot": [0, 14, -0.5],
+					"cubes": [
+						{"origin": [-4, 14, -2], "size": [8, 12, 4], "uv": [0, 16]}
+					]
+				},
+				{
+					"name": "head",
+					"parent": "hip",
+					"pivot": [0, 26.25, 0],
+					"cubes": [
+						{"origin": [-4, 26, -4], "size": [8, 8, 8], "uv": [0, 0]},
+						{"origin": [-4, 24, -4], "size": [8, 2, 0], "uv": [40, 8]}
+					]
+				},
+				{
+					"name": "leftarm",
+					"parent": "hip",
+					"pivot": [4.5, 24, 0],
+					"cubes": [
+						{"origin": [4, 12, -1.5], "size": [3, 14, 3], "uv": [37, 31], "mirror": true}
+					]
+				},
+				{
+					"name": "rightarm",
+					"parent": "hip",
+					"pivot": [-4.5, 24, 0],
+					"cubes": [
+						{"origin": [-7, 12, -1.5], "size": [3, 14, 3], "uv": [37, 31]}
+					]
+				},
+				{
+					"name": "leftleg",
+					"parent": "all",
+					"pivot": [2.5, 14, 0],
+					"cubes": [
+						{"origin": [1, 0, -1.5], "size": [3, 14, 3], "uv": [21, 31], "mirror": true}
+					]
+				},
+				{
+					"name": "rightleg",
+					"parent": "all",
+					"pivot": [-2.5, 14, 0],
+					"cubes": [
+						{"origin": [-4, 0, -1.5], "size": [3, 14, 3], "uv": [21, 31]}
+					]
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "boh:displaysettings/poker_night.tem",
+  "textures": {
+    "particle": "boh:block/dogwood_log_side"
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "credit": "Made with Blockbench",
+  "parent": "builtin/entity",
+  "texture_size": [
+    128,
+    128
+  ],
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        0,
+        -80,
+        -180
+      ],
+      "translation": [
+        -1,
+        19,
+        0.75
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        0,
+        -80,
+        -180
+      ],
+      "translation": [
+        -1,
+        19,
+        0.75
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        -80,
+        -180
+      ],
+      "translation": [
+        -1,
+        19,
+        0.75
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        0,
+        -80,
+        -180
+      ],
+      "translation": [
+        -1,
+        19,
+        0.75
+      ]
+    },
+    "ground": {
+      "rotation": [
+        0,
+        0,
+        -45
+      ],
+      "translation": [
+        -4.25,
+        2,
+        0
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "gui": {
+      "rotation": [
+        -180,
+        -180,
+        135.25
+      ],
+      "translation": [
+        -7.25,
+        -7.25,
+        0
+      ],
+      "scale": [
+        0.71,
+        0.71,
+        0.71
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        -180,
+        0,
+        135.25
+      ],
+      "translation": [
+        9.25,
+        -9.25,
+        0
+      ],
+      "scale": [
+        0.92,
+        0.92,
+        0.92
+      ]
+    }
+  },
+  "textures": {
+    "particle": "boh:item/marcosthekiller_guitar"
+  }
+}

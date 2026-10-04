@@ -1,0 +1,13 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "down": "boh:block/gametable_bottom",
+    "up": "boh:block/gametable_top",
+    "north": "boh:block/gametable_front",
+    "east": "boh:block/gametable_sides",
+    "south": "boh:block/gametable_front",
+    "west": "boh:block/gametable_sides",
+    "particle": "boh:block/gametable_bottom"
+  },
+  "render_type": "solid"
+}

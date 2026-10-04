@@ -1,0 +1,28 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.big_daddy_drill",
+				"texture_width": 128,
+				"texture_height": 128,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 4.5,
+				"visible_bounds_offset": [0, 1.75, 0]
+			},
+			"bones": [
+				{
+					"name": "drill",
+					"pivot": [0, 11.2, 0],
+					"cubes": [
+						{"origin": [-3.5, 14, -3.5], "size": [7, 3, 7], "uv": [85, 44]},
+						{"origin": [-2.5, 10, -2.5], "size": [5, 4, 5], "uv": [64, 17]},
+						{"origin": [-1.5, 6, -1.5], "size": [3, 4, 3], "uv": [45, 41]},
+						{"origin": [-0.5, 4, -0.5], "size": [1, 2, 1], "uv": [0, 0]},
+						{"origin": [-3.5, 14, -3.5], "size": [7, 3, 7], "inflate": 0.4, "uv": [84, 19]}
+					]
+				}
+			]
+		}
+	]
+}

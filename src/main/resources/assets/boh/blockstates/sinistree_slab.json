@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "boh:block/sinistree_slab"
+    },
+    "type=top": {
+      "model": "boh:block/sinistree_slab_top"
+    },
+    "type=double": {
+      "model": "boh:block/sinistree_slab_full"
+    }
+  }
+}

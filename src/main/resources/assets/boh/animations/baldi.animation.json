@@ -1,0 +1,127 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"idle": {
+			"loop": true,
+			"bones": {
+				"rightleg": {
+					"rotation": {
+						"vector": [0.32902, 7.49282, 2.52154]
+					}
+				},
+				"leftleg": {
+					"rotation": {
+						"vector": [0.32902, -7.49282, -2.52154]
+					}
+				},
+				"rightarm": {
+					"rotation": {
+						"vector": [0, 0, 5]
+					}
+				},
+				"rightelbow": {
+					"rotation": {
+						"vector": [0, 0, -7.5]
+					}
+				},
+				"leftarm": {
+					"rotation": {
+						"vector": [0, 0, -5]
+					}
+				},
+				"leftelbow": {
+					"rotation": {
+						"vector": [0, 0, 2.5]
+					}
+				},
+				"baldi_ruler": {
+					"scale": {
+						"vector": [0, 0, 0]
+					}
+				}
+			}
+		},
+		"walk": {
+			"loop": true,
+			"animation_length": 1.24,
+			"bones": {
+				"rightelbow": {
+					"rotation": {
+						"vector": [-90, 0, 0]
+					}
+				},
+				"leftelbow": {
+					"rotation": {
+						"vector": [-90, 0, 0]
+					}
+				},
+				"baldi_ruler": {
+					"rotation": {
+						"0.48": {
+							"vector": [0, 0, 0]
+						},
+						"0.6": {
+							"vector": [0, -90, 0]
+						},
+						"0.84": {
+							"vector": [0, 0, 0]
+						}
+					}
+				}
+			},
+			"sound_effects": {
+				"0.48": {
+					"effect": "baldi_ruler"
+				}
+			}
+		},
+		"run": {
+			"loop": true,
+			"animation_length": 0.36,
+			"bones": {
+				"smile": {
+					"rotation": {
+						"vector": [180, 0, 0]
+					},
+					"position": {
+						"vector": [0, -1, 0]
+					}
+				},
+				"brow": {
+					"position": {
+						"vector": [0, -1, 0]
+					}
+				},
+				"rightelbow": {
+					"rotation": {
+						"vector": [-90, 0, 0]
+					}
+				},
+				"leftelbow": {
+					"rotation": {
+						"vector": [-90, 0, 0]
+					}
+				},
+				"baldi_ruler": {
+					"rotation": {
+						"0.08": {
+							"vector": [0, 0, 0]
+						},
+						"0.2": {
+							"vector": [0, -90, 0]
+						},
+						"0.36": {
+							"vector": [0, 0, 0]
+						}
+					}
+				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "baldi_ruler"
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}

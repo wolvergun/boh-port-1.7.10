@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "boh:block/lifeform_growth"
+    }
+  }
+}

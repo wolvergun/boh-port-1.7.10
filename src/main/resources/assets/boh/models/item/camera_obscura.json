@@ -1,0 +1,7 @@
+{
+  "parent": "boh:custom/camera_obscura",
+  "textures": {
+    "0": "boh:block/camera_obscura",
+    "particle": "boh:item/broken_camera"
+  }
+}

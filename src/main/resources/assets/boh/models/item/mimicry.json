@@ -1,0 +1,6 @@
+{
+  "parent": "boh:displaysettings/red_mist_sword.item",
+  "textures": {
+    "layer0": "boh:item/red_mist_sword"
+  }
+}

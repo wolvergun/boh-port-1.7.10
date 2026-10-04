@@ -1,0 +1,6 @@
+{
+  "parent": "boh:displaysettings/jar_o_wisp.item",
+  "textures": {
+    "particle": "boh:block/pot_o_wisp"
+  }
+}

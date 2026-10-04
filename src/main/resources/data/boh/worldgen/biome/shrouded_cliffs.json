@@ -1,0 +1,155 @@
+{
+  "has_precipitation": true,
+  "temperature": 0.3,
+  "downfall": 0.7,
+  "effects": {
+    "foliage_color": -14006491,
+    "grass_color": -11179217,
+    "sky_color": -10061944,
+    "fog_color": -12298906,
+    "water_color": -12957090,
+    "water_fog_color": -13746611
+  },
+  "spawners": {
+    "monster": [
+      {
+        "type": "zombie",
+        "weight": 100,
+        "minCount": 1,
+        "maxCount": 1
+      },
+      {
+        "type": "skeleton",
+        "weight": 100,
+        "minCount": 1,
+        "maxCount": 1
+      },
+      {
+        "type": "creeper",
+        "weight": 100,
+        "minCount": 1,
+        "maxCount": 1
+      },
+      {
+        "type": "enderman",
+        "weight": 10,
+        "minCount": 1,
+        "maxCount": 1
+      },
+      {
+        "type": "spider",
+        "weight": 100,
+        "minCount": 1,
+        "maxCount": 1
+      }
+    ],
+    "creature": [
+      {
+        "type": "wolf",
+        "weight": 20,
+        "minCount": 1,
+        "maxCount": 4
+      },
+      {
+        "type": "fox",
+        "weight": 14,
+        "minCount": 1,
+        "maxCount": 2
+      },
+      {
+        "type": "frog",
+        "weight": 14,
+        "minCount": 1,
+        "maxCount": 1
+      },
+      {
+        "type": "chicken",
+        "weight": 20,
+        "minCount": 1,
+        "maxCount": 1
+      },
+      {
+        "type": "boh:deer",
+        "weight": 12,
+        "minCount": 1,
+        "maxCount": 4
+      },
+      {
+        "type": "sheep",
+        "weight": 12,
+        "minCount": 1,
+        "maxCount": 2
+      }
+    ],
+    "ambient": [],
+    "axolotls": [],
+    "underground_water_creature": [],
+    "water_creature": [
+      {
+        "type": "cod",
+        "weight": 14,
+        "minCount": 1,
+        "maxCount": 4
+      },
+      {
+        "type": "salmon",
+        "weight": 14,
+        "minCount": 1,
+        "maxCount": 5
+      }
+    ],
+    "water_ambient": [],
+    "misc": []
+  },
+  "spawn_costs": {},
+  "carvers": {
+    "air": [
+      "minecraft:cave",
+      "minecraft:cave_extra_underground",
+      "minecraft:canyon"
+    ]
+  },
+  "features": [
+    [],
+    [
+      "minecraft:lake_lava_underground"
+    ],
+    [
+      "minecraft:forest_rock"
+    ],
+    [],
+    [],
+    [],
+    [
+      "minecraft:ore_coal_upper",
+      "minecraft:ore_coal_lower",
+      "minecraft:ore_iron_upper",
+      "minecraft:ore_iron_middle",
+      "minecraft:ore_iron_small",
+      "minecraft:ore_gold",
+      "minecraft:ore_gold_lower",
+      "minecraft:ore_redstone",
+      "minecraft:ore_redstone_lower",
+      "minecraft:ore_diamond",
+      "minecraft:ore_diamond_large",
+      "minecraft:ore_diamond_buried",
+      "minecraft:ore_lapis",
+      "minecraft:ore_lapis_buried",
+      "minecraft:ore_copper",
+      "minecraft:underwater_magma",
+      "minecraft:ore_emerald"
+    ],
+    [],
+    [],
+    [
+      "boh:shrouded_cliffs_tree",
+      "minecraft:forest_flowers",
+      "minecraft:patch_large_fern",
+      "minecraft:patch_grass_taiga_2",
+      "minecraft:brown_mushroom_taiga",
+      "minecraft:red_mushroom_taiga",
+      "minecraft:patch_grass_forest"
+    ],
+    []
+  ]
+}

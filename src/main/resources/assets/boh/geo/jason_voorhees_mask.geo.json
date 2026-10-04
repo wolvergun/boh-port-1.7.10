@@ -1,0 +1,26 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.jason_voorhees_mask",
+				"texture_width": 128,
+				"texture_height": 128,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 4.5,
+				"visible_bounds_offset": [0, 1.75, 0]
+			},
+			"bones": [
+				{
+					"name": "head",
+					"pivot": [0, -2, 0],
+					"rotation": [-90, 0, 0],
+					"cubes": [
+						{"origin": [-4, -6, -4], "size": [8, 8, 8], "uv": [22, 37]},
+						{"origin": [-4, -6, -4], "size": [8, 8, 8], "inflate": 0.5, "uv": [30, 21]}
+					]
+				}
+			]
+		}
+	]
+}

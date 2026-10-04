@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "item": "boh:bowl_creepypasta"
+    },
+    "title": {
+      "translate": "advancements.pasta_night.title"
+    },
+    "description": {
+      "translate": "advancements.pasta_night.descr"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "criteria": {
+    "pasta_night_0": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 100
+  },
+  "parent": "boh:start_boh"
+}

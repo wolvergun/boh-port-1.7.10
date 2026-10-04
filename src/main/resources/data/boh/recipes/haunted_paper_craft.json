@@ -1,0 +1,34 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "item": "boh:exotic_soul"
+    },
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "item": "boh:monstrous_soul"
+    },
+    {
+      "item": "boh:demonic_soul"
+    },
+    {
+      "item": "minecraft:paper"
+    },
+    {
+      "item": "boh:killers_soul"
+    },
+    {
+      "item": "minecraft:paper"
+    }
+  ],
+  "result": {
+    "item": "boh:haunted_paper",
+    "count": 1
+  }
+}

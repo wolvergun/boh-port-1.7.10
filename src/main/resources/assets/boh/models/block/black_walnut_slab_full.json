@@ -1,0 +1,10 @@
+{
+  "parent": "block/cube_bottom_top",
+  "textures": {
+    "particle": "boh:block/blackwalnut_planks",
+    "bottom": "boh:block/blackwalnut_planks",
+    "top": "boh:block/blackwalnut_planks",
+    "side": "boh:block/blackwalnut_planks"
+  },
+  "render_type": "solid"
+}

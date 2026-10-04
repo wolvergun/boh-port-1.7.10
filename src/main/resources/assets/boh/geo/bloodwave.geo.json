@@ -1,0 +1,38 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.bloodwave",
+				"texture_width": 128,
+				"texture_height": 128,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 2.5,
+				"visible_bounds_offset": [0, 0.75, 0]
+			},
+			"bones": [
+				{
+					"name": "bone",
+					"pivot": [0, -0.7, 0]
+				},
+				{
+					"name": "trail",
+					"parent": "bone",
+					"pivot": [0, -0.7, 0],
+					"cubes": [
+						{"origin": [-8.1, 0.3, -1], "size": [16.2, 0, 14], "uv": [0, 35]},
+						{"origin": [-8.1, 0.3, -1], "size": [0, 6, 14], "uv": [0, 49]},
+						{"origin": [8.1, 0.3, -1], "size": [0, 6, 14], "uv": [0, 49], "mirror": true}
+					]
+				},
+				{
+					"name": "wave",
+					"pivot": [0, 0.3, 1],
+					"cubes": [
+						{"origin": [-8, 0.4, -5], "size": [16, 23, 12], "uv": [0, 0]}
+					]
+				}
+			]
+		}
+	]
+}

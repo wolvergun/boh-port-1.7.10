@@ -1,0 +1,9 @@
+{
+  "parent": "block/door_top_right",
+  "textures": {
+    "particle": "boh:block/gaster_door_bottom",
+    "bottom": "boh:block/gaster_door_bottom",
+    "top": "boh:block/gaster_door_top"
+  },
+  "render_type": "solid"
+}

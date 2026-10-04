@@ -1,0 +1,2 @@
+# Enter the function code here#when 173 is seen
+execute as @s at @s anchored eyes as @e[type=boh:sotiris,distance=..64] facing entity @s eyes anchored feet positioned ^ ^ ^1 rotated as @p positioned ^ ^ ^-1 if entity @a[distance=..1] positioned ^ ^ ^1 run effect give @s minecraft:slowness 1 255 true 

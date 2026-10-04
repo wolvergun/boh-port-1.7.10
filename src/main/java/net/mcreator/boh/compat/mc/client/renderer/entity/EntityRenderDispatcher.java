@@ -1,0 +1,11 @@
+package net.mcreator.boh.compat.mc.client.renderer.entity;
+
+import net.mcreator.boh.compat.mc.client.renderer.entity.player.PlayerRenderer;
+
+public final class EntityRenderDispatcher {
+    public static final EntityRenderDispatcher INSTANCE = new EntityRenderDispatcher();
+
+    public Object getRenderer(Object entity) {
+        return PlayerRenderer.INSTANCE;
+    }
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "boh:item/crawl"
+  },
+  "render_type": "translucent"
+}

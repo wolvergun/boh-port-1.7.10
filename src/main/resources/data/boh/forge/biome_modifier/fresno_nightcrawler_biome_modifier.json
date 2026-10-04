@@ -1,0 +1,20 @@
+{
+  "type": "forge:add_spawns",
+  "biomes": [
+    "dark_forest",
+    "old_growth_pine_taiga",
+    "old_growth_spruce_taiga",
+    "snowy_taiga",
+    "taiga",
+    "birch_forest",
+    "flower_forest",
+    "forest",
+    "old_growth_birch_forest"
+  ],
+  "spawners": {
+    "type": "boh:fresno_nightcrawler",
+    "weight": 1,
+    "minCount": 1,
+    "maxCount": 3
+  }
+}

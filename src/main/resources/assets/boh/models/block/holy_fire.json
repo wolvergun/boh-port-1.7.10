@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/holy_fire",
+  "textures": {
+    "all": "boh:block/holy_fire",
+    "particle": "boh:block/holy_fire",
+    "0": "boh:block/holy_fire"
+  },
+  "render_type": "cutout_mipped"
+}

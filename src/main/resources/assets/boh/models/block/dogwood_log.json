@@ -1,0 +1,13 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "down": "boh:block/dogwood_log_top",
+    "up": "boh:block/dogwood_log_top",
+    "north": "boh:block/dogwood_log_side",
+    "east": "boh:block/dogwood_log_side",
+    "south": "boh:block/dogwood_log_side",
+    "west": "boh:block/dogwood_log_side",
+    "particle": "boh:block/dogwood_log_top"
+  },
+  "render_type": "solid"
+}

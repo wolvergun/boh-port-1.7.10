@@ -1,0 +1,8 @@
+{
+  "parent": "block/template_orientable_trapdoor_open",
+  "textures": {
+    "texture": "boh:block/sinistree_trap_door",
+    "particle": "boh:block/sinistree_trap_door"
+  },
+  "render_type": "cutout_mipped"
+}

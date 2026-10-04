@@ -1,0 +1,38 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"idle": {
+			"loop": true,
+			"animation_length": 2.4,
+			"bones": {
+				"tape_recorder_baldi": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"2.4": {
+							"vector": [0, -360, 0]
+						}
+					},
+					"position": {
+						"0.0": {
+							"vector": [0, 16, 0]
+						},
+						"0.56": {
+							"vector": [0, 18, 0]
+						},
+						"1.24": {
+							"vector": [0, 16, 0]
+						},
+						"1.8": {
+							"vector": [0, 14, 0]
+						},
+						"2.4": {
+							"vector": [0, 16, 0]
+						}
+					}
+				}
+			}
+		}
+	}
+}

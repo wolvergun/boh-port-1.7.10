@@ -1,0 +1,56 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"idle": {
+			"animation_length": 2.28,
+			"bones": {
+				"claw4": {
+					"rotation": {
+						"0.2": {
+							"vector": [0, 0, -10]
+						},
+						"0.28": {
+							"vector": [0, 0, 22.5]
+						},
+						"0.36": {
+							"vector": [0, 0, -30]
+						},
+						"0.44": {
+							"vector": [0, 0, -10]
+						},
+						"2.28": {
+							"vector": [0, 0, -10]
+						}
+					}
+				},
+				"claw3": {
+					"rotation": {
+						"0.2": {
+							"vector": [0, 0, 17.5]
+						},
+						"0.28": {
+							"vector": [0, 0, -30]
+						},
+						"0.36": {
+							"vector": [0, 0, 22.5]
+						},
+						"0.44": {
+							"vector": [0, 0, 17.5]
+						}
+					}
+				},
+				"claw": {
+					"rotation": {
+						"vector": [0, 0, -32.5]
+					}
+				},
+				"claw2": {
+					"rotation": {
+						"vector": [0, 0, -22.5]
+					}
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}

@@ -1,0 +1,206 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"idle": {
+			"loop": true,
+			"animation_length": 1.28,
+			"bones": {
+				"waist": {
+					"rotation": {
+						"vector": [7.5, 0, 0]
+					}
+				},
+				"head": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.24": {
+							"vector": [0, 0, 10],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"0.36": {
+							"vector": [2.5, 0, 8.84615],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"0.52": {
+							"vector": [1.98386, -6.87465, -10.44054],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"0.84": {
+							"vector": [8.64855, -3.98006, -6.04453],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"1.04": {
+							"vector": [-12.78261, -2.17094, -3.29701],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"1.28": {
+							"vector": [0, 0, 0],
+							"easing": "step",
+							"easingArgs": [2]
+						}
+					}
+				},
+				"leftArm": {
+					"rotation": {
+						"vector": [-5, 0, 0]
+					},
+					"position": {
+						"vector": [0, 0, -2]
+					}
+				},
+				"rightArm": {
+					"rotation": {
+						"vector": [-5, 0, 0]
+					},
+					"position": {
+						"vector": [0, 0, -2]
+					}
+				},
+				"bone": {
+					"position": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.12": {
+							"vector": [-1, 0, 0],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"0.2": {
+							"vector": [3, 0, 0],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"0.28": {
+							"vector": [0, 0, 0],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"0.36": {
+							"vector": [-1, 0, 0],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"0.4": {
+							"vector": [-1, -67, 0],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"0.44": {
+							"vector": [0, 0, 0],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"0.52": {
+							"vector": [1, 0, 2],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"0.64": {
+							"vector": [0, 0, 0],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"0.8": {
+							"vector": [0, 0, 0],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"0.84": {
+							"vector": [0, 0, 0],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"0.88": {
+							"vector": [-1, -67, 0],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"0.92": {
+							"vector": [0, 0, 0],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"0.96": {
+							"vector": [-1, -67, 0],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"1.0": {
+							"vector": [-1, 0, 0],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"1.08": {
+							"vector": [3, 0, 0],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"1.16": {
+							"vector": [0, 0, 0],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"1.24": {
+							"vector": [-1, 0, 0],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"1.28": {
+							"vector": [0, 0, 0],
+							"easing": "step",
+							"easingArgs": [2]
+						}
+					},
+					"scale": {
+						"0.0": {
+							"vector": [1, 1, 1]
+						},
+						"0.4": {
+							"vector": [1, 1, 1]
+						},
+						"0.44": {
+							"vector": [0, 0, 0],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"0.48": {
+							"vector": [1, 1, 1],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"0.84": {
+							"vector": [1, 1, 1]
+						},
+						"0.88": {
+							"vector": [0, 0, 0],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"0.92": {
+							"vector": [1, 1, 1]
+						},
+						"0.96": {
+							"vector": [0, 0, 0],
+							"easing": "step",
+							"easingArgs": [2]
+						},
+						"1.0": {
+							"vector": [1, 1, 1],
+							"easing": "step",
+							"easingArgs": [2]
+						}
+					}
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}

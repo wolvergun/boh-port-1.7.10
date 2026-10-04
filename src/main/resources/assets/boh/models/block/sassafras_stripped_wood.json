@@ -1,0 +1,8 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "boh:block/sassafras_log_side_stripped",
+    "particle": "boh:block/sassafras_log_side_stripped"
+  },
+  "render_type": "solid"
+}

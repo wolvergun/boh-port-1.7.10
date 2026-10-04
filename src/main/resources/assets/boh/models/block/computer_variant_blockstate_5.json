@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/computer",
+  "textures": {
+    "all": "boh:block/computer_monika",
+    "particle": "boh:block/computer_monika",
+    "0": "boh:block/computer_off"
+  },
+  "render_type": "cutout_mipped"
+}

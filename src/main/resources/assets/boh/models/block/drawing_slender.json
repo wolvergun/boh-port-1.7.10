@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/drawing",
+  "textures": {
+    "all": "boh:block/drawing",
+    "particle": "boh:block/drawing",
+    "0": "boh:block/drawing"
+  },
+  "render_type": "cutout_mipped"
+}

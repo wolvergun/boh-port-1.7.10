@@ -1,0 +1,17 @@
+{
+  "type": "forge:add_spawns",
+  "biomes": [
+    "dark_forest",
+    "flower_forest",
+    "forest",
+    "boh:shrouded_cliffs",
+    "plains",
+    "sunflower_plains"
+  ],
+  "spawners": {
+    "type": "boh:jackalope",
+    "weight": 1,
+    "minCount": 1,
+    "maxCount": 1
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "boh:displaysettings/the_great_knife.item",
+  "textures": {
+    "layer0": "boh:item/great_knife"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "type": "forge:add_features",
+  "biomes": "boh:shrouded_cliffs",
+  "features": "boh:sasafras_tree_feature",
+  "step": "vegetal_decoration"
+}

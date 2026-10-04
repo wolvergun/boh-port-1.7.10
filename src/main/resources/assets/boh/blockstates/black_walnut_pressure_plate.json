@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "powered=false": {
+      "model": "boh:block/black_walnut_pressure_plate"
+    },
+    "powered=true": {
+      "model": "boh:block/black_walnut_pressure_plate_down"
+    }
+  }
+}

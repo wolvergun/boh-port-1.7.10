@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "boh:custom/jar_o_wisp_particle"
+    }
+  }
+}

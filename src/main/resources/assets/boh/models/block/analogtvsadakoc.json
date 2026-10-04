@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/analog_tv_sadako_c",
+  "textures": {
+    "all": "boh:block/analog_tv_sadako",
+    "particle": "boh:block/analog_tv_sadako",
+    "0": "boh:block/analog_tv_sadako"
+  },
+  "render_type": "solid"
+}

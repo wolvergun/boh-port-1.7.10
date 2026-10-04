@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "aaa",
+    "bcb",
+    "ddd"
+  ],
+  "key": {
+    "a": {
+      "item": "minecraft:soul_soil"
+    },
+    "b": {
+      "item": "minecraft:redstone_block"
+    },
+    "c": {
+      "item": "minecraft:wither_skeleton_skull"
+    },
+    "d": {
+      "item": "minecraft:clay"
+    }
+  },
+  "result": {
+    "item": "boh:specimen_9_head",
+    "count": 1
+  }
+}

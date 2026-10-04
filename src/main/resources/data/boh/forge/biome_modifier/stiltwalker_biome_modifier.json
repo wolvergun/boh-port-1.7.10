@@ -1,0 +1,16 @@
+{
+  "type": "forge:add_spawns",
+  "biomes": [
+    "desert",
+    "old_growth_pine_taiga",
+    "old_growth_spruce_taiga",
+    "dark_forest",
+    "flower_forest"
+  ],
+  "spawners": {
+    "type": "boh:stiltwalker",
+    "weight": 1,
+    "minCount": 1,
+    "maxCount": 1
+  }
+}

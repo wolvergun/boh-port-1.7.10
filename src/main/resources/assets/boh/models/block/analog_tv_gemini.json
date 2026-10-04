@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/analog_tv_gemini",
+  "textures": {
+    "all": "boh:block/analog_tv_gemini",
+    "particle": "boh:block/analog_tv_gemini",
+    "missing": "boh:block/analog_tv_gemini"
+  },
+  "render_type": "solid"
+}

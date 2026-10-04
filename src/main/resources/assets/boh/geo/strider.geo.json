@@ -1,0 +1,74 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.strider",
+				"texture_width": 128,
+				"texture_height": 128,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 3.5,
+				"visible_bounds_offset": [0, 1.25, 0]
+			},
+			"bones": [
+				{
+					"name": "all",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "head",
+					"parent": "all",
+					"pivot": [0, 33, -7],
+					"cubes": [
+						{"origin": [-3, 26, -11], "size": [6, 12, 5], "uv": [34, 25]}
+					]
+				},
+				{
+					"name": "torso",
+					"parent": "all",
+					"pivot": [0, 39, -4.25],
+					"cubes": [
+						{"origin": [-4, 26, -7], "size": [8, 7, 18], "pivot": [0, 29, 9], "rotation": [-22.5, 0, 0], "uv": [0, 0]},
+						{"origin": [0, 23.4, -5.75], "size": [0, 6, 17], "pivot": [0, 32.4, 9.25], "rotation": [-10, 0, 0], "uv": [0, 25]}
+					]
+				},
+				{
+					"name": "right_leg2",
+					"parent": "all",
+					"pivot": [-4, 27, 10.5],
+					"cubes": [
+						{"origin": [-6, 0, 11], "size": [2, 24, 2], "uv": [42, 42]},
+						{"origin": [-6, 24, 9], "size": [3, 5, 4], "uv": [12, 48]}
+					]
+				},
+				{
+					"name": "left_leg2",
+					"parent": "all",
+					"pivot": [4, 27, 10.5],
+					"cubes": [
+						{"origin": [4, 0, 11], "size": [2, 24, 2], "uv": [42, 42], "mirror": true},
+						{"origin": [3, 24, 9], "size": [3, 5, 4], "uv": [12, 48], "mirror": true}
+					]
+				},
+				{
+					"name": "left_leg1",
+					"parent": "all",
+					"pivot": [5, 30, -4],
+					"cubes": [
+						{"origin": [4, 25, -6], "size": [2, 7, 4], "uv": [0, 48], "mirror": true},
+						{"origin": [4, 0, -8], "size": [2, 27, 2], "uv": [34, 42], "mirror": true}
+					]
+				},
+				{
+					"name": "right_leg1",
+					"parent": "all",
+					"pivot": [-5, 30, -4],
+					"cubes": [
+						{"origin": [-6, 25, -6], "size": [2, 7, 4], "uv": [0, 48]},
+						{"origin": [-6, 0, -8], "size": [2, 27, 2], "uv": [34, 42]}
+					]
+				}
+			]
+		}
+	]
+}

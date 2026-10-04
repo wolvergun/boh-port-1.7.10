@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "boh:backrooms_6",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 2,
+    "separation": 0,
+    "salt": 600589971
+  }
+}

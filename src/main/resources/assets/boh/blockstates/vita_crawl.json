@@ -1,0 +1,27 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "boh:block/vita_crawl"
+    },
+    "facing=east": {
+      "model": "boh:block/vita_crawl",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "boh:block/vita_crawl",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "boh:block/vita_crawl",
+      "y": 270
+    },
+    "facing=up": {
+      "model": "boh:block/vita_crawl",
+      "x": 270
+    },
+    "facing=down": {
+      "model": "boh:block/vita_crawl",
+      "x": 90
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "boh:block/black_walnut_slab"
+    },
+    "type=top": {
+      "model": "boh:block/black_walnut_slab_top"
+    },
+    "type=double": {
+      "model": "boh:block/black_walnut_slab_full"
+    }
+  }
+}

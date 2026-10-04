@@ -1,0 +1,6 @@
+{
+  "type": "forge:add_features",
+  "biomes": "boh:shrouded_cliffs",
+  "features": "boh:shourded_cliff_foliage_coarse_dirt",
+  "step": "top_layer_modification"
+}

@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/analog_tv_needle",
+  "textures": {
+    "all": "boh:block/analog_tv_needlemouse",
+    "particle": "boh:block/analog_tv_needlemouse",
+    "missing": "boh:block/analog_tv_needlemouse"
+  },
+  "render_type": "solid"
+}

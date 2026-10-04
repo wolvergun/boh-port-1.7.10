@@ -1,0 +1,8 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "boh:block/blackwalnut_planks",
+    "particle": "boh:block/blackwalnut_planks"
+  },
+  "render_type": "solid"
+}

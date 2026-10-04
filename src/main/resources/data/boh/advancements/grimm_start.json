@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "minecraft:spruce_sapling"
+    },
+    "title": {
+      "translate": "advancements.grimm_start.title"
+    },
+    "description": {
+      "translate": "advancements.grimm_start.descr"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "criteria": {
+    "grimm_start_0": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "parent": "boh:start_boh"
+}

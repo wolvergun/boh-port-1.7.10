@@ -1,0 +1,6 @@
+{
+  "parent": "boh:displaysettings/book_simon.item",
+  "textures": {
+    "layer0": "boh:item/books_simon"
+  }
+}

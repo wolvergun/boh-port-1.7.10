@@ -1,0 +1,6 @@
+{
+  "parent": "boh:displaysettings/gun_with_one_bullet.item",
+  "textures": {
+    "layer0": "boh:item/gun_with_one_bullet"
+  }
+}

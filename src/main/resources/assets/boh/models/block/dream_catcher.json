@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/dreamcatcher",
+  "textures": {
+    "all": "boh:block/dreamcatcher",
+    "particle": "boh:block/dreamcatcher",
+    "0": "boh:block/dreamcatcher"
+  },
+  "render_type": "translucent"
+}

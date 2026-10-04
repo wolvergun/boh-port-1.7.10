@@ -1,0 +1,9 @@
+{
+  "parent": "boh:custom/custard",
+  "textures": {
+    "all": "boh:block/custard",
+    "particle": "boh:block/custard",
+    "0": "boh:block/custard"
+  },
+  "render_type": "cutout_mipped"
+}

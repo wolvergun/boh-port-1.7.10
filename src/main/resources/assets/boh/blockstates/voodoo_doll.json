@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "boh:block/voodoo_doll"
+    },
+    "facing=east": {
+      "model": "boh:block/voodoo_doll",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "boh:block/voodoo_doll",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "boh:block/voodoo_doll",
+      "y": 270
+    }
+  }
+}

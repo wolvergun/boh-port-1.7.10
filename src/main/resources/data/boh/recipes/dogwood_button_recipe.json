@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "wooden_button",
+  "category": "redstone",
+  "ingredients": [
+    {
+      "item": "boh:dogwood_planks"
+    }
+  ],
+  "result": {
+    "item": "boh:dogwood_button",
+    "count": 1
+  }
+}

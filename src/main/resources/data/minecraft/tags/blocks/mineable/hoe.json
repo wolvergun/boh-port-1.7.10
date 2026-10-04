@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "boh:sinistree_leaves",
+    "boh:sassafras_leaves",
+    "boh:dogwood_leaves",
+    "boh:black_walnut_leaves"
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "boh:displaysettings/z_scythe.item",
+  "textures": {
+    "layer0": "boh:item/zack_scythe"
+  }
+}

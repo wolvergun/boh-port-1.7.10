@@ -1,0 +1,13 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "down": "boh:block/backrooms_ceiling",
+    "up": "boh:block/backrooms_ceiling",
+    "north": "boh:block/backrooms_ceiling",
+    "east": "boh:block/backrooms_ceiling",
+    "south": "boh:block/backrooms_ceiling",
+    "west": "boh:block/backrooms_ceiling",
+    "particle": "boh:block/backrooms_ceiling"
+  },
+  "render_type": "solid"
+}

@@ -1,0 +1,13 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "down": "boh:block/sinistree_log_top",
+    "up": "boh:block/sinistree_log_top",
+    "north": "boh:block/sinistree_log",
+    "east": "boh:block/sinistree_log",
+    "south": "boh:block/sinistree_log",
+    "west": "boh:block/sinistree_log",
+    "particle": "boh:block/sinistree_log_top"
+  },
+  "render_type": "solid"
+}

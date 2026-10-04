@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "boh:block/analog_tv_six"
+    },
+    "facing=east": {
+      "model": "boh:block/analog_tv_six",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "boh:block/analog_tv_six",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "boh:block/analog_tv_six",
+      "y": 270
+    }
+  }
+}

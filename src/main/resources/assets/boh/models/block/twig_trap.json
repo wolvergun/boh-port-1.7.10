@@ -1,0 +1,8 @@
+{
+  "parent": "block/cross",
+  "textures": {
+    "cross": "boh:block/twig_trap",
+    "particle": "boh:block/twig_trap"
+  },
+  "render_type": "translucent"
+}

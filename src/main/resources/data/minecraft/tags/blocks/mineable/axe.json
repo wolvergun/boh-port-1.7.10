@@ -1,0 +1,33 @@
+{
+  "replace": false,
+  "values": [
+    "boh:sinistree_trap_door",
+    "boh:sinistree_door",
+    "boh:sinistree_stripped_log",
+    "boh:sinistree_stripped_wood",
+    "boh:sinistree_planks",
+    "boh:sinistree_log",
+    "boh:sinistree_wood",
+    "boh:sassafras_trapdoor",
+    "boh:sassafras_door",
+    "boh:sassafras_stripped_log",
+    "boh:sassafras_stripped_wood",
+    "boh:dogwood_trapdoor",
+    "boh:dogwood_door",
+    "boh:dogwood_stripped_log",
+    "boh:dogwood_stripped_wood",
+    "boh:black_walnut_trapdoor",
+    "boh:black_walnut_door",
+    "boh:black_walnut_stripped_log",
+    "boh:black_walnut_stripped_wood",
+    "boh:sassafras_planks",
+    "boh:sassafras_log",
+    "boh:sassafras_wood",
+    "boh:dogwood_planks",
+    "boh:dogwood_log",
+    "boh:dogwood_wood",
+    "boh:black_walnut_planks",
+    "boh:black_walnut_log",
+    "boh:black_walnut_wood"
+  ]
+}

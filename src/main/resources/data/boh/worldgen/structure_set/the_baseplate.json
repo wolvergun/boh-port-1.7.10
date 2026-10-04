@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "boh:the_baseplate",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 5,
+    "separation": 4,
+    "salt": 1873356985
+  }
+}
