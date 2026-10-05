@@ -72,6 +72,7 @@ public final class RiftTest {
             BohMod.LOGGER.error("[BOH-SELFTEST] rift setup failed", e);
         }
         FMLCommonHandler.instance().bus().register(t);
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(t);
     }
 
     private static void log(String s, Object... args) {
@@ -257,6 +258,14 @@ public final class RiftTest {
     }
 
     private int hurt;
+    /** Where each White Face joined the world: it flies off at its clamped 1024 flying speed, as in 1.20. */
+    private final List<int[]> whiteFaces = new ArrayList<>();
+
+    @SubscribeEvent
+    public void onJoin(net.minecraftforge.event.entity.EntityJoinWorldEvent e) {
+        if (e.world == w && "boh.whiteface".equals(EntityList.getEntityString(e.entity)))
+            whiteFaces.add(new int[] { (int) e.entity.posX, (int) e.entity.posZ });
+    }
 
     private String mobsAt(int x, int z) {
         List<String> names = new ArrayList<>();
@@ -296,6 +305,7 @@ public final class RiftTest {
         }
         if (tick == COMPUTER_WAIT) {
             FMLCommonHandler.instance().bus().unregister(this);
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(this);
             log("done");
             MinecraftServer.getServer().initiateShutdown();
         }
@@ -332,6 +342,8 @@ public final class RiftTest {
                         ((Entity) o).setDead();
                         break;
                     }
+                if (mobs.isEmpty() && want.equals("boh.whiteface")) for (int[] at : whiteFaces)
+                    if (Math.abs(at[0] - x) <= 2 && Math.abs(at[1] - z) <= 2) mobs = want + " (spawned here, then flew out of range)";
             }
             if (!mobs.isEmpty() && left == 0) ok++;
             else bad.append(String.format(" %s (mobs '%s', %d stabilizers left);", d, mobs, left));
