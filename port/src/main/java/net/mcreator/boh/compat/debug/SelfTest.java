@@ -63,6 +63,7 @@ public final class SelfTest {
         RiftTest.start(server.worldServerForDimension(0));
         net.minecraft.util.ChunkCoordinates spawn = server.worldServerForDimension(0).getSpawnPoint();
         CombatTest.start(server.worldServerForDimension(0), spawn.posX + 20, spawn.posZ + 60);
+        MobSweep.start(server.worldServerForDimension(0), spawn.posX - 500, spawn.posZ - 500);
     }
 
     /** Loads a 12x12 chunk area far from anything generated and reports per-chunk load times and block entities. */
