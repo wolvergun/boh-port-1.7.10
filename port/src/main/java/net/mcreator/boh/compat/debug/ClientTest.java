@@ -68,6 +68,19 @@ public final class ClientTest {
             e instanceof EntityLiving ? ((EntityLiving) e).getHealth() : 0f, e.isDead);
     }
 
+    /** The floor layer (y 0) and the layer above (y 1) in a 32x32 area: '#' both solid, '_' floor only, '.' no floor. */
+    private static void floorMap(String who, World w, int cx, int cz) {
+        StringBuilder b = new StringBuilder();
+        for (int z = cz - 16; z < cz + 16; z++) {
+            b.append(String.format("%n  z%4d ", z));
+            for (int x = cx - 16; x < cx + 16; x++) {
+                boolean f = w.getBlock(x, 0, z).getMaterial().blocksMovement(), a = w.getBlock(x, 1, z).getMaterial().blocksMovement();
+                b.append(f && a ? '#' : f ? '_' : a ? '^' : '.');
+            }
+        }
+        log("%s floor map around %d %d (x from %d):%s", who, cx, cz, cx - 16, b);
+    }
+
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent e) {
         if (e.phase != TickEvent.Phase.END) return;
@@ -98,6 +111,7 @@ public final class ClientTest {
             String msg = ScreenShotHelper.saveScreenshot(mc.mcDataDir, mc.displayWidth, mc.displayHeight, mc.getFramebuffer()).getUnformattedText();
             log("screenshot: %s", msg);
         }
+        if (clientTicks % 40 == 20 && clientTicks / 40 <= 1) floorMap("client", mc.theWorld, 104, 88);
         if (stage == 3) {
             log("done");
             mc.shutdown();
@@ -125,6 +139,7 @@ public final class ClientTest {
         }
         if (stage == 1 && serverTicks == 100) {
             WorldServer w = (WorldServer) p.worldObj;
+            floorMap("server", w, 104, 88);
             log("server: player in dim %d at %.1f %.1f %.1f, feet %s, below %s", w.provider.dimensionId, p.posX, p.posY, p.posZ,
                 block(w, (int) Math.floor(p.posX), (int) Math.floor(p.posY), (int) Math.floor(p.posZ)),
                 block(w, (int) Math.floor(p.posX), (int) Math.floor(p.posY) - 1, (int) Math.floor(p.posZ)));
