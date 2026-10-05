@@ -51,7 +51,8 @@ public final class Dimensions {
     public static void transferPlayer(EntityPlayerMP player, int dim, double x, double y, double z, float yaw, float pitch) {
         MinecraftServer server = MinecraftServer.getServer();
         WorldServer target = server.worldServerForDimension(dim);
-        if (target == null) return;
+        // fake players (other mods' machines) have no connection; vanilla's transfer would crash on them
+        if (target == null || !net.mcreator.boh.compat.net.CompatNetwork.connected(player)) return;
         double[] spot = safeArrival(target, x, y, z);
         if (spot != null) {
             x = spot[0];
