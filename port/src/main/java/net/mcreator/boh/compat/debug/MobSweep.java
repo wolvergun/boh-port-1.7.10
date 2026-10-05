@@ -108,6 +108,8 @@ public final class MobSweep {
                 if (ticket == null) return;
                 tickets.add(ticket);
             }
+            // a ticket keeps a chunk loaded but does not load it
+            w.theChunkProviderServer.loadChunk(cx, cz);
             ForgeChunkManager.forceChunk(ticket, new ChunkCoordIntPair(cx, cz));
         }
     }
