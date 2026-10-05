@@ -174,6 +174,13 @@ public final class MobSweep {
             EntityLiving m = c.mob;
             net.minecraft.entity.EntityLivingBase t = m.getAttackTarget();
             net.minecraft.pathfinding.PathEntity path = t == null ? null : m.getNavigator().getPathToEntityLiving(t);
+            String ranges = "";
+            if (t != null) for (float r : new float[] { 16, 32, 64 }) {
+                net.minecraft.pathfinding.PathEntity pe = w.getPathEntityToEntity(m, t, r, false, false, false, true);
+                ranges += String.format(" r%.0f=%s", r, pe == null ? "NONE" : pe.getCurrentPathLength() + "pts");
+            }
+            log("mob sweep idle %s: follow %.0f search %.0f%s", c.id.replace("boh.", ""),
+                m.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.followRange).getAttributeValue(), m.getNavigator().getPathSearchRange(), ranges);
             log("mob sweep idle %s: target %s, pig alive %s, path %s, pathToTarget %s, goals [%s], targets [%s], noAi %s, ground %s, ticks %d, dy %.2f",
                 c.id.replace("boh.", ""), t == null ? "-" : t.getClass().getSimpleName(), c.pig != null && !c.pig.isDead,
                 m.getNavigator().noPath() ? "none" : "yes", path == null ? "NONE" : path.getCurrentPathLength() + "pts",
