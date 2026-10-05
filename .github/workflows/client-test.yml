@@ -1,0 +1,80 @@
+name: Client test
+
+# Runs the real client on a virtual display with -Dboh.clienttest=true (see compat/debug/ClientTest): it opens a
+# creative world, goes to Level 0, spawns Lifeforms and logs where server and client each see them, with
+# screenshots. Publishes the log and screenshots as the "client-test" release. Runs for commits with [clienttest].
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  clienttest:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[clienttest]')
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        angelica: [true, false]
+    defaults:
+      run:
+        working-directory: port
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: zulu
+          java-version: |
+            25
+            21
+
+      - uses: gradle/actions/setup-gradle@v5
+
+      - name: Install a virtual display
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq xvfb mesa-utils libgl1-mesa-dri x11-utils > /dev/null
+
+      - name: Run the client test
+        env:
+          LIBGL_ALWAYS_SOFTWARE: "1"
+          MESA_GL_VERSION_OVERRIDE: "4.6"
+          MESA_GLSL_VERSION_OVERRIDE: "460"
+        run: |
+          chmod +x gradlew
+          extra=""
+          if [ "${{ matrix.angelica }}" = "true" ]; then extra="-PwithAngelica"; fi
+          export XDG_DATA_HOME="$HOME/.local/share"
+          mkdir -p "$XDG_DATA_HOME"
+          Xvfb :99 -screen 0 1280x720x24 &
+          export DISPLAY=:99
+          ./gradlew --stacktrace runClient25 $extra --mcJvmArgs=-Dboh.clienttest=true > client.log 2>&1 &
+          for i in $(seq 1 150); do
+            sleep 10
+            if grep -q "\[BOH-CLIENTTEST\] done" client.log; then sleep 15; break; fi
+            if ! pgrep -f java > /dev/null && [ $i -gt 6 ]; then break; fi
+          done
+          pkill -f java || true
+          mkdir -p out
+          n=0
+          for f in $(find . -path '*screenshots*' -name '*.png' | sort); do n=$((n+1)); cp "$f" "out/clienttest-angelica-${{ matrix.angelica }}-$n.png"; done
+          grep -F "[BOH-CLIENTTEST]" client.log > out/clienttest-angelica-${{ matrix.angelica }}.txt || echo "no client-test output" > out/clienttest-angelica-${{ matrix.angelica }}.txt
+          cp client.log "out/clienttest-angelica-${{ matrix.angelica }}.log"
+          { echo "### Client test (Angelica ${{ matrix.angelica }})"; echo '```'; cat out/clienttest-angelica-${{ matrix.angelica }}.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          ls -la out
+
+      - name: Publish
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for i in 1 2 3; do
+            gh release view client-test > /dev/null 2>&1 || gh release create client-test --target "$GITHUB_SHA" --prerelease \
+              --title "Client test" --notes "Made by the Client test workflow." || true
+            gh release upload client-test out/* --clobber && break
+            sleep 10
+          done
