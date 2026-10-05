@@ -99,8 +99,28 @@ public abstract class BohAbstractArrow extends Entity implements IEntityAddition
         arrowFlight();
     }
 
+    /** 1.20 piercing: passes through up to pierceLevel entities (pierceLevel + 1 hits), each hit once. */
+    private byte pierceLevel;
+    private java.util.Set<Integer> pierced;
+
+    public void setPierceLevel(byte level) {
+        pierceLevel = level;
+    }
+
+    public byte getPierceLevel() {
+        return pierceLevel;
+    }
+
     protected void onHitEntity(EntityHitResult hit) {
         Entity target = hit.getEntity();
+        if (pierceLevel > 0) {
+            if (pierced == null) pierced = new java.util.HashSet<>();
+            if (pierced.size() >= pierceLevel + 1) {
+                setDead();
+                return;
+            }
+            pierced.add(target.getEntityId());
+        }
         float speed = MathHelper.sqrt_double(motionX * motionX + motionY * motionY + motionZ * motionZ);
         int dmg = MathHelper.ceiling_double_int(speed * damage);
         if (critical) dmg += rand.nextInt(dmg / 2 + 2);
@@ -124,7 +144,7 @@ public abstract class BohAbstractArrow extends Entity implements IEntityAddition
                     ((EntityPlayerMP) shootingEntity).playerNetServerHandler.sendPacket(new S2BPacketChangeGameState(6, 0.0F));
             }
             if (!silent) playSound("random.bowhit", 1.0F, 1.2F / (rand.nextFloat() * 0.2F + 0.9F));
-            if (!(target instanceof net.minecraft.entity.monster.EntityEnderman)) setDead();
+            if (pierceLevel <= 0 && !(target instanceof net.minecraft.entity.monster.EntityEnderman)) setDead();
         } else {
             motionX *= -0.1;
             motionY *= -0.1;
@@ -287,6 +307,7 @@ public abstract class BohAbstractArrow extends Entity implements IEntityAddition
         double best = 0.0;
         for (Entity e : list) {
             if (!e.canBeCollidedWith() || e == shootingEntity && ticksInAir < 5) continue;
+            if (pierced != null && pierced.contains(e.getEntityId())) continue;
             AxisAlignedBB bb = e.boundingBox.expand(0.3, 0.3, 0.3);
             MovingObjectPosition m = bb.calculateIntercept(from, to);
             if (m == null) continue;

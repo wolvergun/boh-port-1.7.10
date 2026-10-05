@@ -114,6 +114,10 @@ public class BohMod {
         // compat entities created by translated commands/procedures (ids above the mod's own range)
         cpw.mods.fml.common.registry.EntityRegistry.registerModEntity(net.mcreator.boh.compat.entity.BohAreaEffectCloud.class, "area_effect_cloud", 240, this, 64, 10, false);
         cpw.mods.fml.common.registry.EntityRegistry.registerModEntity(net.mcreator.boh.compat.entity.BohArrow.class, "compat_arrow", 241, this, 64, 3, true);
+        // the mod's paintings (vanilla's painting list is a fixed enum); tracked like vanilla paintings
+        cpw.mods.fml.common.registry.EntityRegistry.registerModEntity(net.mcreator.boh.compat.entity.BohPainting.class, "painting", 242, this, 160,
+            Integer.MAX_VALUE, false);
+        net.mcreator.boh.compat.world.Paintings.install();
         registerSubscribers(proxy.isClient());
         MOD_BUS.post(new RegisterCapabilitiesEvent());
         MOD_BUS.post(new EntityAttributeCreationEvent());

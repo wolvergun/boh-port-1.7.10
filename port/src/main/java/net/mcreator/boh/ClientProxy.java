@@ -58,6 +58,7 @@ public class ClientProxy extends CommonProxy {
                 return null;
             }
         });
+        RenderingRegistry.registerEntityRenderingHandler(net.mcreator.boh.compat.entity.BohPainting.class, new net.mcreator.boh.compat.client.BohPaintingRender());
         RenderingRegistry.registerEntityRenderingHandler(net.mcreator.boh.compat.entity.BohArrow.class,
             new net.mcreator.boh.compat.mc.client.renderer.entity.ThrownItemRenderer(net.mcreator.boh.compat.mc.client.renderer.entity.Context.INSTANCE));
         BohMod.MOD_BUS.post(new RegisterRenderers());

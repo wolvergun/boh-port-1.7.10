@@ -49,7 +49,9 @@ public final class RiftTest {
     private final List<String> docs = new ArrayList<>();
     private final List<int[]> spots = new ArrayList<>();
     private int[] noRing, computer;
-    private Entity shot;
+    private Entity shot, saucer, arrow;
+    private final List<EntityLiving> pigs = new ArrayList<>();
+    private double saucerX, saucerZ;
     private double shotX, shotY, shotZ;
     private int tick;
 
@@ -176,8 +178,69 @@ public final class RiftTest {
                 shotY = shot.posY;
                 shotZ = shot.posZ;
             }
+            extras();
             log("ray gun: fired, projectile %s at %.1f %.1f %.1f, motion %.2f %.2f %.2f", shot == null ? null : EntityList.getEntityString(shot), shotX, shotY,
                 shotZ, shot == null ? 0 : shot.motionX, shot == null ? 0 : shot.motionY, shot == null ? 0 : shot.motionZ);
+        }
+    }
+
+    /** Paintings, a piercing arrow through a row of pigs, the Saucer's gliding hop. */
+    private void extras() {
+        // every mod painting on a wall, saved and loaded again
+        int px = sx - 40, pz = sz + 40, ok = 0, total = 0;
+        StringBuilder bad = new StringBuilder();
+        for (net.mcreator.boh.compat.mc.world.entity.decoration.PaintingVariant v : net.mcreator.boh.compat.registry.Registration.PAINTINGS) {
+            total++;
+            for (int dx = -2; dx <= 2; dx++) for (int dy = 0; dy <= 4; dy++) {
+                w.setBlock(px + dx, Y + 1 + dy, pz, Blocks.stone, 0, 2);
+                w.setBlock(px + dx, Y + 1 + dy, pz - 1, Blocks.air, 0, 2);
+            }
+            for (Object o : w.getEntitiesWithinAABB(net.mcreator.boh.compat.entity.BohPainting.class,
+                AxisAlignedBB.getBoundingBox(px - 4, Y, pz - 3, px + 4, Y + 8, pz + 2))) ((Entity) o).setDead();
+            net.mcreator.boh.compat.entity.BohPainting p = new net.mcreator.boh.compat.entity.BohPainting(w, px, Y + 3, pz, 2, v);
+            if (!p.onValidSurface()) {
+                bad.append(' ').append(v.getId()).append("(no fit)");
+                continue;
+            }
+            w.spawnEntityInWorld(p);
+            net.minecraft.nbt.NBTTagCompound tag = new net.minecraft.nbt.NBTTagCompound();
+            p.writeToNBT(tag);
+            Entity back = EntityList.createEntityFromNBT(tag, w);
+            if (back instanceof net.mcreator.boh.compat.entity.BohPainting && ((net.mcreator.boh.compat.entity.BohPainting) back).getVariant() == v) ok++;
+            else bad.append(' ').append(v.getId()).append("(reload ").append(back).append(')');
+            p.setDead();
+        }
+        log("paintings: %d/%d placed, saved and reloaded%s", ok, total, bad.length() == 0 ? "" : ";" + bad);
+
+        // a pierce-level 2 arrow along a row of 4 pigs: hits 3, the 4th is untouched
+        int ax = sx + 60, az = sz - 60;
+        for (int dx = -2; dx <= 12; dx++) for (int dz = -2; dz <= 2; dz++) {
+            w.setBlock(ax + dx, Y, az + dz, Blocks.stone, 0, 2);
+            for (int y = Y + 1; y < Y + 5; y++) w.setBlock(ax + dx, y, az + dz, Blocks.air, 0, 2);
+        }
+        for (int i = 0; i < 4; i++) {
+            EntityLiving pig = new net.minecraft.entity.passive.EntityPig(w);
+            pig.setLocationAndAngles(ax + 3.5 + i * 2, Y + 1, az + 0.5, 0, 0);
+            w.spawnEntityInWorld(pig);
+            pigs.add(pig);
+        }
+        net.mcreator.boh.compat.entity.BohArrow a = new net.mcreator.boh.compat.entity.BohArrow(w);
+        a.setPosition(ax + 0.5, Y + 1.5, az + 0.5);
+        a.setBaseDamage(1.0);
+        a.setPierceLevel((byte) 2);
+        a.shoot(1, 0, 0, 3.0F, 0.0F);
+        w.spawnEntityInWorld(a);
+        arrow = a;
+
+        // the Saucer's +5 hop glides
+        Entity s = EntityList.createEntityByName("boh.saucer", w);
+        if (s != null) {
+            s.setLocationAndAngles(sx + 0.5, Y + 40, sz + 80.5, 0, 0);
+            w.spawnEntityInWorld(s);
+            saucerX = s.posX;
+            saucerZ = s.posZ;
+            net.mcreator.boh.compat.M.teleportTo(s, s.posX + 5, s.posY, s.posZ + 5);
+            saucer = s;
         }
     }
 
@@ -213,6 +276,18 @@ public final class RiftTest {
             if (shot != null && (tick == 10 || tick == 30))
                 log("ray gun projectile after %d ticks: alive %s, moved %.1f blocks (dy %.1f), motion %.2f %.2f %.2f", tick, !shot.isDead,
                     Math.sqrt(sq(shot.posX - shotX) + sq(shot.posZ - shotZ)), shot.posY - shotY, shot.motionX, shot.motionY, shot.motionZ);
+            if (saucer != null && (tick == 10 || tick == 25))
+                log("saucer hop after %d ticks: moved %.1f of 7.1 blocks (glides over 20 ticks)", tick,
+                    Math.sqrt(sq(saucer.posX - saucerX) + sq(saucer.posZ - saucerZ)));
+            if (arrow != null && tick == 30) {
+                StringBuilder hp = new StringBuilder();
+                int hit = 0;
+                for (EntityLiving pig : pigs) {
+                    hp.append(String.format(" %.0f", pig.getHealth()));
+                    if (pig.getHealth() < pig.getMaxHealth()) hit++;
+                }
+                log("piercing arrow (level 2): %d of 4 pigs hit, expected 3; health%s", hit, hp);
+            }
             if (tick == SUMMON_WAIT) summons();
             if (tick == COMPUTER_WAIT) computer();
         } catch (Throwable t) {

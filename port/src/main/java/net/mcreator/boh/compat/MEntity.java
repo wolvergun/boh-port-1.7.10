@@ -169,6 +169,11 @@ public class MEntity extends MWorld {
         // procedures also run on the client; there a random teleport (the Saucer's hops) puts the entity somewhere
         // else than the server did, and the next sync drags it back. The server's move reaches the client anyway.
         if (e.worldObj.isRemote && !(e instanceof net.minecraft.entity.player.EntityPlayer)) return;
+        // the Saucer's random hops glide instead of snapping (see Glides)
+        if (net.mcreator.boh.compat.entity.Glides.glides(e, x, y, z)) {
+            net.mcreator.boh.compat.entity.Glides.start(e, x, y, z);
+            return;
+        }
         if (e instanceof EntityPlayerMP) ((EntityPlayerMP) e).playerNetServerHandler.setPlayerLocation(x, y, z, e.rotationYaw, e.rotationPitch);
         else if (e instanceof EntityLivingBase) ((EntityLivingBase) e).setPositionAndUpdate(x, y, z);
         else e.setLocationAndAngles(x, y, z, e.rotationYaw, e.rotationPitch);
@@ -1170,7 +1175,9 @@ public class MEntity extends MWorld {
         a.canBePickedUp = p.ordinal();
     }
 
-    public static void setPierceLevel(net.mcreator.boh.compat.entity.BohAbstractArrow a, byte level) {}
+    public static void setPierceLevel(net.mcreator.boh.compat.entity.BohAbstractArrow a, byte level) {
+        a.setPierceLevel(level);
+    }
 
     public static void setBaseDamage(EntityArrow a, double d) {
         a.setDamage(d);
