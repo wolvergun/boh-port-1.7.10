@@ -53,6 +53,7 @@ public final class SelfTest {
                 }
                 generation(w, spec);
                 if (spec.floor == null) arrival(w, spec);
+                else LifeformTest.start(w, (4000 + spec.id * 7 + 6) * 16 + 8, (4000 + spec.id * 7 + 6) * 16 + 8);
             }
             overworld(server.worldServerForDimension(0));
         } catch (Throwable t) {
