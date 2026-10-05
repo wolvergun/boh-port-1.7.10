@@ -100,9 +100,10 @@ public final class MobSweep {
         ForgeChunkManager.setForcedChunkLoadingCallback(BohMod.instance, (ForgeChunkManager.LoadingCallback) (ts, world) -> {
             for (ForgeChunkManager.Ticket ticket : ts) ForgeChunkManager.releaseTicket(ticket);
         });
-        int span = cols * SPACING + 2 * SPACING;
+        // pens plus 64 blocks around them: a path search needs every chunk within (search range + 16) loaded
+        int margin = 64, span = cols * SPACING + margin;
         ForgeChunkManager.Ticket ticket = null;
-        for (int cx = (x0 - SPACING) >> 4; cx <= (x0 + span) >> 4; cx++) for (int cz = (z0 - SPACING) >> 4; cz <= (z0 + span) >> 4; cz++) {
+        for (int cx = (x0 - margin) >> 4; cx <= (x0 + span) >> 4; cx++) for (int cz = (z0 - margin) >> 4; cz <= (z0 + span) >> 4; cz++) {
             if (ticket == null || ticket.getChunkList().size() >= ticket.getChunkListDepth()) {
                 ticket = ForgeChunkManager.requestTicket(BohMod.instance, w, ForgeChunkManager.Type.NORMAL);
                 if (ticket == null) return;
