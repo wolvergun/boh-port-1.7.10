@@ -179,6 +179,36 @@ public final class MobSweep {
                 net.minecraft.pathfinding.PathEntity pe = w.getPathEntityToEntity(m, t, r, false, false, false, true);
                 ranges += String.format(" r%.0f=%s", r, pe == null ? "NONE" : pe.getCurrentPathLength() + "pts");
             }
+            String flags = "";
+            try {
+                net.minecraft.pathfinding.PathNavigate nav = m.getNavigator();
+                String[][] names = { { "canPassOpenWoodenDoors", "field_75518_j" }, { "canPassClosedWoodenDoors", "field_75519_k" },
+                    { "avoidsWater", "field_75517_m" }, { "canSwim", "field_75516_n" } };
+                boolean[] v = new boolean[4];
+                for (int i = 0; i < 4; i++) {
+                    java.lang.reflect.Field f;
+                    try {
+                        f = net.minecraft.pathfinding.PathNavigate.class.getDeclaredField(names[i][0]);
+                    } catch (NoSuchFieldException x) {
+                        f = net.minecraft.pathfinding.PathNavigate.class.getDeclaredField(names[i][1]);
+                    }
+                    f.setAccessible(true);
+                    v[i] = f.getBoolean(nav);
+                }
+                java.lang.reflect.Method cn;
+                try {
+                    cn = net.minecraft.pathfinding.PathNavigate.class.getDeclaredMethod("canNavigate");
+                } catch (NoSuchMethodException x) {
+                    cn = net.minecraft.pathfinding.PathNavigate.class.getDeclaredMethod("func_75485_k");
+                }
+                cn.setAccessible(true);
+                net.minecraft.pathfinding.PathEntity same = t == null ? null : w.getPathEntityToEntity(m, t, nav.getPathSearchRange(), v[0], v[1], v[2], v[3]);
+                flags = String.format(" nav %s open %s break %s avoidWater %s swim %s canNavigate %s sameFlagsPath %s", nav.getClass().getSimpleName(), v[0], v[1],
+                    v[2], v[3], cn.invoke(nav), same == null ? "NONE" : same.getCurrentPathLength() + "pts");
+            } catch (Throwable x) {
+                flags = " flags? " + x;
+            }
+            log("mob sweep idle %s:%s", c.id.replace("boh.", ""), flags);
             log("mob sweep idle %s: follow %.0f search %.0f%s", c.id.replace("boh.", ""),
                 m.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.followRange).getAttributeValue(), m.getNavigator().getPathSearchRange(), ranges);
             log("mob sweep idle %s: target %s, pig alive %s, path %s, pathToTarget %s, goals [%s], targets [%s], noAi %s, ground %s, ticks %d, dy %.2f",
