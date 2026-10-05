@@ -61,6 +61,8 @@ public final class SelfTest {
         }
         // the document chain runs over the next ticks and stops the server when done
         RiftTest.start(server.worldServerForDimension(0));
+        net.minecraft.util.ChunkCoordinates spawn = server.worldServerForDimension(0).getSpawnPoint();
+        CombatTest.start(server.worldServerForDimension(0), spawn.posX + 20, spawn.posZ + 60);
     }
 
     /** Loads a 12x12 chunk area far from anything generated and reports per-chunk load times and block entities. */
