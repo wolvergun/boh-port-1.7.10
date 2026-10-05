@@ -323,6 +323,16 @@ public final class RiftTest {
             String placed = Block.blockRegistry.getNameForObject(w.getBlock(x, Y + 1, z));
             if (mobs.isEmpty() && placed != null && !placed.equals("minecraft:air") && !placed.contains("water")) mobs = "block " + placed;
             if (mobs.isEmpty() && d.equals("document_flowers")) mobs = "teleport (skipped for the test's fake player)";
+            // Krasue and White Face fly along their look direction every tick (their tick procedures): look further
+            if (mobs.isEmpty() && (d.equals("document_krasue") || d.equals("document_white_face"))) {
+                String want = d.equals("document_krasue") ? "boh.krasue" : "boh.whiteface";
+                for (Object o : w.getEntitiesWithinAABB(EntityLiving.class, AxisAlignedBB.getBoundingBox(x - 48, Y - 48, z - 48, x + 48, Y + 80, z + 48)))
+                    if (want.equals(EntityList.getEntityString((Entity) o))) {
+                        mobs = want + " (flew " + (int) ((Entity) o).getDistance(x, Y + 1, z) + " blocks)";
+                        ((Entity) o).setDead();
+                        break;
+                    }
+            }
             if (!mobs.isEmpty() && left == 0) ok++;
             else bad.append(String.format(" %s (mobs '%s', %d stabilizers left);", d, mobs, left));
             all.append(String.format(" %s=%s", d, mobs.isEmpty() ? "-" : mobs.replace("boh.", "")));
