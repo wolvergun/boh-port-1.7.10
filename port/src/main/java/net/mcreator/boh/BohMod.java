@@ -118,6 +118,7 @@ public class BohMod {
         cpw.mods.fml.common.registry.EntityRegistry.registerModEntity(net.mcreator.boh.compat.entity.BohPainting.class, "painting", 242, this, 160,
             Integer.MAX_VALUE, false);
         net.mcreator.boh.compat.world.Paintings.install();
+        net.mcreator.boh.compat.world.gen.FloorPatch.install();
         registerSubscribers(proxy.isClient());
         MOD_BUS.post(new RegisterCapabilitiesEvent());
         MOD_BUS.post(new EntityAttributeCreationEvent());

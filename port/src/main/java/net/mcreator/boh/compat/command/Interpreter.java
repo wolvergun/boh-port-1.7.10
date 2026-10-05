@@ -484,11 +484,11 @@ public final class Interpreter {
                     && ((net.mcreator.boh.compat.world.gen.BohWorldProvider) ctx.world.provider).spec().floor != null) {
                     // floored mod dimensions (Level 0) are a maze under one roof: 1.20 would drop the mob on the roof,
                     // which looks like it sinks into the ceiling; use the walkable floor level instead
-                    int f = 1;
-                    while (f < y && !(ctx.world.getBlock(x, f - 1, z).getMaterial().blocksMovement() && ctx.world.isAirBlock(x, f, z)
-                        && ctx.world.isAirBlock(x, f + 1, z))) f++;
-                    if (f >= y) continue;
-                    M.teleportTo(e, x + 0.5, f, z + 0.5);
+                    // only finished chunks (a room placed later could close over the spot) and only the room floor
+                    if (!ctx.world.getChunkFromBlockCoords(x, z).isTerrainPopulated) continue;
+                    if (!(ctx.world.getBlock(x, 0, z).getMaterial().blocksMovement() && ctx.world.isAirBlock(x, 1, z) && ctx.world.isAirBlock(x, 2, z)))
+                        continue;
+                    M.teleportTo(e, x + 0.5, 1, z + 0.5);
                     break;
                 }
                 while (y > 1 && ctx.world.isAirBlock(x, y, z)) y--;

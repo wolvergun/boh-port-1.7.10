@@ -36,7 +36,7 @@ public final class ClientTest {
 
     private int clientTicks, serverTicks, stage;
     private volatile int eggId = -1, nearId = -1;
-    private boolean launched;
+    private boolean launched, clientMap;
 
     private ClientTest() {}
 
@@ -111,7 +111,10 @@ public final class ClientTest {
             String msg = ScreenShotHelper.saveScreenshot(mc.mcDataDir, mc.displayWidth, mc.displayHeight, mc.getFramebuffer()).getUnformattedText();
             log("screenshot: %s", msg);
         }
-        if (clientTicks % 40 == 20 && clientTicks / 40 <= 1) floorMap("client", mc.theWorld, 104, 88);
+        if (!clientMap) {
+            clientMap = true;
+            floorMap("client", mc.theWorld, 104, 88);
+        }
         if (stage == 3) {
             log("done");
             mc.shutdown();

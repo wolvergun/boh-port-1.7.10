@@ -101,6 +101,7 @@ public final class StructureSets {
                 .addProcessor(BlockIgnoreProcessor.STRUCTURE_BLOCK);
             try {
                 boolean ok = t.placeInWorldgen(w, new BlockPos(x, y, z), s, pr);
+                FloorPatch.refill(w, x, z);
                 if (LOGGED.add(e.structure)) net.mcreator.boh.BohMod.LOGGER.info("Structure {} ({}) at {} {} {}: {}", e.structure, e.pool, x, y, z,
                     ok ? "placed" : "template empty or not placed");
             } catch (Throwable ex) {
