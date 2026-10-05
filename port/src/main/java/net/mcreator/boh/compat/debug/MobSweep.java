@@ -135,6 +135,12 @@ public final class MobSweep {
     public void onTick(TickEvent.ServerTickEvent e) {
         if (e.phase != TickEvent.Phase.END) return;
         tick++;
+        if (tick == 20 && !cases.isEmpty() && cases.get(0).mob != null) {
+            EntityLiving m = cases.get(0).mob;
+            log("mob sweep check: %d tickets, %d forced chunks, first mob ticksExisted %d, in world list %s, chunk loaded %s, dead %s",
+                tickets.size(), w.getPersistentChunks().size(), m.ticksExisted, w.loadedEntityList.contains(m),
+                w.getChunkProvider().chunkExists((int) Math.floor(m.posX) >> 4, (int) Math.floor(m.posZ) >> 4), m.isDead);
+        }
         for (Case c : cases) {
             if (c.mob == null) continue;
             if (c.pig != null && !c.pig.isDead && c.mob.getAttackTarget() == null) c.mob.setAttackTarget(c.pig);
