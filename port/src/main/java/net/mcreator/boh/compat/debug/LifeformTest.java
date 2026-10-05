@@ -42,6 +42,7 @@ public final class LifeformTest {
             log("lifeform: no entity");
             return;
         }
+        t.forceChunks(x >> 4, z >> 4);
         t.mob.setLocationAndAngles(x + 0.5, y, z + 0.5, 0, 0);
         t.mob.onSpawnWithEgg(null);
         w.spawnEntityInWorld(t.mob);
@@ -51,6 +52,31 @@ public final class LifeformTest {
         t.watcher.setPosition(x + 40.5, y, z + 0.5);
         w.playerEntities.add(t.watcher);
         FMLCommonHandler.instance().bus().register(t);
+    }
+
+    private final java.util.List<net.minecraftforge.common.ForgeChunkManager.Ticket> tickets = new java.util.ArrayList<>();
+
+    /**
+     * Forge unloads a dimension as soon as no chunk in it is forced and no real player is in it; keep the 7x7 chunks
+     * around the spawn (spread within 20 blocks, plus the 2 chunks entities need around them to update) loaded.
+     */
+    private void forceChunks(int cx, int cz) {
+        net.minecraftforge.common.ForgeChunkManager.setForcedChunkLoadingCallback(BohMod.instance,
+            (net.minecraftforge.common.ForgeChunkManager.LoadingCallback) (ts, world) -> {
+                for (net.minecraftforge.common.ForgeChunkManager.Ticket ticket : ts) net.minecraftforge.common.ForgeChunkManager.releaseTicket(ticket);
+            });
+        net.minecraftforge.common.ForgeChunkManager.Ticket ticket = null;
+        for (int dx = -3; dx <= 3; dx++) for (int dz = -3; dz <= 3; dz++) {
+            if (ticket == null || ticket.getChunkList().size() >= ticket.getChunkListDepth()) {
+                ticket = net.minecraftforge.common.ForgeChunkManager.requestTicket(BohMod.instance, w, net.minecraftforge.common.ForgeChunkManager.Type.NORMAL);
+                if (ticket == null) {
+                    log("lifeform: no chunk ticket");
+                    return;
+                }
+                tickets.add(ticket);
+            }
+            net.minecraftforge.common.ForgeChunkManager.forceChunk(ticket, new net.minecraft.world.ChunkCoordIntPair(cx + dx, cz + dz));
+        }
     }
 
     private String at() {
@@ -72,6 +98,7 @@ public final class LifeformTest {
         if (tick >= 200 || mob.isDead) {
             FMLCommonHandler.instance().bus().unregister(this);
             w.playerEntities.remove(watcher);
+            for (net.minecraftforge.common.ForgeChunkManager.Ticket ticket : tickets) net.minecraftforge.common.ForgeChunkManager.releaseTicket(ticket);
             log("lifeform in Level 0:%s", track);
             mob.setDead();
         }
