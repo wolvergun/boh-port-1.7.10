@@ -84,10 +84,11 @@ Compatibility fixes to know about:
 
 ### To do (priority order)
 
-1. **Lifeform**: spawned from an egg it lies flat, can't be hit and never attacks (probably dead but never removed).
-   Fix it, then check the other mobs for the same problem.
-2. Level 0 ambience (sound loop, mood sounds, music, ash particles); the Boiler Room's random Freddy laugh; Shrouded
-   Cliffs' fog colour in the overworld.
+1. ~~Lifeform~~: fixed. One Level 0 room has 2x2 holes in its floor and rooms replace the dimension's only floor
+   layer, so mobs fell into the void; the floor is put back under rooms (also in already generated chunks). Its
+   egg's spread lands it on the room floor. The `Client test` workflow (commits with `[clienttest]`) checks it in a
+   real client.
+2. ~~Level 0 ambience, Boiler Room Freddy laugh, Shrouded Cliffs fog~~: in.
 3. Baseplate, Boiler Room and Gaster's room: the CI self-test now checks they generate whole and that arriving puts
    you inside the room (structures wider than 2x2 chunks used to be cut off, and arrival used to miss the room).
    The overworld structures (Sadako well, merchant, Siren Head nest, the Slender forest set) are checked the same
