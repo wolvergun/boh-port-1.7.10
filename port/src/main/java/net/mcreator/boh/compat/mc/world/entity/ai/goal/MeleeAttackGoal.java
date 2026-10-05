@@ -37,14 +37,14 @@ public class MeleeAttackGoal extends Goal {
         if (target == null || !target.isEntityAlive()) return false;
         path = mob.getNavigator().getPathToEntityLiving(target);
         if (path != null) return true;
-        return getAttackReachSqr(target) >= mob.getDistanceSq(target.posX, target.boundingBox.minY, target.posZ);
+        return getAttackReachSqr(target) >= mob.getDistanceSq(target.posX, target.boundingBox.minY, target.posZ) || closeChase(target);
     }
 
     @Override
     public boolean canContinueToUse() {
         EntityLivingBase target = mob.getAttackTarget();
         if (target == null || !target.isEntityAlive()) return false;
-        if (!followingTargetEvenIfNotSeen) return !mob.getNavigator().noPath();
+        if (!followingTargetEvenIfNotSeen) return !mob.getNavigator().noPath() || closeChase(target);
         if (!mob.isWithinHomeDistance((int) Math.floor(target.posX), (int) Math.floor(target.posY), (int) Math.floor(target.posZ)))
             return false;
         return !(target instanceof EntityPlayer) || !((EntityPlayer) target).capabilities.isCreativeMode;
@@ -91,8 +91,21 @@ public class MeleeAttackGoal extends Goal {
             if (!mob.getNavigator().tryMoveToEntityLiving(target, speedModifier)) ticksUntilNextPathRecalculation += 15;
             ticksUntilNextPathRecalculation = adjustedTickDelay(ticksUntilNextPathRecalculation);
         }
+        // no path (see closeChase): steer straight at it, as 1.20 follows its one-node path to the target's block
+        if (mob.getNavigator().noPath() && closeChase(target))
+            mob.getMoveHelper().setMoveTo(target.posX, target.boundingBox.minY, target.posZ, speedModifier);
         ticksUntilNextAttack = Math.max(ticksUntilNextAttack - 1, 0);
         checkAndPerformAttack(target, distSqr);
+    }
+
+    /**
+     * 1.20's pathfinder always returns a path, ending at the reachable node closest to the target. 1.7.10's returns
+     * none when that node is the mob's own (the target right next to it, or knocked into the air by the last hit),
+     * which ended the goal and paused the chase for a second after nearly every hit. A visible target within 4
+     * blocks keeps the goal running without a path.
+     */
+    private boolean closeChase(EntityLivingBase target) {
+        return mob.getDistanceSq(target.posX, target.boundingBox.minY, target.posZ) <= 16.0 && mob.getEntitySenses().canSee(target);
     }
 
     protected void checkAndPerformAttack(EntityLivingBase target, double distSqr) {

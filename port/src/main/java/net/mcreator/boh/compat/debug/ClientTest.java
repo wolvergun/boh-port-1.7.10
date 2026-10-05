@@ -104,10 +104,10 @@ public final class ClientTest {
             mc.thePlayer.rotationYaw = (float) (Math.atan2(dz, dx) * 180 / Math.PI) - 90;
             mc.thePlayer.rotationPitch = (float) -(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz)) * 180 / Math.PI);
         }
-        if (clientTicks % 10 == 0)
+        if (clientTicks % 5 == 0)
             log("client t%d: dim %d, player %.1f %.1f %.1f; egg lifeform %s; near lifeform %s", clientTicks, mc.theWorld.provider.dimensionId,
                 mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, where(mc.theWorld, egg), where(mc.theWorld, near));
-        if (stage >= 2 && clientTicks % 40 == 0 && clientTicks / 40 <= 8) {
+        if (stage >= 2 && clientTicks % 10 == 0 && clientTicks / 10 <= 30) {
             String msg = ScreenShotHelper.saveScreenshot(mc.mcDataDir, mc.displayWidth, mc.displayHeight, mc.getFramebuffer()).getUnformattedText();
             log("screenshot: %s", msg);
         }
@@ -166,13 +166,17 @@ public final class ClientTest {
             near.setLocationAndAngles(nx, p.posY, nz, 0, 0);
             w.spawnEntityInWorld(near);
             nearId = near.getEntityId();
+            // something for it to chase in view: a pig 2 blocks further along the same line
+            Entity pig = EntityList.createEntityByName("Pig", w);
+            pig.setLocationAndAngles(nx + (nx - p.posX) / 2, p.posY, nz + (nz - p.posZ) / 2, 0, 0);
+            w.spawnEntityInWorld(pig);
             stage = 2;
             serverTicks = 0;
             return;
         }
         if (stage == 2) {
             WorldServer w = (WorldServer) p.worldObj;
-            if (serverTicks % 10 == 0)
+            if (serverTicks % 5 == 0)
                 log("server t%d: egg lifeform %s; near lifeform %s", serverTicks, where(w, w.getEntityByID(eggId)), where(w, w.getEntityByID(nearId)));
             if (serverTicks >= 360) stage = 3;
         }
