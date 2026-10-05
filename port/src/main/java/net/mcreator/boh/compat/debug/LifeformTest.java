@@ -19,6 +19,8 @@ public final class LifeformTest {
 
     private final WorldServer w;
     private EntityLiving mob;
+    /** A world without players stops updating entities: count a fake player in it, 40 blocks away, during the test. */
+    private net.minecraftforge.common.util.FakePlayer watcher;
     private int tick;
     private final StringBuilder track = new StringBuilder();
 
@@ -44,6 +46,10 @@ public final class LifeformTest {
         t.mob.onSpawnWithEgg(null);
         w.spawnEntityInWorld(t.mob);
         t.track.append(String.format(" spawned at %d %d %d;", x, y, z));
+        t.watcher = net.minecraftforge.common.util.FakePlayerFactory.get(w,
+            new com.mojang.authlib.GameProfile(java.util.UUID.fromString("b0b0b0b0-0000-4000-8000-000000000002"), "[BohSelfTest2]"));
+        t.watcher.setPosition(x + 40.5, y, z + 0.5);
+        w.playerEntities.add(t.watcher);
         FMLCommonHandler.instance().bus().register(t);
     }
 
@@ -65,6 +71,7 @@ public final class LifeformTest {
         if (tick % 20 == 0 || tick == 3) track.append(String.format(" t%d: %s;", tick, at()));
         if (tick >= 200 || mob.isDead) {
             FMLCommonHandler.instance().bus().unregister(this);
+            w.playerEntities.remove(watcher);
             log("lifeform in Level 0:%s", track);
             mob.setDead();
         }
