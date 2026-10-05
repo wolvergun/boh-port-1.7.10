@@ -168,6 +168,19 @@ public final class MobSweep {
         }
         for (Map.Entry<String, List<String>> g : groups.entrySet())
             log("mob sweep %s (%d): %s", g.getKey(), g.getValue().size(), String.join(" ", g.getValue()));
+        // why the ones without a hit did nothing
+        for (Case c : cases) {
+            if (c.mob == null || c.firstHit >= 0 || c.mob.isDead) continue;
+            EntityLiving m = c.mob;
+            net.minecraft.entity.EntityLivingBase t = m.getAttackTarget();
+            net.minecraft.pathfinding.PathEntity path = t == null ? null : m.getNavigator().getPathToEntityLiving(t);
+            log("mob sweep idle %s: target %s, pig alive %s, path %s, pathToTarget %s, goals [%s], targets [%s], noAi %s, ground %s, ticks %d, dy %.2f",
+                c.id.replace("boh.", ""), t == null ? "-" : t.getClass().getSimpleName(), c.pig != null && !c.pig.isDead,
+                m.getNavigator().noPath() ? "none" : "yes", path == null ? "NONE" : path.getCurrentPathLength() + "pts",
+                net.mcreator.boh.compat.command.DebugCommand.running(m.tasks), net.mcreator.boh.compat.command.DebugCommand.running(m.targetTasks),
+                m instanceof net.mcreator.boh.compat.entity.BohMob && ((net.mcreator.boh.compat.entity.BohMob) m).isNoAi(), m.onGround, m.ticksExisted,
+                m.posY - Y - 1);
+        }
         for (Case c : cases) {
             if (c.mob != null) c.mob.setDead();
             if (c.pig != null) c.pig.setDead();

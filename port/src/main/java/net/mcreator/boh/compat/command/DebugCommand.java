@@ -136,7 +136,7 @@ public class DebugCommand extends CommandBase {
         }
     }
 
-    private static String running(EntityAITasks tasks) {
+    public static String running(EntityAITasks tasks) {
         StringBuilder b = new StringBuilder();
         try {
             java.lang.reflect.Field f;
